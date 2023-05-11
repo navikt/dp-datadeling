@@ -29,6 +29,12 @@ plugins {
     application
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
