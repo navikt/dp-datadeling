@@ -3,13 +3,58 @@
  */
 package dp.datadeling
 
-class App {
-    val greeting: String
-        get() {
-            return "Hello World!"
-        }
-}
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.papsign.ktor.openapigen.OpenAPIGen
+import com.papsign.ktor.openapigen.route.apiRouting
+import dp.datadeling.api.internalApi
+import io.ktor.http.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.metrics.micrometer.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 
-fun main() {
-    println(App().greeting)
+fun main(args: Array<String>): Unit = EngineMain.main(args)
+
+fun Application.module() {
+
+    // Install Micrometer/Prometheus
+    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+    }
+
+    // Install CORS
+    install(CORS) {
+        anyHost()
+        allowHeader(HttpHeaders.ContentType)
+    }
+
+    // Install OpenAPI plugin (Swagger UI)
+    install(OpenAPIGen) {
+        // Serve OpenAPI definition on /openapi.json
+        serveOpenApiJson = true
+        // Serve Swagger UI on %swaggerUiPath%/index.html
+        serveSwaggerUi = true
+        swaggerUiPath = "internal/swagger-ui"
+        info {
+            title = "DP datadeling API"
+        }
+    }
+
+    // Install JSON support
+    install(ContentNegotiation) {
+        jackson {
+            val javaTimeModule = JavaTimeModule()
+
+            registerModule(javaTimeModule)
+        }
+    }
+
+    apiRouting {
+        internalApi(appMicrometerRegistry)
+    }
 }
