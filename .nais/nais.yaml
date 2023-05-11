@@ -1,0 +1,70 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: dp-datadeling
+  namespace: teamdagpenger
+  labels:
+    team: teamdagpenger
+
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: /internal/liveness
+    initialDelay: 30
+    failureThreshold: 10
+  readiness:
+    path: /internal/readyness
+    initialDelay: 30
+    failureThreshold: 10
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  replicas:
+    min: 2
+    max: 4
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      memory: {{ limitsMemory }}
+    requests:
+      memory: {{ requestsMemory }}
+      cpu: {{ requestsCpu }}
+  ingresses:
+  {{#each ingresses as |url|}}
+      - {{ url }}
+  {{/each}}
+  # accessPolicy:
+  #  inbound:
+  #  outbound:
+  # envFrom:
+  #  - secret: dp-datadeling
+  # env:
+  #  - name: JAVA_OPTS
+  #    value: "-XX:MinRAMPercentage=25.0 -XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
+  azure:
+    application:
+      enabled: true
+  gcp:
+    sqlInstances:
+      - autoBackupTime: "05:00"
+        collation: nb_NO.UTF8
+        databases:
+          - envVarPrefix: DB
+            name: dp-datadeling-db
+        diskAutoresize: true
+        diskType: SSD
+        flags:
+          - name: max_connections
+            value: "100"
+        highAvailability: true
+        maintenance:
+          day: 4
+          hour: 3
+        pointInTimeRecovery: false
+        tier: {{ db_tier }}
+        type: POSTGRES_14
+        name: dp-datadeling
+        #cascadingDelete: true # DETTE ER EN DESTRUKTIV OPERASJON! cascadingDelete=true sletter db-instans hvis appen slettes
+        # OBS! Man kan ikke opprette, slette og opprette instance igjen med en gang:
+        # man kan ikke gjenbruke samme instansnavn på 7 dager. Dette er en "feature" i gcp.

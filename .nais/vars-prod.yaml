@@ -1,0 +1,6 @@
+limitsMemory: 4096Mi
+requestsMemory: 1Gi
+requestsCpu: 500m
+db_tier: "db-custom-4-8192"
+ingresses:
+  - https://dp-datadeling.ekstern.nav.no
