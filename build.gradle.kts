@@ -3,6 +3,8 @@
  * User Manual available at https://docs.gradle.org/7.6/userguide/building_java_projects.html
  */
 
+project.setProperty("mainClassName", "dp.datadeling.AppKt")
+
 val ktorVersion = "2.3.0"
 val micrometerVersion = "1.10.6"
 val jacksonVersion = "2.15.0"
@@ -90,10 +92,17 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("dp.datadeling.AppKt")
+    mainClass.set(project.property("mainClassName").toString())
 }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+tasks {
+    register("runServerTest", JavaExec::class) {
+        classpath = sourceSets["main"].runtimeClasspath
+        mainClass.set(project.property("mainClassName").toString())
+    }
 }
