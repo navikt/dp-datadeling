@@ -7,6 +7,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.papsign.ktor.openapigen.OpenAPIGen
 import com.papsign.ktor.openapigen.route.apiRouting
 import dp.datadeling.api.internalApi
+import dp.datadeling.utils.LocalDateDeserializer
+import dp.datadeling.utils.LocalDateSerializer
+import dp.datadeling.utils.LocalDateTimeDeserializer
+import dp.datadeling.utils.LocalDateTimeSerializer
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -16,6 +20,8 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -49,6 +55,22 @@ fun Application.module() {
     install(ContentNegotiation) {
         jackson {
             val javaTimeModule = JavaTimeModule()
+            javaTimeModule.addSerializer(
+                LocalDate::class.java,
+                LocalDateSerializer()
+            )
+            javaTimeModule.addDeserializer(
+                LocalDate::class.java,
+                LocalDateDeserializer()
+            )
+            javaTimeModule.addSerializer(
+                LocalDateTime::class.java,
+                LocalDateTimeSerializer()
+            )
+            javaTimeModule.addDeserializer(
+                LocalDateTime::class.java,
+                LocalDateTimeDeserializer()
+            )
 
             registerModule(javaTimeModule)
         }
