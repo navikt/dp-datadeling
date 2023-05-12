@@ -3,4 +3,4 @@ requestsMemory: 512Mi
 requestsCpu: 500m
 db_tier: "db-f1-micro"
 ingresses:
-  - https://dp-datadeling.ekstern.dev.nav.no
+  - https://dp-datadeling.intern.dev.nav.no
