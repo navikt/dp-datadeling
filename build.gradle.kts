@@ -102,6 +102,9 @@ tasks.named<Test>("test") {
 
 tasks {
     register("runServerTest", JavaExec::class) {
+        environment["AZURE_APP_WELL_KNOWN_URL"] = "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"
+        environment["AZURE_APP_CLIENT_ID"] = "test"
+
         classpath = sourceSets["main"].runtimeClasspath
         mainClass.set(project.property("mainClassName").toString())
     }

@@ -7,10 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.papsign.ktor.openapigen.OpenAPIGen
 import com.papsign.ktor.openapigen.route.apiRouting
 import dp.datadeling.api.internalApi
-import dp.datadeling.utils.LocalDateDeserializer
-import dp.datadeling.utils.LocalDateSerializer
-import dp.datadeling.utils.LocalDateTimeDeserializer
-import dp.datadeling.utils.LocalDateTimeSerializer
+import dp.datadeling.utils.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -22,6 +19,8 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.time.LocalDate
 import java.time.LocalDateTime
+
+val defaultAuthProvider = JwtProvider()
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -49,6 +48,8 @@ fun Application.module() {
         info {
             title = "DP datadeling API"
         }
+        // Use JWT authentication (Authorize button appears in Swagger UI)
+        addModules(defaultAuthProvider)
     }
 
     // Install JSON support
