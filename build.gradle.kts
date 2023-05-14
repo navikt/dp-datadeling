@@ -18,7 +18,7 @@ val hikariVersion = "5.0.1"
 val flywayVersion = "9.17.0"
 val mockOauth2Version = "0.5.8"
 val jupiterVersion = "5.9.3"
-val testcontainersVersion = "1.18.0"
+val testcontainersVersion = "1.18.1"
 val mockkVersion = "1.13.5"
 
 plugins {
