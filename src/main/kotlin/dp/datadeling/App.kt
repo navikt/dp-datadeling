@@ -11,6 +11,7 @@ import dp.datadeling.utils.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -18,6 +19,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
+import no.nav.security.token.support.v2.tokenValidationSupport
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -76,6 +78,19 @@ fun Application.module() {
             )
 
             registerModule(javaTimeModule)
+        }
+    }
+
+    // Install Authentication
+    val conf = this.environment.config
+    install(Authentication) {
+        // Validate tokens if running on NAIS, skip validation otherwise
+        if (isCurrentlyRunningOnNais()) {
+            tokenValidationSupport(config = conf)
+        } else {
+            basic {
+                skipWhen { true }
+            }
         }
     }
 
