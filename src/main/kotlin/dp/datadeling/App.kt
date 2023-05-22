@@ -17,9 +17,11 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import mu.KotlinLogging
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+val defaultLogger = KotlinLogging.logger {}
 val defaultAuthProvider = JwtProvider()
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
