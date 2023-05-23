@@ -6,6 +6,7 @@ package dp.datadeling
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.papsign.ktor.openapigen.OpenAPIGen
 import com.papsign.ktor.openapigen.route.apiRouting
+import dp.datadeling.api.dataApi
 import dp.datadeling.api.internalApi
 import dp.datadeling.utils.*
 import io.ktor.serialization.jackson.*
@@ -88,5 +89,7 @@ fun Application.module() {
 
     apiRouting {
         internalApi(appMicrometerRegistry)
+
+        dataApi()
     }
 }
