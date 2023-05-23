@@ -5,8 +5,8 @@ import dp.datadeling.defaultLogger
 import io.ktor.http.*
 
 
-fun isCurrentlyRunningOnNais(): Boolean {
-    return System.getenv("NAIS_APP_NAME") != null
+fun isLocal(): Boolean {
+    return System.getenv("ENV") == "LOCAL"
 }
 
 suspend inline fun <reified TResponse : Any> OpenAPIPipelineResponseContext<TResponse>.respondError(

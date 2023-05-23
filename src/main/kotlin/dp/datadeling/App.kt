@@ -85,12 +85,12 @@ fun Application.module() {
     val conf = this.environment.config
     install(Authentication) {
         // Validate tokens if running on NAIS, skip validation otherwise
-        if (isCurrentlyRunningOnNais()) {
-            tokenValidationSupport(config = conf)
-        } else {
+        if (isLocal()) {
             basic {
                 skipWhen { true }
             }
+        } else {
+            tokenValidationSupport(config = conf)
         }
     }
 
