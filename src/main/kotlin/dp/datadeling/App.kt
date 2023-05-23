@@ -8,14 +8,12 @@ import com.papsign.ktor.openapigen.OpenAPIGen
 import com.papsign.ktor.openapigen.route.apiRouting
 import dp.datadeling.api.internalApi
 import dp.datadeling.utils.*
-import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
@@ -34,12 +32,6 @@ fun Application.module() {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
-    }
-
-    // Install CORS
-    install(CORS) {
-        anyHost()
-        allowHeader(HttpHeaders.ContentType)
     }
 
     // Install OpenAPI plugin (Swagger UI)
