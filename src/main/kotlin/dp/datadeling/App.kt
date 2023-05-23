@@ -84,7 +84,7 @@ fun Application.module() {
     // Install Authentication
     val conf = this.environment.config
     install(Authentication) {
-        // Validate tokens if running on NAIS, skip validation otherwise
+        // Skip validation only if runs locally
         if (isLocal()) {
             basic {
                 skipWhen { true }
