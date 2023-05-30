@@ -4,3 +4,4 @@ requestsCpu: 500m
 db_tier: "db-f1-micro"
 ingresses:
   - https://dp-datadeling.intern.dev.nav.no
+iverksettApiUrl: https://dp-iverksett.intern.dev.nav.no/api
