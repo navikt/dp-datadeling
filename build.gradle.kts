@@ -16,10 +16,12 @@ val logstashVersion = "7.3"
 val postgresVersion = "42.6.0"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.18.0"
+val kontrakterVersion = "1.0_20230527141033_103f5f1"
 val mockOauth2Version = "0.5.8"
 val jupiterVersion = "5.9.3"
 val testcontainersVersion = "1.18.1"
 val mockkVersion = "1.13.5"
+val wiremockVersion = "2.27.2"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -40,10 +42,15 @@ java {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven {
+        name = "github"
+        url = uri("https://maven.pkg.github.com/navikt/dp-kontrakter")
+
+    }
 }
 
 dependencies {
-    // Ktor
+    // Ktor Server
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
@@ -53,11 +60,19 @@ dependencies {
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
 
+    // Ktor HttpClient
+    implementation("io.ktor:ktor-client-apache:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-client-json:$ktorVersion")
+
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion")
 
     // OpenAPI / Swagger UI
     implementation("dev.forst:ktor-openapi-generator:$openApiGeneratorVersion")
@@ -75,6 +90,9 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
 
+    // Kontrakter
+    implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
+
     // Test
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
@@ -87,6 +105,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
     // MockK
     testImplementation("io.mockk:mockk:$mockkVersion")
+    // Wiremock
+    testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
 }
 
 application {
@@ -102,6 +122,7 @@ tasks.named<Test>("test") {
 tasks {
     register("runServerTest", JavaExec::class) {
         environment["ENV"] = "LOCAL"
+        environment["IVERKSETT_API_URL"] = "http://localhost:8092"
 
         environment["AZURE_APP_WELL_KNOWN_URL"] = "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"
         environment["AZURE_APP_CLIENT_ID"] = "test"
