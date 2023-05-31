@@ -4,12 +4,14 @@ import com.papsign.ktor.openapigen.annotations.parameters.PathParam
 import com.papsign.ktor.openapigen.route.info
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
+import dp.datadeling.defaultLogger
 import dp.datadeling.utils.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.dagpenger.kontrakter.iverksett.AktivitetType
+import no.nav.dagpenger.kontrakter.iverksett.DatoperiodeDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeDagpengerDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeType
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
@@ -27,6 +29,8 @@ fun NormalOpenAPIRoute.dataApi() {
                 try {
                     // Sjekk dp-iverksett
                     val apiUrl = getProperty("IVERKSETT_API_URL")!!
+                    defaultLogger.info { apiUrl }
+                    defaultLogger.info { params.fnr }
                     val response = defaultHttpClient().get("$apiUrl/vedtakstatus/${params.fnr}")
 
                     when (response.status.value) {
@@ -61,7 +65,11 @@ data class DataParams(@PathParam("fnr") val fnr: String)
 
 val vedtaksperiodeDagpengerDtoExample = VedtaksperiodeDagpengerDto(
     fraOgMedDato = LocalDate.now(),
-    tilOgMedDato = LocalDate.now(),
+    tilOgMedDato = LocalDate.now().plusDays(14),
+    periode = DatoperiodeDto(
+        fom = LocalDate.now(),
+        tom = LocalDate.now().plusDays(10)
+    ),
     aktivitet = AktivitetType.FORLENGELSE_STØNAD_PÅVENTE_ARBEID,
     periodeType = VedtaksperiodeType.HOVEDPERIODE
 )
