@@ -53,6 +53,7 @@ fun NormalOpenAPIRoute.dataApi() {
                         }
                     }
                 } catch (e: Exception) {
+                    defaultLogger.error { e }
                     // Feil? Svar med status 500
                     respondError("Kunne ikke få data", e)
                 }
