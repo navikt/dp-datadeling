@@ -10,6 +10,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.logging.*
 import no.nav.dagpenger.kontrakter.iverksett.AktivitetType
 import no.nav.dagpenger.kontrakter.iverksett.DatoperiodeDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeDagpengerDto
@@ -32,6 +33,7 @@ fun NormalOpenAPIRoute.dataApi() {
                     defaultLogger.info { apiUrl }
                     defaultLogger.info { params.fnr }
                     val response = defaultHttpClient().get("$apiUrl/vedtakstatus/${params.fnr}")
+                    defaultLogger.info { response.status.value }
 
                     when (response.status.value) {
                         in 200..299 -> {
@@ -53,7 +55,7 @@ fun NormalOpenAPIRoute.dataApi() {
                         }
                     }
                 } catch (e: Exception) {
-                    defaultLogger.error { e }
+                    defaultLogger.error(e)
                     // Feil? Svar med status 500
                     respondError("Kunne ikke få data", e)
                 }
