@@ -45,7 +45,10 @@ repositories {
     maven {
         name = "github"
         url = uri("https://maven.pkg.github.com/navikt/dp-kontrakter")
-
+        credentials {
+            username = System.getenv("GITHUB_USERNAME")
+            password = System.getenv("GITHUB_TOKEN")
+        }
     }
 }
 
