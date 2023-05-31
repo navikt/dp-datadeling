@@ -27,6 +27,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Bygg og test
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew clean build
 
       - name: Bygg Docker image
