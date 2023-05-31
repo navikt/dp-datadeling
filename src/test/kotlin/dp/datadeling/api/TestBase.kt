@@ -1,5 +1,7 @@
 package dp.datadeling.api
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import dp.datadeling.module
 import io.ktor.server.config.*
 import io.ktor.server.testing.*
@@ -16,18 +18,21 @@ open class TestBase {
         const val REQUIRED_AUDIENCE = "default"
 
         var mockOAuth2Server = MockOAuth2Server()
+        val wireMockServer = WireMockServer(WireMockConfiguration.wireMockConfig().port(8092))
 
         @BeforeAll
         @JvmStatic
         fun setup() {
             mockOAuth2Server = MockOAuth2Server()
             mockOAuth2Server.start(8091)
+            wireMockServer.start()
         }
 
         @AfterAll
         @JvmStatic
         fun cleanup() {
             mockOAuth2Server.shutdown()
+            wireMockServer.stop()
         }
     }
 
