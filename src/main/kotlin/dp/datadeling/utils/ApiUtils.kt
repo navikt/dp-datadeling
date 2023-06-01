@@ -3,6 +3,7 @@ package dp.datadeling.utils
 import com.papsign.ktor.openapigen.route.response.OpenAPIPipelineResponseContext
 import dp.datadeling.defaultLogger
 import io.ktor.http.*
+import io.ktor.util.logging.*
 
 
 fun isLocal(): Boolean {
@@ -13,7 +14,7 @@ suspend inline fun <reified TResponse : Any> OpenAPIPipelineResponseContext<TRes
     message: String,
     throwable: Throwable? = null
 ) {
-    defaultLogger.error { throwable }
+    if (throwable != null) defaultLogger.error(throwable)
 
     responder.respond(
         HttpStatusCode.InternalServerError,

@@ -30,8 +30,7 @@ fun NormalOpenAPIRoute.dataApi() {
                 try {
                     // Sjekk dp-iverksett
                     val apiUrl = getProperty("IVERKSETT_API_URL")!!
-                    defaultLogger.info { apiUrl }
-                    defaultLogger.info { params.fnr }
+                    defaultLogger.info { "$apiUrl/vedtakstatus/${params.fnr}" }
                     val response = defaultHttpClient().get("$apiUrl/vedtakstatus/${params.fnr}")
                     defaultLogger.info { response.status.value }
 
@@ -55,7 +54,6 @@ fun NormalOpenAPIRoute.dataApi() {
                         }
                     }
                 } catch (e: Exception) {
-                    defaultLogger.error(e)
                     // Feil? Svar med status 500
                     respondError("Kunne ikke få data", e)
                 }
