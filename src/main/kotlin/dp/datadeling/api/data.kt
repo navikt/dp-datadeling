@@ -16,6 +16,9 @@ import no.nav.dagpenger.kontrakter.iverksett.DatoperiodeDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeDagpengerDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeType
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.URL
 import java.time.LocalDate
 import com.papsign.ktor.openapigen.route.path.auth.get as authGet
 
@@ -31,6 +34,18 @@ fun NormalOpenAPIRoute.dataApi() {
                     // Sjekk dp-iverksett
                     val apiUrl = getProperty("IVERKSETT_API_URL")!!
                     defaultLogger.info { "$apiUrl/vedtakstatus/${params.fnr}" }
+
+                    val url = URL("$apiUrl/vedtakstatus/${params.fnr}")
+                    val conn = url.openConnection()
+                    conn.doOutput = true
+
+                    BufferedReader(InputStreamReader(conn.getInputStream())).use { bf ->
+                        var line: String?
+                        while (bf.readLine().also { line = it } != null) {
+                            defaultLogger.info { line }
+                        }
+                    }
+
                     val response = defaultHttpClient().get("$apiUrl/vedtakstatus/${params.fnr}")
                     defaultLogger.info { response.status.value }
 
@@ -41,6 +56,7 @@ fun NormalOpenAPIRoute.dataApi() {
                             // Svar
                             respondOk(vedtaksperiodeDagpengerDto)
                         }
+
                         404 -> {
                             // Sjekk Arena hvis status er NotFound
                             // Map Arena response to VedtaksperiodeDagpengerDto
@@ -48,6 +64,7 @@ fun NormalOpenAPIRoute.dataApi() {
                             // TODO:
                             respondNotFound("Kunne ikke finne data")
                         }
+
                         else -> {
                             // Feil i dp-iverksett? Svar med status 500
                             respondError("Kunne ikke få data fra dp-iverksett")
