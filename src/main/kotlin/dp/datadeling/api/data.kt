@@ -6,19 +6,15 @@ import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
 import dp.datadeling.defaultLogger
 import dp.datadeling.utils.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.util.logging.*
 import no.nav.dagpenger.kontrakter.iverksett.AktivitetType
 import no.nav.dagpenger.kontrakter.iverksett.DatoperiodeDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeDagpengerDto
 import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeType
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.URL
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.time.LocalDate
 import com.papsign.ktor.openapigen.route.path.auth.get as authGet
 
@@ -35,24 +31,21 @@ fun NormalOpenAPIRoute.dataApi() {
                     val apiUrl = getProperty("IVERKSETT_API_URL")!!
                     defaultLogger.info { "$apiUrl/vedtakstatus/${params.fnr}" }
 
-                    val url = URL("$apiUrl/vedtakstatus/${params.fnr}")
-                    val conn = url.openConnection()
-                    conn.doOutput = true
+                    val client = HttpClient.newBuilder().build()
+                    val request = HttpRequest.newBuilder()
+                        .uri(URI.create("$apiUrl/vedtakstatus/${params.fnr}"))
+                        .build()
+                    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-                    BufferedReader(InputStreamReader(conn.getInputStream())).use { bf ->
-                        var line: String?
-                        while (bf.readLine().also { line = it } != null) {
-                            defaultLogger.info { line }
-                        }
-                    }
-
-                    val response = defaultHttpClient().get("$apiUrl/vedtakstatus/${params.fnr}")
-                    defaultLogger.info { response.status.value }
-
-                    when (response.status.value) {
+                    when (response.statusCode()) {
                         in 200..299 -> {
                             // Les response fra dp-iverksett hvis status er OK
-                            val vedtaksperiodeDagpengerDto: VedtaksperiodeDagpengerDto = response.body()
+                            val body = response.body()
+                            defaultLogger.info(body)
+                            val vedtaksperiodeDagpengerDto = defaultObjectMapper.readValue(
+                                body,
+                                VedtaksperiodeDagpengerDto::class.java
+                            )
                             // Svar
                             respondOk(vedtaksperiodeDagpengerDto)
                         }
