@@ -57,9 +57,11 @@ fun defaultHttpClient(): HttpClient {
             }
             */
             expectSuccess = false
+            /*
             engine {
                 customizeClient { setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault())) }
             }
+            */
         }
     }
 
