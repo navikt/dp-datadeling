@@ -63,12 +63,6 @@ dependencies {
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
 
-    // Ktor HttpClient
-    implementation("io.ktor:ktor-client-apache:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-client-json:$ktorVersion")
-
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")

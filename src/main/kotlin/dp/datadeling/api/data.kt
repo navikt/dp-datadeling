@@ -4,7 +4,6 @@ import com.papsign.ktor.openapigen.annotations.parameters.PathParam
 import com.papsign.ktor.openapigen.route.info
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
-import dp.datadeling.defaultLogger
 import dp.datadeling.utils.*
 import no.nav.dagpenger.kontrakter.iverksett.AktivitetType
 import no.nav.dagpenger.kontrakter.iverksett.DatoperiodeDto
@@ -29,8 +28,6 @@ fun NormalOpenAPIRoute.dataApi() {
                 try {
                     // Sjekk dp-iverksett
                     val apiUrl = getProperty("IVERKSETT_API_URL")!!
-                    defaultLogger.info { "$apiUrl/vedtakstatus/${params.fnr}" }
-
                     val client = HttpClient.newBuilder().build()
                     val request = HttpRequest.newBuilder()
                         .uri(URI.create("$apiUrl/vedtakstatus/${params.fnr}"))
@@ -41,7 +38,6 @@ fun NormalOpenAPIRoute.dataApi() {
                         in 200..299 -> {
                             // Les response fra dp-iverksett hvis status er OK
                             val body = response.body()
-                            defaultLogger.info(body)
                             val vedtaksperiodeDagpengerDto = defaultObjectMapper.readValue(
                                 body,
                                 VedtaksperiodeDagpengerDto::class.java
