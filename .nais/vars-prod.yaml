@@ -4,4 +4,4 @@ requestsCpu: 500m
 db_tier: "db-custom-4-8192"
 ingresses:
   - https://dp-datadeling.intern.nav.no
-iverksettApiUrl: https://dp-iverksett.intern.nav.no/api
+iverksettApiUrl: http://dp-iverksett/api
