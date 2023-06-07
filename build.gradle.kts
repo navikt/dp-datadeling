@@ -5,7 +5,7 @@
 
 project.setProperty("mainClassName", "dp.datadeling.AppKt")
 
-val ktorVersion = "2.3.0"
+val ktorVersion = "2.3.1"
 val micrometerVersion = "1.11.0"
 val jacksonVersion = "2.15.1"
 val openApiGeneratorVersion = "0.6.1"
@@ -54,8 +54,8 @@ repositories {
 
 dependencies {
     // Ktor Server
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
@@ -90,7 +90,7 @@ dependencies {
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
 
     // Test
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     // Use the Kotlin JUnit 5 integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
