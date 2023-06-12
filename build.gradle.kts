@@ -16,7 +16,7 @@ val logstashVersion = "7.3"
 val postgresVersion = "42.6.0"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.19.1"
-val kontrakterVersion = "1.0_20230527141033_103f5f1"
+val kontrakterVersion = "2.0_20230607115344_50f0391"
 val mockOauth2Version = "0.5.8"
 val jupiterVersion = "5.9.3"
 val testcontainersVersion = "1.18.1"
@@ -40,14 +40,13 @@ java {
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
     maven {
         name = "github"
         url = uri("https://maven.pkg.github.com/navikt/dp-kontrakter")
         credentials {
-            username = System.getenv("GITHUB_USERNAME")
-            password = System.getenv("GITHUB_TOKEN")
+            username = project.findProperty("githubUser") as String? ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("githubPassword") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
 }

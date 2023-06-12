@@ -5,25 +5,23 @@ import com.papsign.ktor.openapigen.route.info
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
 import dp.datadeling.utils.*
-import no.nav.dagpenger.kontrakter.iverksett.AktivitetType
-import no.nav.dagpenger.kontrakter.iverksett.DatoperiodeDto
-import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeDagpengerDto
-import no.nav.dagpenger.kontrakter.iverksett.VedtaksperiodeType
+import no.nav.dagpenger.kontrakter.iverksett.*
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.LocalDate
+import java.time.LocalDateTime
 import com.papsign.ktor.openapigen.route.path.auth.get as authGet
 
 fun NormalOpenAPIRoute.dataApi() {
 
     auth {
         route("/data/{fnr}") {
-            authGet<DataParams, VedtaksperiodeDagpengerDto, TokenValidationContextPrincipal?>(
+            authGet<DataParams, VedtaksdetaljerDto, TokenValidationContextPrincipal?>(
                 info("Oppslag"),
-                example = vedtaksperiodeDagpengerDtoExample
+                example = vedtaksdetaljerDtoExample
             ) { params ->
                 try {
                     // Sjekk dp-iverksett
@@ -40,7 +38,7 @@ fun NormalOpenAPIRoute.dataApi() {
                             val body = response.body()
                             val vedtaksperiodeDagpengerDto = defaultObjectMapper.readValue(
                                 body,
-                                VedtaksperiodeDagpengerDto::class.java
+                                VedtaksdetaljerDto::class.java
                             )
                             // Svar
                             respondOk(vedtaksperiodeDagpengerDto)
@@ -70,13 +68,22 @@ fun NormalOpenAPIRoute.dataApi() {
 
 data class DataParams(@PathParam("fnr") val fnr: String)
 
-val vedtaksperiodeDagpengerDtoExample = VedtaksperiodeDagpengerDto(
-    fraOgMedDato = LocalDate.now(),
-    tilOgMedDato = LocalDate.now().plusDays(14),
-    periode = DatoperiodeDto(
-        fom = LocalDate.now(),
-        tom = LocalDate.now().plusDays(10)
+val vedtaksdetaljerDtoExample = VedtaksdetaljerDto(
+    vedtakstype = VedtakType.RAMMEVEDTAK,
+    vedtakstidspunkt = LocalDateTime.now(),
+    resultat = Vedtaksresultat.INNVILGET,
+    saksbehandlerId = "",
+    beslutterId = "",
+    opphorAarsak = null,
+    avslagAarsak = null,
+    utbetalinger = emptyList(),
+    vedtaksperioder = listOf(
+        VedtaksperiodeDto(
+            fraOgMedDato = LocalDate.now(),
+            tilOgMedDato = LocalDate.now().plusDays(7),
+            periodeType = VedtaksperiodeType.HOVEDPERIODE
+        )
     ),
-    aktivitet = AktivitetType.FORLENGELSE_STØNAD_PÅVENTE_ARBEID,
-    periodeType = VedtaksperiodeType.HOVEDPERIODE
+    tilbakekreving = null,
+    brevmottakere = emptyList()
 )
