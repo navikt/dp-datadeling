@@ -19,7 +19,7 @@ val flywayVersion = "9.19.4"
 val kontrakterVersion = "2.0_20230613092537_6f4e0f0"
 val mockOauth2Version = "0.5.8"
 val jupiterVersion = "5.9.3"
-val testcontainersVersion = "1.18.1"
+val testcontainersVersion = "1.18.3"
 val mockkVersion = "1.13.5"
 val wiremockVersion = "2.27.2"
 
