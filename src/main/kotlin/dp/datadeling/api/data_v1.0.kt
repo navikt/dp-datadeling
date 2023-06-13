@@ -18,7 +18,7 @@ import com.papsign.ktor.openapigen.route.path.auth.get as authGet
 fun NormalOpenAPIRoute.dataApi() {
 
     auth {
-        route("/data/{fnr}") {
+        route("/data/v1.0/{fnr}") {
             authGet<DataParams, VedtaksstatusDto, TokenValidationContextPrincipal?>(
                 info("Oppslag"),
                 example = vedtaksstatusDtoExample
