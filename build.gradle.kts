@@ -7,7 +7,7 @@ project.setProperty("mainClassName", "dp.datadeling.AppKt")
 
 val ktorVersion = "2.3.1"
 val micrometerVersion = "1.11.1"
-val jacksonVersion = "2.15.1"
+val jacksonVersion = "2.15.2"
 val openApiGeneratorVersion = "0.6.1"
 val tokenValidationVersion = "3.1.0"
 val kotlinLoggerVersion = "3.0.5"
