@@ -13,11 +13,11 @@ import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class DataApiTest : TestBase() {
+class DataV10ApiTest : TestBase() {
 
     @Test
     fun shouldGet401WithoutToken() = setUpTestApplication {
-        val response = client.get("/data/01020312345")
+        val response = client.get("/data/v1.0/01020312345")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -37,7 +37,7 @@ class DataApiTest : TestBase() {
         )
 
         val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
-        val response = client.get("/data/$fnr") {
+        val response = client.get("/data/v1.0/$fnr") {
             headers {
                 append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
             }
@@ -101,7 +101,7 @@ class DataApiTest : TestBase() {
         )
 
         val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
-        val response = client.get("/data/$fnr") {
+        val response = client.get("/data/v1.0/$fnr") {
             headers {
                 append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
             }
