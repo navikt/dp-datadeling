@@ -19,9 +19,9 @@ fun NormalOpenAPIRoute.dataApi() {
 
     auth {
         route("/data/{fnr}") {
-            authGet<DataParams, VedtaksdetaljerDto, TokenValidationContextPrincipal?>(
+            authGet<DataParams, VedtaksstatusDto, TokenValidationContextPrincipal?>(
                 info("Oppslag"),
-                example = vedtaksdetaljerDtoExample
+                example = vedtaksstatusDtoExample
             ) { params ->
                 try {
                     // Sjekk dp-iverksett
@@ -36,12 +36,12 @@ fun NormalOpenAPIRoute.dataApi() {
                         in 200..299 -> {
                             // Les response fra dp-iverksett hvis status er OK
                             val body = response.body()
-                            val vedtaksperiodeDagpengerDto = defaultObjectMapper.readValue(
+                            val vedtaksstatusDto = defaultObjectMapper.readValue(
                                 body,
-                                VedtaksdetaljerDto::class.java
+                                VedtaksstatusDto::class.java
                             )
                             // Svar
-                            respondOk(vedtaksperiodeDagpengerDto)
+                            respondOk(vedtaksstatusDto)
                         }
 
                         404 -> {
@@ -68,15 +68,10 @@ fun NormalOpenAPIRoute.dataApi() {
 
 data class DataParams(@PathParam("fnr") val fnr: String)
 
-val vedtaksdetaljerDtoExample = VedtaksdetaljerDto(
+val vedtaksstatusDtoExample = VedtaksstatusDto(
     vedtakstype = VedtakType.RAMMEVEDTAK,
     vedtakstidspunkt = LocalDateTime.now(),
     resultat = Vedtaksresultat.INNVILGET,
-    saksbehandlerId = "",
-    beslutterId = "",
-    opphorAarsak = null,
-    avslagAarsak = null,
-    utbetalinger = emptyList(),
     vedtaksperioder = listOf(
         VedtaksperiodeDto(
             fraOgMedDato = LocalDate.now(),
@@ -84,6 +79,4 @@ val vedtaksdetaljerDtoExample = VedtaksdetaljerDto(
             periodeType = VedtaksperiodeType.HOVEDPERIODE
         )
     ),
-    tilbakekreving = null,
-    brevmottakere = emptyList()
 )

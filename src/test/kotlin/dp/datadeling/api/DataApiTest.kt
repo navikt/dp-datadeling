@@ -6,13 +6,8 @@ import dp.datadeling.utils.defaultObjectMapper
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import no.nav.dagpenger.kontrakter.felles.BrevmottakerDto
-import no.nav.dagpenger.kontrakter.felles.Datoperiode
-import no.nav.dagpenger.kontrakter.felles.StønadType
-import no.nav.dagpenger.kontrakter.felles.Tilbakekrevingsvalg
 import no.nav.dagpenger.kontrakter.iverksett.*
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.Test
@@ -82,49 +77,15 @@ class DataApiTest : TestBase() {
 
         val fnr = "01020312345"
 
-        val iverksettResponse = VedtaksdetaljerDto(
+        val iverksettResponse = VedtaksstatusDto(
             vedtakstype = VedtakType.RAMMEVEDTAK,
             vedtakstidspunkt = LocalDateTime.now(),
             resultat = Vedtaksresultat.INNVILGET,
-            saksbehandlerId = "S12345",
-            beslutterId = "B12345",
-            opphorAarsak = OpphørÅrsak.PERIODE_UTLØPT,
-            avslagAarsak = AvslagÅrsak.MANGLENDE_OPPLYSNINGER,
-            utbetalinger = listOf(
-                UtbetalingDto(
-                    belopPerDag = 100,
-                    fraOgMedDato = LocalDate.now().minusDays(7),
-                    tilOgMedDato = LocalDate.now().minusDays(14),
-                    stonadstype = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                    ferietillegg = Ferietillegg.ORDINAER
-                )
-            ),
             vedtaksperioder = listOf(
                 VedtaksperiodeDto(
                     fraOgMedDato = LocalDate.now(),
                     tilOgMedDato = LocalDate.now().plusDays(7),
                     periodeType = VedtaksperiodeType.HOVEDPERIODE
-                )
-            ),
-            tilbakekreving = TilbakekrevingDto(
-                tilbakekrevingsvalg = Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL,
-                tilbakekrevingMedVarsel = TilbakekrevingMedVarselDto(
-                    varseltekst = "Bla bla bla",
-                    sumFeilutbetaling = BigDecimal.TEN,
-                    fellesperioder = listOf(
-                        Datoperiode(
-                            fom = LocalDate.now().minusDays(14),
-                            tom = LocalDate.now().minusDays(7)
-                        )
-                    )
-                )
-            ),
-            brevmottakere = listOf(
-                BrevmottakerDto(
-                    ident = "01020312345",
-                    navn = "Test Testesen",
-                    mottakerRolle = BrevmottakerDto.MottakerRolle.BRUKER,
-                    identType = BrevmottakerDto.IdentType.PERSONIDENT
                 )
             )
         )
@@ -145,7 +106,7 @@ class DataApiTest : TestBase() {
                 append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
             }
         }
-        val apiResponse = defaultObjectMapper.readValue(response.bodyAsText(), VedtaksdetaljerDto::class.java)
+        val apiResponse = defaultObjectMapper.readValue(response.bodyAsText(), VedtaksstatusDto::class.java)
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(iverksettResponse, apiResponse)
