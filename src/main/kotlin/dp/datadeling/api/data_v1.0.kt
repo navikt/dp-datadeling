@@ -1,11 +1,16 @@
 package dp.datadeling.api
 
+import com.natpryce.konfig.*
+import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.papsign.ktor.openapigen.annotations.parameters.PathParam
 import com.papsign.ktor.openapigen.route.info
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
+import dp.datadeling.defaultLogger
 import dp.datadeling.utils.*
 import no.nav.dagpenger.kontrakter.iverksett.*
+import no.nav.dagpenger.oauth2.CachedOauth2Client
+import no.nav.dagpenger.oauth2.OAuth2Config
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import java.net.URI
 import java.net.http.HttpClient
@@ -48,7 +53,21 @@ fun NormalOpenAPIRoute.dataApi() {
                             // Sjekk Arena hvis status er NotFound
                             // Map Arena response to VedtaksperiodeDagpengerDto
                             // Svar
-                            // TODO:
+                            val properties: Configuration by lazy {
+                                systemProperties() overriding EnvironmentVariables()
+                            }
+
+                            val cachedTokenProvider by lazy {
+                                val azureAd = OAuth2Config.AzureAd(properties)
+                                CachedOauth2Client(
+                                    tokenEndpointUrl = azureAd.tokenEndpointUrl,
+                                    authType = azureAd.clientSecret(),
+                                )
+                            }
+
+                            val token = cachedTokenProvider.clientCredentials(getProperty("DP_PROXY_SCOPE")!!).accessToken
+                            defaultLogger.info { token }
+
                             respondNotFound("Kunne ikke finne data")
                         }
 

@@ -5,3 +5,4 @@ db_tier: "db-custom-4-8192"
 ingresses:
   - https://dp-datadeling.intern.nav.no
 iverksettApiUrl: http://dp-iverksett/api
+dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default

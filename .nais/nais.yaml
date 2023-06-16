@@ -44,6 +44,8 @@ spec:
   env:
     - name: IVERKSETT_API_URL
       value: {{ iverksettApiUrl }}
+    - name: DP_PROXY_SCOPE
+      value: {{ dpProxyScope }}
   azure:
     application:
       enabled: true

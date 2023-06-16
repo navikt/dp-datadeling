@@ -5,3 +5,4 @@ db_tier: "db-f1-micro"
 ingresses:
   - https://dp-datadeling.intern.dev.nav.no
 iverksettApiUrl: http://dp-iverksett/api
+dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default

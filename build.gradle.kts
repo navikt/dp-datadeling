@@ -17,6 +17,7 @@ val postgresVersion = "42.6.0"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.19.4"
 val kontrakterVersion = "2.0_20230613092537_6f4e0f0"
+val bibliotekerVersion = "2023.04.27-09.33.fcf0798bf943"
 val mockOauth2Version = "0.5.8"
 val jupiterVersion = "5.9.3"
 val testcontainersVersion = "1.18.3"
@@ -41,6 +42,7 @@ java {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
     maven {
         name = "github"
         url = uri("https://maven.pkg.github.com/navikt/dp-kontrakter")
@@ -88,6 +90,8 @@ dependencies {
     // Kontrakter
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
 
+    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:$bibliotekerVersion")
+
     // Test
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
@@ -119,7 +123,8 @@ tasks {
         environment["ENV"] = "LOCAL"
         environment["IVERKSETT_API_URL"] = "http://localhost:8092/api"
 
-        environment["AZURE_APP_WELL_KNOWN_URL"] = "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"
+        environment["AZURE_APP_WELL_KNOWN_URL"] =
+            "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"
         environment["AZURE_APP_CLIENT_ID"] = "test"
 
         classpath = sourceSets["main"].runtimeClasspath
