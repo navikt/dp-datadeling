@@ -46,6 +46,14 @@ open class TestBase {
     }
 
     fun setUpTestApplication(block: suspend ApplicationTestBuilder.() -> Unit) {
+        System.setProperty("IVERKSETT_API_URL", "http://localhost:8092/api")
+        System.setProperty("DP_PROXY_URL", "http://localhost:8092/dp-proxy")
+        System.setProperty("DP_PROXY_SCOPE", "scope")
+
+        System.setProperty("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT", "${mockOAuth2Server.tokenEndpointUrl("azureAd")}")
+        System.setProperty("AZURE_APP_CLIENT_ID", "dp-proxy-12345")
+        System.setProperty("AZURE_APP_CLIENT_SECRET", "dp-proxy-secret")
+
         testApplication {
             environment {
                 config = setOidcConfig()

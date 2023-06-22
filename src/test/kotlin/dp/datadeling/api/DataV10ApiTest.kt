@@ -24,9 +24,7 @@ class DataV10ApiTest : TestBase() {
 
     @Test
     fun shouldGet500If500FromIverksett() = setUpTestApplication {
-        System.setProperty("IVERKSETT_API_URL", "http://localhost:8092/api")
-
-        val fnr = "01020312345"
+        val fnr = "01020312341"
 
         wireMockServer.stubFor(
             WireMock.get(WireMock.urlEqualTo("/api/vedtakstatus/$fnr"))
@@ -47,10 +45,8 @@ class DataV10ApiTest : TestBase() {
     }
 
     @Test
-    fun shouldGet404IfNotFoundInIverksettAndNotFoundInArena() = setUpTestApplication {
-        System.setProperty("IVERKSETT_API_URL", "http://localhost:8092/api")
-
-        val fnr = "01020312345"
+    fun shouldGet500If500FromDpProxy() = setUpTestApplication {
+        val fnr = "01020312342"
 
         wireMockServer.stubFor(
             WireMock.get(WireMock.urlEqualTo("/api/vedtakstatus/$fnr"))
@@ -59,9 +55,45 @@ class DataV10ApiTest : TestBase() {
                         .withStatus(HttpStatusCode.NotFound.value)
                 )
         )
+        wireMockServer.stubFor(
+            WireMock.get(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus/$fnr"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(HttpStatusCode.InternalServerError.value)
+                )
+        )
 
         val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
-        val response = client.get("/data/$fnr") {
+        val response = client.get("/data/v1.0/$fnr") {
+            headers {
+                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
+            }
+        }
+
+        assertEquals(HttpStatusCode.InternalServerError, response.status)
+    }
+
+    @Test
+    fun shouldGet404IfNotFoundInIverksettAndNotFoundInArena() = setUpTestApplication {
+        val fnr = "01020312343"
+
+        wireMockServer.stubFor(
+            WireMock.get(WireMock.urlEqualTo("/api/vedtakstatus/$fnr"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(HttpStatusCode.NotFound.value)
+                )
+        )
+        wireMockServer.stubFor(
+            WireMock.get(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus/$fnr"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(HttpStatusCode.NotFound.value)
+                )
+        )
+
+        val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
+        val response = client.get("/data/v1.0/$fnr") {
             headers {
                 append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
             }
@@ -73,9 +105,7 @@ class DataV10ApiTest : TestBase() {
 
     @Test
     fun shouldGetDataFromIverksett() = setUpTestApplication {
-        System.setProperty("IVERKSETT_API_URL", "http://localhost:8092/api")
-
-        val fnr = "01020312345"
+        val fnr = "01020312344"
 
         val iverksettResponse = VedtaksstatusDto(
             vedtakstype = VedtakType.RAMMEVEDTAK,
