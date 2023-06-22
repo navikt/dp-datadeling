@@ -6,5 +6,5 @@ ingresses:
   - https://dp-datadeling.intern.nav.no
 dpIverksettUrl: http://dp-iverksett
 dpIverksettScope: api://prod-gcp.teamdagpenger.dp-iverksett/.default
-dpProxyUrl: https://dp-proxy.prod-fss-pub.nais.io
+dpProxyHost: p-proxy.prod-fss-pub.nais.io
 dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
