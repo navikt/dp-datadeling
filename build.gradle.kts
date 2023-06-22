@@ -121,7 +121,7 @@ tasks.named<Test>("test") {
 tasks {
     register("runServerTest", JavaExec::class) {
         environment["ENV"] = "LOCAL"
-        environment["IVERKSETT_API_URL"] = "http://localhost:8092/api"
+        environment["DP_IVERKSETT_URL"] = "http://localhost:8092/api"
 
         environment["AZURE_APP_WELL_KNOWN_URL"] =
             "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"

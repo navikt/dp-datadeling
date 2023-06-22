@@ -46,7 +46,7 @@ open class TestBase {
     }
 
     fun setUpTestApplication(block: suspend ApplicationTestBuilder.() -> Unit) {
-        System.setProperty("IVERKSETT_API_URL", "http://localhost:8092/api")
+        System.setProperty("DP_IVERKSETT_URL", "http://localhost:8092")
         System.setProperty("DP_IVERKSETT_SCOPE", "iverksett_scope")
         System.setProperty("DP_PROXY_URL", "http://localhost:8092/dp-proxy")
         System.setProperty("DP_PROXY_SCOPE", "proxy_scope")

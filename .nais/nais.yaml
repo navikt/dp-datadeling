@@ -42,8 +42,8 @@ spec:
   # envFrom:
   #  - secret: dp-datadeling
   env:
-    - name: IVERKSETT_API_URL
-      value: {{ iverksettApiUrl }}
+    - name: DP_IVERKSETT_URL
+      value: {{ dpIverksettUrl }}
     - name: DP_IVERKSETT_SCOPE
       value: { { dpIverksettScope } }
     - name: DP_PROXY_URL

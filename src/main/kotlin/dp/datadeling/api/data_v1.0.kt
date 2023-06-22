@@ -37,9 +37,9 @@ fun NormalOpenAPIRoute.dataApi() {
 
                     // Sjekk dp-iverksett
                     val dpIverksettCreds = cachedTokenProvider.clientCredentials(getProperty("DP_IVERKSETT_SCOPE")!!)
-                    val dpIverksettUrl = getProperty("IVERKSETT_API_URL")!!
+                    val dpIverksettUrl = getProperty("DP_IVERKSETT_URL")!!
                     val dpIverksettRequest = HttpRequest.newBuilder()
-                        .uri(URI.create("$dpIverksettUrl/vedtakstatus/${params.fnr}"))
+                        .uri(URI.create("$dpIverksettUrl/api/vedtakstatus/${params.fnr}"))
                         .header(HttpHeaders.Authorization, "Bearer ${dpIverksettCreds.accessToken}")
                         .build()
                     val dpIverksettResponse = client.send(dpIverksettRequest, HttpResponse.BodyHandlers.ofString())
