@@ -45,7 +45,7 @@ spec:
     - name: DP_IVERKSETT_URL
       value: {{ dpIverksettUrl }}
     - name: DP_IVERKSETT_SCOPE
-      value: { { dpIverksettScope } }
+      value: {{ dpIverksettScope }}
     - name: DP_PROXY_URL
       value: {{ dpProxyUrl }}
     - name: DP_PROXY_SCOPE
