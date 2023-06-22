@@ -44,6 +44,8 @@ spec:
   env:
     - name: IVERKSETT_API_URL
       value: {{ iverksettApiUrl }}
+    - name: DP_IVERKSETT_SCOPE
+      value: { { dpIverksettScope } }
     - name: DP_PROXY_URL
       value: {{ dpProxyUrl }}
     - name: DP_PROXY_SCOPE

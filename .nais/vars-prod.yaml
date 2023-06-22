@@ -5,5 +5,6 @@ db_tier: "db-custom-4-8192"
 ingresses:
   - https://dp-datadeling.intern.nav.no
 iverksettApiUrl: http://dp-iverksett/api
+dpIverksettScope: api://prod-gcp.teamdagpenger.dp-iverksett/.default
 dpProxyUrl: https://dp-proxy.prod-fss-pub.nais.io
 dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default

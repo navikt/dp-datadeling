@@ -36,9 +36,11 @@ fun NormalOpenAPIRoute.dataApi() {
                     val client = HttpClient.newBuilder().build()
 
                     // Sjekk dp-iverksett
+                    val dpIverksettCreds = cachedTokenProvider.clientCredentials(getProperty("DP_IVERKSETT_SCOPE")!!)
                     val dpIverksettUrl = getProperty("IVERKSETT_API_URL")!!
                     val dpIverksettRequest = HttpRequest.newBuilder()
                         .uri(URI.create("$dpIverksettUrl/vedtakstatus/${params.fnr}"))
+                        .header(HttpHeaders.Authorization, "Bearer ${dpIverksettCreds.accessToken}")
                         .build()
                     val dpIverksettResponse = client.send(dpIverksettRequest, HttpResponse.BodyHandlers.ofString())
 
@@ -59,12 +61,11 @@ fun NormalOpenAPIRoute.dataApi() {
                             // Sjekk Arena gjennom dp-proxy hvis status er NotFound
                             // Map Arena response to VedtaksperiodeDagpengerDto
                             // Svar
-                            val credentials = cachedTokenProvider.clientCredentials(getProperty("DP_PROXY_SCOPE")!!)
-
+                            val dpProxyCreds = cachedTokenProvider.clientCredentials(getProperty("DP_PROXY_SCOPE")!!)
                             val dpProxyUrl = getProperty("DP_PROXY_URL")!!
                             val dpProxyRequest = HttpRequest.newBuilder()
                                 .uri(URI.create("$dpProxyUrl/proxy/v1/arena/vedtaksstatus/${params.fnr}"))
-                                .header(HttpHeaders.Authorization, "Bearer ${credentials.accessToken}")
+                                .header(HttpHeaders.Authorization, "Bearer ${dpProxyCreds.accessToken}")
                                 .build()
                             val dpProxyResponse = client.send(dpProxyRequest, HttpResponse.BodyHandlers.ofString())
 
