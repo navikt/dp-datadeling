@@ -73,19 +73,39 @@ fun NormalOpenAPIRoute.dataApi() {
                                 in 200..299 -> {
                                     // Les response fra dp-proxy hvis status er OK
                                     val body = dpProxyResponse.body()
+                                    val list = defaultObjectMapper.readValue(
+                                        body,
+                                        DpProxyResponseDtoList::class.java
+                                    )
                                     // TODO: Delete
                                     defaultLogger.info { body }
 
-                                    // TODO: map data to VedtaksstatusDto
-                                    val arenaVedtaksstatusDto = VedtaksstatusDto(
-                                        vedtakstype = VedtakType.RAMMEVEDTAK,
-                                        vedtakstidspunkt = LocalDateTime.now(),
-                                        resultat = Vedtaksresultat.INNVILGET,
-                                        vedtaksperioder = emptyList()
-                                    )
+                                    // Finn siste vedtak som er innvilget (Godkjent eller Iverksatt)
+                                    // TODO: Eller kun Iverksatt?
+                                    val sisteVedtak =
+                                        list.list.filter { it.vedtakstatuskode == "GODKJ" || it.vedtakstatuskode == "IVERK" }
+                                            .maxByOrNull { it.vedtaksdato!! } // Alle vedtak som er GODJ og IVERK skal ha vedtaksdato != NULL
 
-                                    // Svar
-                                    respondOk(arenaVedtaksstatusDto)
+                                    if (sisteVedtak == null) {
+                                        respondNotFound("Kunne ikke finne data")
+                                    } else {
+                                        // Map til VedtaksstatusDto
+                                        val arenaVedtaksstatusDto = VedtaksstatusDto(
+                                            vedtakstype = VedtakType.RAMMEVEDTAK, // TODO: Hvordan kan vi finne ut at det er et RAMMEVEDTAK? Fra vedtaktypekode?
+                                            vedtakstidspunkt = sisteVedtak.vedtaksdato!!.atStartOfDay(), // Vi har ikke tidspunkt i vedtaksdato fra Arena. Derfor atStartOfDay
+                                            resultat = Vedtaksresultat.INNVILGET, // sisteVedtak er innvilget (Godkjent eller Iverksatt)
+                                            vedtaksperioder = listOf(
+                                                VedtaksperiodeDto(
+                                                    fraOgMedDato = sisteVedtak.fraDato!!,
+                                                    tilOgMedDato = sisteVedtak.tilDato,
+                                                    periodeType = VedtaksperiodeType.HOVEDPERIODE
+                                                )
+                                            )
+                                        )
+
+                                        // Svar
+                                        respondOk(arenaVedtaksstatusDto)
+                                    }
                                 }
 
                                 404 -> {
@@ -137,4 +157,16 @@ val vedtaksstatusDtoExample = VedtaksstatusDto(
             periodeType = VedtaksperiodeType.HOVEDPERIODE
         )
     ),
+)
+
+data class DpProxyResponseDtoList(
+    val list: List<DpProxyResponseDto>
+)
+
+data class DpProxyResponseDto(
+    val vedtaktypekode: String,
+    val vedtakstatuskode: String,
+    val fraDato: LocalDate?,
+    val tilDato: LocalDate?,
+    val vedtaksdato: LocalDate?
 )
