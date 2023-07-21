@@ -1,5 +1,6 @@
 package dp.datadeling.api
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.natpryce.konfig.Configuration
 import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.natpryce.konfig.EnvironmentVariables
@@ -73,17 +74,14 @@ fun NormalOpenAPIRoute.dataApi() {
                                 in 200..299 -> {
                                     // Les response fra dp-proxy hvis status er OK
                                     val body = dpProxyResponse.body()
-                                    val list = defaultObjectMapper.readValue(
-                                        body,
-                                        DpProxyResponseDtoList::class.java
-                                    )
+                                    val list = defaultObjectMapper.readValue<List<DpProxyResponseDto>>(body)
                                     // TODO: Delete
                                     defaultLogger.info { body }
 
                                     // Finn siste vedtak som er innvilget (Godkjent eller Iverksatt)
                                     // TODO: Eller kun Iverksatt?
                                     val sisteVedtak =
-                                        list.list.filter { it.vedtakstatuskode == "GODKJ" || it.vedtakstatuskode == "IVERK" }
+                                        list.filter { it.vedtakstatuskode == "GODKJ" || it.vedtakstatuskode == "IVERK" }
                                             .maxByOrNull { it.vedtaksdato!! } // Alle vedtak som er GODJ og IVERK skal ha vedtaksdato != NULL
 
                                     if (sisteVedtak == null) {
@@ -157,10 +155,6 @@ val vedtaksstatusDtoExample = VedtaksstatusDto(
             periodeType = VedtaksperiodeType.HOVEDPERIODE
         )
     ),
-)
-
-data class DpProxyResponseDtoList(
-    val list: List<DpProxyResponseDto>
 )
 
 data class DpProxyResponseDto(

@@ -147,29 +147,27 @@ class DataV10ApiTest : TestBase() {
         val fnr = "01020312343"
         val vedtaksdato = LocalDate.now()
 
-        val dpProxyResponse = DpProxyResponseDtoList(
-            listOf(
-                DpProxyResponseDto(
-                    vedtaktypekode = "O",
-                    vedtakstatuskode = "IVERK",
-                    fraDato = vedtaksdato.plusDays(1),
-                    tilDato = vedtaksdato.plusDays(15),
-                    vedtaksdato = vedtaksdato
-                ),
-                DpProxyResponseDto(
-                    vedtaktypekode = "O",
-                    vedtakstatuskode = "GODKJ",
-                    fraDato = LocalDate.now(),
-                    tilDato = LocalDate.now(),
-                    vedtaksdato = LocalDate.now().minusDays(1)
-                ),
-                DpProxyResponseDto(
-                    vedtaktypekode = "O",
-                    vedtakstatuskode = "AVSLU",
-                    fraDato = LocalDate.now(),
-                    tilDato = LocalDate.now(),
-                    vedtaksdato = LocalDate.now()
-                )
+        val dpProxyResponse = listOf(
+            DpProxyResponseDto(
+                vedtaktypekode = "O",
+                vedtakstatuskode = "IVERK",
+                fraDato = vedtaksdato.plusDays(1),
+                tilDato = vedtaksdato.plusDays(15),
+                vedtaksdato = vedtaksdato
+            ),
+            DpProxyResponseDto(
+                vedtaktypekode = "O",
+                vedtakstatuskode = "GODKJ",
+                fraDato = LocalDate.now(),
+                tilDato = LocalDate.now(),
+                vedtaksdato = LocalDate.now().minusDays(1)
+            ),
+            DpProxyResponseDto(
+                vedtaktypekode = "O",
+                vedtakstatuskode = "AVSLU",
+                fraDato = LocalDate.now(),
+                tilDato = LocalDate.now(),
+                vedtaksdato = LocalDate.now()
             )
         )
 
