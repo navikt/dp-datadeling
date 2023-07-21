@@ -49,11 +49,3 @@ class LocalDateTimeDeserializer : StdDeserializer<LocalDateTime>(LocalDateTime::
         return LocalDateTime.parse(jp.readValueAs(String::class.java))
     }
 }
-
-fun LocalDate.toXMLDate(): XMLGregorianCalendar {
-    return DatatypeFactory.newInstance().newXMLGregorianCalendar(
-        GregorianCalendar.from(
-            this.atStartOfDay(ZoneId.systemDefault())
-        )
-    )
-}
