@@ -16,7 +16,7 @@ val logstashVersion = "7.4"
 val postgresVersion = "42.6.0"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.21.0"
-val kontrakterVersion = "2.0_20230613092537_6f4e0f0"
+val kontrakterVersion = "2.0_20230811102351_9e2be1c"
 val bibliotekerVersion = "2023.04.27-09.33.fcf0798bf943"
 val mockOauth2Version = "1.0.0"
 val jupiterVersion = "5.9.3"
@@ -60,11 +60,15 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
 
+    // Ktor Client
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
     // Jackson
+    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
@@ -89,6 +93,7 @@ dependencies {
 
     // Kontrakter
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
+    implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
 
     implementation("com.github.navikt.dp-biblioteker:oauth2-klient:$bibliotekerVersion")
 
