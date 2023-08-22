@@ -15,7 +15,7 @@ import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class DataV10ApiTest : TestBase() {
+class DataV1ApiTest : TestBase() {
 
     private val fnr = "01020312342"
     private val datadelingRequest = DatadelingRequest(
