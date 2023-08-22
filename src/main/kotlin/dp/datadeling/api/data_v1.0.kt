@@ -87,10 +87,22 @@ fun NormalOpenAPIRoute.dataApi() {
                         val dpIverksettResponseContent = dpIverksettResponse.await()
                         val dpProxyResponseContent = dpProxyResponse.await()
 
+                        // Felles peiodeliste
+                        val perioder = dpIverksettResponseContent.perioder + dpProxyResponseContent.perioder
+
                         // Oppretter ett felles svar
                         val response = DatadelingResponse(
                             personIdent = request.personIdent,
-                            perioder = dpIverksettResponseContent.perioder + dpProxyResponseContent.perioder
+                            perioder = perioder.map {
+                                // Skjuler FOM- og TOM-datoer hvis mulig og viser ikke mer enn forespurt
+                                it.copy(
+                                    fraOgMedDato = maxOf(it.fraOgMedDato, request.fraOgMedDato),
+                                    tilOgMedDato = if (it.tilOgMedDato == null && request.tilOgMedDato != null) request.tilOgMedDato
+                                    else if (it.tilOgMedDato != null && request.tilOgMedDato == null) it.tilOgMedDato
+                                    else if (it.tilOgMedDato == null && request.tilOgMedDato == null) null
+                                    else minOf(it.tilOgMedDato!!, request.tilOgMedDato!!)
+                                )
+                            }.sortedBy { it.fraOgMedDato }
                         )
 
                         respondOk(response)

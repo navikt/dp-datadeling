@@ -20,12 +20,37 @@ class DataV10ApiTest : TestBase() {
     private val fnr = "01020312342"
     private val datadelingRequest = DatadelingRequest(
         personIdent = fnr,
-        fraOgMedDato = LocalDate.now(),
+        fraOgMedDato = LocalDate.now().minusDays(20),
         tilOgMedDato = null
     )
-    private val datadelingResponse = DatadelingResponse(
+    private val emptyResponse = DatadelingResponse(
         personIdent = fnr,
         perioder = emptyList()
+    )
+    private val dpIverksettPerioder = listOf(
+        Periode(
+            fraOgMedDato = LocalDate.now(),
+            tilOgMedDato = LocalDate.now().plusDays(14),
+            ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+            gjenståendeDager = 123
+        )
+    )
+    private val dpIverksettResponse = DatadelingResponse(
+        personIdent = fnr,
+        perioder = dpIverksettPerioder
+    )
+
+    private val dpProxyPerioder = listOf(
+        Periode(
+            fraOgMedDato = LocalDate.now().minusDays(15),
+            tilOgMedDato = LocalDate.now().minusDays(1),
+            ytelseType = StønadType.DAGPENGER_PERMITTERING_ORDINAER,
+            gjenståendeDager = 0
+        )
+    )
+    private val dpProxyResponse = DatadelingResponse(
+        personIdent = fnr,
+        perioder = dpProxyPerioder
     )
 
     @Test
@@ -42,25 +67,9 @@ class DataV10ApiTest : TestBase() {
 
     @Test
     fun shouldGet500If500FromDpIverksett() = setUpTestApplication {
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.InternalServerError.value)
-                )
-        )
+        setUpMock(null, emptyResponse)
+        val token = createToken()
 
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(datadelingResponse))
-                )
-        )
-
-        val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
         val response = client.post("/data/v1.0") {
             headers {
                 append(HttpHeaders.Accept, "application/json")
@@ -75,25 +84,9 @@ class DataV10ApiTest : TestBase() {
 
     @Test
     fun shouldGet500If500FromDpProxy() = setUpTestApplication {
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(datadelingResponse))
-                )
-        )
+        setUpMock(emptyResponse, null)
+        val token = createToken()
 
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.InternalServerError.value)
-                )
-        )
-
-        val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
         val response = client.post("/data/v1.0") {
             headers {
                 append(HttpHeaders.Accept, "application/json")
@@ -108,40 +101,9 @@ class DataV10ApiTest : TestBase() {
 
     @Test
     fun shouldGetDataFromDpIverksett() = setUpTestApplication {
-        val perioder = listOf(
-            Periode(
-                fraOgMedDato = LocalDate.now(),
-                tilOgMedDato = LocalDate.now().plusDays(14),
-                ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                gjenståendeDager = 123
-            )
-        )
-        val responseMedPerioder = DatadelingResponse(
-            personIdent = fnr,
-            perioder = perioder
-        )
+        setUpMock(dpIverksettResponse, emptyResponse)
+        val token = createToken()
 
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(responseMedPerioder))
-                )
-        )
-
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(datadelingResponse))
-                )
-        )
-
-        val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
         val response = client.post("/data/v1.0") {
             headers {
                 append(HttpHeaders.Accept, "application/json")
@@ -155,45 +117,14 @@ class DataV10ApiTest : TestBase() {
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(fnr, apiResponse.personIdent)
         assertEquals(1, apiResponse.perioder.size)
-        assertEquals(perioder, apiResponse.perioder)
+        assertEquals(dpIverksettPerioder, apiResponse.perioder)
     }
 
     @Test
     fun shouldGetDataFromDpProxy() = setUpTestApplication {
-        val perioder = listOf(
-            Periode(
-                fraOgMedDato = LocalDate.now(),
-                tilOgMedDato = LocalDate.now().plusDays(14),
-                ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                gjenståendeDager = 123
-            )
-        )
-        val responseMedPerioder = DatadelingResponse(
-            personIdent = fnr,
-            perioder = perioder
-        )
+        setUpMock(emptyResponse, dpProxyResponse)
+        val token = createToken()
 
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(datadelingResponse))
-                )
-        )
-
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(responseMedPerioder))
-                )
-        )
-
-        val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
         val response = client.post("/data/v1.0") {
             headers {
                 append(HttpHeaders.Accept, "application/json")
@@ -207,58 +138,14 @@ class DataV10ApiTest : TestBase() {
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(fnr, apiResponse.personIdent)
         assertEquals(1, apiResponse.perioder.size)
-        assertEquals(perioder, apiResponse.perioder)
+        assertEquals(dpProxyPerioder, apiResponse.perioder)
     }
 
     @Test
     fun shouldGetDataFromDpIverksettAndDpProxy() = setUpTestApplication {
-        val dpIverksettPerioder = listOf(
-            Periode(
-                fraOgMedDato = LocalDate.now(),
-                tilOgMedDato = LocalDate.now().plusDays(14),
-                ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                gjenståendeDager = 123
-            )
-        )
-        val dpIverksettResponse = DatadelingResponse(
-            personIdent = fnr,
-            perioder = dpIverksettPerioder
-        )
+        setUpMock(dpIverksettResponse, dpProxyResponse)
+        val token = createToken()
 
-        val dpProxyPerioder = listOf(
-            Periode(
-                fraOgMedDato = LocalDate.now().minusDays(15),
-                tilOgMedDato = LocalDate.now().minusDays(1),
-                ytelseType = StønadType.DAGPENGER_PERMITTERING_ORDINAER,
-                gjenståendeDager = 0
-            )
-        )
-        val dpProxyResponse = DatadelingResponse(
-            personIdent = fnr,
-            perioder = dpProxyPerioder
-        )
-
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(dpIverksettResponse))
-                )
-        )
-
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(HttpStatusCode.OK.value)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(dpProxyResponse))
-                )
-        )
-
-        val token: SignedJWT = mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
         val response = client.post("/data/v1.0") {
             headers {
                 append(HttpHeaders.Accept, "application/json")
@@ -273,5 +160,105 @@ class DataV10ApiTest : TestBase() {
         assertEquals(fnr, apiResponse.personIdent)
         assertEquals(2, apiResponse.perioder.size)
         assertEquals(dpIverksettPerioder + dpProxyPerioder, apiResponse.perioder)
+    }
+
+    @Test
+    fun shouldRewriteFomDate() = setUpTestApplication {
+        setUpMock(dpIverksettResponse, dpProxyResponse)
+        val token = createToken()
+
+        val fom = LocalDate.now().minusDays(5)
+        val datadelingRequest = DatadelingRequest(
+            personIdent = fnr,
+            fraOgMedDato = fom,
+            tilOgMedDato = null
+        )
+
+        val response = client.post("/data/v1.0") {
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
+                append(HttpHeaders.ContentType, "application/json")
+            }
+            setBody(defaultObjectMapper.writeValueAsString(datadelingRequest))
+        }
+        val apiResponse = defaultObjectMapper.readValue(response.bodyAsText(), DatadelingResponse::class.java)
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals(fnr, apiResponse.personIdent)
+        assertEquals(2, apiResponse.perioder.size)
+        // FOM-dato i denne perioden skal erstattes med FOM fra request'en
+        assertEquals(fom, apiResponse.perioder[0].fraOgMedDato)
+        assertEquals(dpProxyPerioder[0].tilOgMedDato, apiResponse.perioder[0].tilOgMedDato)
+        assertEquals(dpIverksettPerioder[0].fraOgMedDato, apiResponse.perioder[1].fraOgMedDato)
+        assertEquals(dpIverksettPerioder[0].tilOgMedDato, apiResponse.perioder[1].tilOgMedDato)
+    }
+
+    @Test
+    fun shouldRewriteToDate() = setUpTestApplication {
+        setUpMock(dpIverksettResponse, dpProxyResponse)
+        val token = createToken()
+
+        val tom = LocalDate.now().plusDays(5)
+        val datadelingRequest = DatadelingRequest(
+            personIdent = fnr,
+            fraOgMedDato = LocalDate.now().minusDays(20),
+            tilOgMedDato = tom
+        )
+
+        val response = client.post("/data/v1.0") {
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
+                append(HttpHeaders.ContentType, "application/json")
+            }
+            setBody(defaultObjectMapper.writeValueAsString(datadelingRequest))
+        }
+        val apiResponse = defaultObjectMapper.readValue(response.bodyAsText(), DatadelingResponse::class.java)
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals(fnr, apiResponse.personIdent)
+        assertEquals(2, apiResponse.perioder.size)
+        assertEquals(dpProxyPerioder[0].fraOgMedDato, apiResponse.perioder[0].fraOgMedDato)
+        assertEquals(dpProxyPerioder[0].tilOgMedDato, apiResponse.perioder[0].tilOgMedDato)
+        assertEquals(dpIverksettPerioder[0].fraOgMedDato, apiResponse.perioder[1].fraOgMedDato)
+        // TOM-dato i denne perioden skal erstattes med TOM fra request'en
+        assertEquals(tom, apiResponse.perioder[1].tilOgMedDato)
+    }
+
+    private fun setUpMock(dpIverksettResponse: DatadelingResponse?, dpProxyResponse: DatadelingResponse?) {
+        val dpIverksettHttpStatus = if (dpIverksettResponse == null) {
+            HttpStatusCode.InternalServerError.value
+        } else {
+            HttpStatusCode.OK.value
+        }
+        wireMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(dpIverksettHttpStatus)
+                        .withHeader(HttpHeaders.ContentType, "application/json")
+                        .withBody(defaultObjectMapper.writeValueAsString(dpIverksettResponse))
+                )
+        )
+
+        val dpProxyHttpStatus = if (dpProxyResponse == null) {
+            HttpStatusCode.InternalServerError.value
+        } else {
+            HttpStatusCode.OK.value
+        }
+        wireMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(dpProxyHttpStatus)
+                        .withHeader(HttpHeaders.ContentType, "application/json")
+                        .withBody(defaultObjectMapper.writeValueAsString(dpProxyResponse))
+                )
+        )
+    }
+
+    private fun createToken(): SignedJWT {
+        return mockOAuth2Server.issueToken(ISSUER_ID, "someclientid", DefaultOAuth2TokenCallback())
     }
 }
