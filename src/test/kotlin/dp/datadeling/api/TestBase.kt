@@ -1,10 +1,14 @@
 package dp.datadeling.api
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import dp.datadeling.module
+import dp.datadeling.utils.defaultObjectMapper
+import io.ktor.http.*
 import io.ktor.server.config.*
 import io.ktor.server.testing.*
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -65,5 +69,37 @@ open class TestBase {
 
             block()
         }
+    }
+
+    fun setUpMock(dpIverksettResponse: DatadelingResponse?, dpProxyResponse: DatadelingResponse?) {
+        val dpIverksettHttpStatus = if (dpIverksettResponse == null) {
+            HttpStatusCode.InternalServerError.value
+        } else {
+            HttpStatusCode.OK.value
+        }
+        wireMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(dpIverksettHttpStatus)
+                        .withHeader(HttpHeaders.ContentType, "application/json")
+                        .withBody(defaultObjectMapper.writeValueAsString(dpIverksettResponse))
+                )
+        )
+
+        val dpProxyHttpStatus = if (dpProxyResponse == null) {
+            HttpStatusCode.InternalServerError.value
+        } else {
+            HttpStatusCode.OK.value
+        }
+        wireMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(dpProxyHttpStatus)
+                        .withHeader(HttpHeaders.ContentType, "application/json")
+                        .withBody(defaultObjectMapper.writeValueAsString(dpProxyResponse))
+                )
+        )
     }
 }

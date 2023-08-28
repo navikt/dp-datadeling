@@ -1,6 +1,5 @@
 package dp.datadeling.api
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.nimbusds.jwt.SignedJWT
 import dp.datadeling.utils.defaultObjectMapper
 import io.ktor.client.request.*
@@ -224,38 +223,6 @@ class DataV1ApiTest : TestBase() {
         assertEquals(dpIverksettPerioder[0].fraOgMedDato, apiResponse.perioder[1].fraOgMedDato)
         // TOM-dato i denne perioden skal erstattes med TOM fra request'en
         assertEquals(tom, apiResponse.perioder[1].tilOgMedDato)
-    }
-
-    private fun setUpMock(dpIverksettResponse: DatadelingResponse?, dpProxyResponse: DatadelingResponse?) {
-        val dpIverksettHttpStatus = if (dpIverksettResponse == null) {
-            HttpStatusCode.InternalServerError.value
-        } else {
-            HttpStatusCode.OK.value
-        }
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/vedtakstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(dpIverksettHttpStatus)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(dpIverksettResponse))
-                )
-        )
-
-        val dpProxyHttpStatus = if (dpProxyResponse == null) {
-            HttpStatusCode.InternalServerError.value
-        } else {
-            HttpStatusCode.OK.value
-        }
-        wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(dpProxyHttpStatus)
-                        .withHeader(HttpHeaders.ContentType, "application/json")
-                        .withBody(defaultObjectMapper.writeValueAsString(dpProxyResponse))
-                )
-        )
     }
 
     private fun createToken(): SignedJWT {

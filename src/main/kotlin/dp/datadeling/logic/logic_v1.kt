@@ -18,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 
@@ -67,13 +68,30 @@ fun process(request: DatadelingRequest): DatadelingResponse {
         val dpIverksettResponseContent = dpIverksettResponse.await()
         val dpProxyResponseContent = dpProxyResponse.await()
 
-        // Felles peiodeliste
-        val perioder = dpIverksettResponseContent.perioder + dpProxyResponseContent.perioder
+        // Liste med alle perioder (både fra dp-iverksett og dp-proxy)
+        val allePerioder = dpIverksettResponseContent.perioder + dpProxyResponseContent.perioder
+
+        // Slå sammen perioder
+        val sortertePerioder = allePerioder.sortedBy { it.fraOgMedDato }
+        val slaattSammenPerioder = mutableListOf<Periode>()
+
+        if (sortertePerioder.isNotEmpty()) {
+            var periode = sortertePerioder[0]
+            for (i in 1..<sortertePerioder.size) {
+                periode = if (sortertePerioder[i].fraOgMedDato.minusDays(1) <= periode.tilOgMedDato) {
+                    periode.copy(tilOgMedDato = sortertePerioder[i].tilOgMedDato)
+                } else {
+                    slaattSammenPerioder.add(periode)
+                    sortertePerioder[i]
+                }
+            }
+            slaattSammenPerioder.add(periode)
+        }
 
         // Oppretter ett felles svar
         response = DatadelingResponse(
             personIdent = request.personIdent,
-            perioder = perioder.map {
+            perioder = slaattSammenPerioder.map {
                 // Skjuler FOM- og TOM-datoer hvis mulig og viser ikke mer enn forespurt
                 it.copy(
                     fraOgMedDato = maxOf(it.fraOgMedDato, request.fraOgMedDato),
