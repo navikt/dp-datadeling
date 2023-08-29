@@ -23,16 +23,6 @@ suspend inline fun <reified TResponse : Any> OpenAPIPipelineResponseContext<TRes
     )
 }
 
-suspend inline fun <reified TResponse : Any> OpenAPIPipelineResponseContext<TResponse>.respondNotFound(message: String) {
-    defaultLogger.info { message }
-
-    responder.respond(
-        HttpStatusCode.NotFound,
-        message,
-        this.pipeline
-    )
-}
-
 suspend inline fun <TResponse : Any> OpenAPIPipelineResponseContext<TResponse>.respondOk(body: Any) {
     responder.respond(
         HttpStatusCode.OK,

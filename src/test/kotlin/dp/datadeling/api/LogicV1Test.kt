@@ -1,9 +1,6 @@
 package dp.datadeling.api
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import dp.datadeling.logic.process
-import dp.datadeling.utils.defaultObjectMapper
-import io.ktor.http.*
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
