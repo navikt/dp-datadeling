@@ -42,7 +42,7 @@ class DataV1ApiTest : TestBase() {
     private val dpProxyPerioder = listOf(
         Periode(
             fraOgMedDato = LocalDate.now().minusDays(15),
-            tilOgMedDato = LocalDate.now().minusDays(1),
+            tilOgMedDato = LocalDate.now().minusDays(2),
             ytelseType = StønadType.DAGPENGER_PERMITTERING_ORDINAER,
             gjenståendeDager = 0
         )
@@ -158,7 +158,7 @@ class DataV1ApiTest : TestBase() {
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(fnr, apiResponse.personIdent)
         assertEquals(2, apiResponse.perioder.size)
-        assertEquals(dpIverksettPerioder + dpProxyPerioder, apiResponse.perioder)
+        assertEquals(dpProxyPerioder + dpIverksettPerioder, apiResponse.perioder)
     }
 
     @Test
