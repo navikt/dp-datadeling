@@ -54,7 +54,7 @@ fun process(request: DatadelingRequest): DatadelingResponse {
         val dpProxyCreds = cachedTokenProvider.clientCredentials(getProperty("DP_PROXY_SCOPE")!!)
         val dpProxyUrl = getProperty("DP_PROXY_URL")!!
         val dpProxyResponse: Deferred<DatadelingResponse> = async {
-            client.post("$dpProxyUrl/proxy/v1/arena/vedtaksstatus") {
+            client.post("$dpProxyUrl/proxy/v1/arena/dagpengerperioder") {
                 headers {
                     append(HttpHeaders.Accept, "application/json")
                     append(HttpHeaders.Authorization, "Bearer ${dpProxyCreds.accessToken}")

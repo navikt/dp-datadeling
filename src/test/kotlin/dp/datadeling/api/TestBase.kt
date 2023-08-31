@@ -93,7 +93,7 @@ open class TestBase {
             HttpStatusCode.OK.value
         }
         wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/vedtaksstatus"))
+            WireMock.post(WireMock.urlEqualTo("/dp-proxy/proxy/v1/arena/dagpengerperioder"))
                 .willReturn(
                     WireMock.aResponse()
                         .withStatus(dpProxyHttpStatus)
