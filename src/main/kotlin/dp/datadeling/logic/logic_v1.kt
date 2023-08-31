@@ -40,7 +40,7 @@ fun process(request: DatadelingRequest): DatadelingResponse {
         val dpIverksettCreds = cachedTokenProvider.clientCredentials(getProperty("DP_IVERKSETT_SCOPE")!!)
         val dpIverksettUrl = getProperty("DP_IVERKSETT_URL")!!
         val dpIverksettResponse: Deferred<DatadelingResponse> = async {
-            client.post("$dpIverksettUrl/api/vedtakstatus") {
+            client.post("$dpIverksettUrl/api/dagpengerperioder") {
                 headers {
                     append(HttpHeaders.Accept, "application/json")
                     append(HttpHeaders.Authorization, "Bearer ${dpIverksettCreds.accessToken}")
