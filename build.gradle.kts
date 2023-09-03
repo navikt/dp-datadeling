@@ -22,7 +22,7 @@ val mockOauth2Version = "1.0.0"
 val jupiterVersion = "5.10.0"
 val testcontainersVersion = "1.19.0"
 val mockkVersion = "1.13.7"
-val wiremockVersion = "3.0.0"
+val wiremockVersion = "3.0.1"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
