@@ -1,4 +1,4 @@
-package dp.datadeling.utils
+package dp.datadeling.teknisk
 
 import com.papsign.ktor.openapigen.model.Described
 import com.papsign.ktor.openapigen.model.security.HttpSecurityScheme

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 
-fun getProperty(name: String): String? {
+fun getProperty(name: String): String {
     var value = System.getenv(name)
     if (value == null || value.isEmpty()) value = System.getProperty(name)
 
