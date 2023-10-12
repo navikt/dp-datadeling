@@ -6,7 +6,7 @@ import io.ktor.server.config.*
 
 
 fun isLocal(config: ApplicationConfig): Boolean {
-    return config.property("ENV").getString() == "LOCAL"
+    return config.propertyOrNull("ENV")?.getString() == "LOCAL"
 }
 
 suspend inline fun <reified TResponse : Any> OpenAPIPipelineResponseContext<TResponse>.respondError(message: String) {
