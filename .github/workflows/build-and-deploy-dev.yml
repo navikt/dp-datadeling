@@ -11,6 +11,7 @@ jobs:
   build:
     name: Bygg app/image, push til github
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Checkout
         uses: actions/checkout@v3
