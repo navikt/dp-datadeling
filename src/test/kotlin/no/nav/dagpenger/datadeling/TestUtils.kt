@@ -1,4 +1,4 @@
-package dp.datadeling
+package no.nav.dagpenger.datadeling
 
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse

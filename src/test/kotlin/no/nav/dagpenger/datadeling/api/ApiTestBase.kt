@@ -1,4 +1,4 @@
-package dp.datadeling.api
+package no.nav.dagpenger.datadeling.api
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.papsign.ktor.openapigen.OpenAPIGen

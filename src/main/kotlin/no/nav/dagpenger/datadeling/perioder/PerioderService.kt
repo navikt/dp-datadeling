@@ -1,4 +1,4 @@
-package dp.datadeling.perioder
+package no.nav.dagpenger.datadeling.perioder
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

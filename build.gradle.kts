@@ -55,6 +55,7 @@ dependencies {
     // Ktor Server
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
@@ -119,7 +120,7 @@ tasks.named<Test>("test") {
 tasks {
     register("runServerTest", JavaExec::class) {
         environment["ENV"] = "LOCAL"
-        environment["DP_IVERKSETT_URL"] = "http://localhost:8092/api"
+        environment["DP_IVERKSETT_URL"] = "http://localhost:8094/api"
 
         environment["AZURE_APP_WELL_KNOWN_URL"] =
             "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"

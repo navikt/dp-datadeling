@@ -1,4 +1,4 @@
-package dp.datadeling.api
+package no.nav.dagpenger.datadeling.api
 
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

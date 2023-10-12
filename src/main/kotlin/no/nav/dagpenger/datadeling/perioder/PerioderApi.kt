@@ -1,13 +1,13 @@
-package dp.datadeling.perioder
+package no.nav.dagpenger.datadeling.perioder
 
 import com.papsign.ktor.openapigen.route.info
 import com.papsign.ktor.openapigen.route.path.auth.post
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
-import dp.datadeling.defaultLogger
-import dp.datadeling.teknisk.auth
-import dp.datadeling.utils.respondError
-import dp.datadeling.utils.respondOk
+import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.teknisk.auth
+import no.nav.dagpenger.datadeling.utils.respondError
+import no.nav.dagpenger.datadeling.utils.respondOk
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode

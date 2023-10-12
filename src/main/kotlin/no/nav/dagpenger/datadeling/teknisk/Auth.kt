@@ -1,5 +1,9 @@
-package dp.datadeling.teknisk
+package no.nav.dagpenger.datadeling.teknisk
 
+import com.natpryce.konfig.Configuration
+import com.natpryce.konfig.ConfigurationProperties
+import com.natpryce.konfig.EnvironmentVariables
+import com.natpryce.konfig.overriding
 import com.papsign.ktor.openapigen.model.Described
 import com.papsign.ktor.openapigen.model.security.HttpSecurityScheme
 import com.papsign.ktor.openapigen.model.security.SecuritySchemeModel
@@ -7,10 +11,12 @@ import com.papsign.ktor.openapigen.model.security.SecuritySchemeType
 import com.papsign.ktor.openapigen.modules.providers.AuthProvider
 import com.papsign.ktor.openapigen.route.path.auth.OpenAPIAuthenticatedRoute
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
-import dp.datadeling.defaultAuthProvider
+import no.nav.dagpenger.datadeling.defaultAuthProvider
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.util.pipeline.*
+import no.nav.dagpenger.oauth2.CachedOauth2Client
+import no.nav.dagpenger.oauth2.OAuth2Config
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 
 enum class Scopes(override val description: String) : Described {
@@ -53,4 +59,16 @@ inline fun NormalOpenAPIRoute.auth(route: OpenAPIAuthenticatedRoute<TokenValidat
     return openAPIAuthenticatedRoute.apply {
         route()
     }
+}
+
+private val properties: Configuration by lazy {
+    ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
+}
+
+val cachedTokenProvider by lazy {
+    val azureAd = OAuth2Config.AzureAd(properties)
+    CachedOauth2Client(
+        tokenEndpointUrl = azureAd.tokenEndpointUrl,
+        authType = azureAd.clientSecret(),
+    )
 }

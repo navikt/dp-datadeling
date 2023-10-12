@@ -1,19 +1,9 @@
-package dp.datadeling
+package no.nav.dagpenger.datadeling
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.natpryce.konfig.ConfigurationProperties
-import com.natpryce.konfig.EnvironmentVariables
-import com.natpryce.konfig.overriding
 import com.papsign.ktor.openapigen.OpenAPIGen
 import com.papsign.ktor.openapigen.route.apiRouting
-import dp.datadeling.api.internalApi
-import dp.datadeling.perioder.ProxyClient
-import dp.datadeling.perioder.IverksettClient
-import dp.datadeling.perioder.PerioderService
-import dp.datadeling.perioder.perioderApi
-import dp.datadeling.teknisk.JwtProvider
-import dp.datadeling.utils.*
 import io.ktor.client.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -24,8 +14,13 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
-import no.nav.dagpenger.oauth2.CachedOauth2Client
-import no.nav.dagpenger.oauth2.OAuth2Config
+import no.nav.dagpenger.datadeling.api.internalApi
+import no.nav.dagpenger.datadeling.perioder.IverksettClient
+import no.nav.dagpenger.datadeling.perioder.PerioderService
+import no.nav.dagpenger.datadeling.perioder.ProxyClient
+import no.nav.dagpenger.datadeling.perioder.perioderApi
+import no.nav.dagpenger.datadeling.teknisk.JwtProvider
+import no.nav.dagpenger.datadeling.utils.*
 import no.nav.security.token.support.v2.tokenValidationSupport
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -35,6 +30,7 @@ val defaultAuthProvider = JwtProvider()
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
+@Suppress("unused") // application.conf refererer til modulen
 fun Application.module() {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
@@ -78,7 +74,7 @@ fun Application.module() {
 
     val config = environment.config
     install(Authentication) {
-        if (isLocal()) {
+        if (isLocal(config)) {
             basic {
                 skipWhen { true }
             }
@@ -96,18 +92,9 @@ fun Application.module() {
         }
     }
 
-    val azureAdConfig = OAuth2Config.AzureAd(
-        config = ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
-    )
-
-    val tokenProvider = CachedOauth2Client(
-        tokenEndpointUrl = azureAdConfig.tokenEndpointUrl,
-        authType = azureAdConfig.clientSecret(),
-    )
-
     val perioderService = PerioderService(
-        iverksettClient = IverksettClient(client, tokenProvider),
-        proxyClient = ProxyClient(client, tokenProvider)
+        iverksettClient = IverksettClient(client),
+        proxyClient = ProxyClient(client)
     )
 
     apiRouting {

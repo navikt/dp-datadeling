@@ -1,4 +1,4 @@
-package dp.datadeling.utils
+package no.nav.dagpenger.datadeling.utils
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature

@@ -1,12 +1,12 @@
-package dp.datadeling.perioder
+package no.nav.dagpenger.datadeling.perioder
 
 import com.nimbusds.jwt.SignedJWT
-import dp.datadeling.api.ApiTestBase
-import dp.datadeling.enDatadelingRequest
-import dp.datadeling.enDatadelingResponse
-import dp.datadeling.enPeriode
-import dp.datadeling.januar
-import dp.datadeling.utils.defaultObjectMapper
+import no.nav.dagpenger.datadeling.api.ApiTestBase
+import no.nav.dagpenger.datadeling.enDatadelingRequest
+import no.nav.dagpenger.datadeling.enDatadelingResponse
+import no.nav.dagpenger.datadeling.enPeriode
+import no.nav.dagpenger.datadeling.januar
+import no.nav.dagpenger.datadeling.utils.defaultObjectMapper
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

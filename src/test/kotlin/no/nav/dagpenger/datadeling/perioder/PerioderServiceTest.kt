@@ -1,14 +1,10 @@
-package dp.datadeling.perioder
+package no.nav.dagpenger.datadeling.perioder
 
-import dp.datadeling.*
-import dp.datadeling.emptyResponse
-import dp.datadeling.enDatadelingRequest
-import dp.datadeling.enDatadelingResponse
-import dp.datadeling.enPeriode
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import no.nav.dagpenger.datadeling.*
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
 import org.junit.jupiter.api.AfterEach
