@@ -2,7 +2,7 @@ name: Build-Deploy-Prod
 on:
   push:
     branches:
-      - 'master'
+      - main
 
 env:
   IMAGE: ghcr.io/navikt/dp-datadeling:${{ github.sha }}
