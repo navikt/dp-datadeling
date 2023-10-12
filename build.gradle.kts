@@ -3,7 +3,7 @@
  * User Manual available at https://docs.gradle.org/7.6/userguide/building_java_projects.html
  */
 
-project.setProperty("mainClassName", "dp.datadeling.AppKt")
+project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
 val ktorVersion = "2.3.3"
 val micrometerVersion = "1.11.3"
