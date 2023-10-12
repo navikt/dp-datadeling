@@ -31,3 +31,5 @@ build
 
 # Ignore Idea directory
 .idea
+
+.env
