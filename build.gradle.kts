@@ -5,8 +5,8 @@
 
 project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
-val ktorVersion = "2.3.3"
 val micrometerVersion = "1.11.5"
+val ktorVersion = "2.3.5"
 val jacksonVersion = "2.15.3"
 val openApiGeneratorVersion = "0.6.1"
 val tokenValidationVersion = "3.1.5"
@@ -20,13 +20,13 @@ val kontrakterVersion = "2.0_20230818151805_8ba7bfe"
 val bibliotekerVersion = "2023.04.27-09.33.fcf0798bf943"
 val mockOauth2Version = "1.0.0"
 val jupiterVersion = "5.10.0"
-val testcontainersVersion = "1.19.0"
+val testcontainersVersion = "1.19.1"
 val mockkVersion = "1.13.7"
 val wiremockVersion = "3.0.0"
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
-    id("io.ktor.plugin") version "2.3.3"
+    id("io.ktor.plugin") version "2.3.5"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
