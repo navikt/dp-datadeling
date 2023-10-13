@@ -7,7 +7,7 @@ project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
 val ktorVersion = "2.3.3"
 val micrometerVersion = "1.11.3"
-val jacksonVersion = "2.15.2"
+val jacksonVersion = "2.15.3"
 val openApiGeneratorVersion = "0.6.1"
 val tokenValidationVersion = "3.1.5"
 val kotlinLoggerVersion = "3.0.5"
