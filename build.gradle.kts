@@ -21,7 +21,7 @@ val bibliotekerVersion = "2023.04.27-09.33.fcf0798bf943"
 val mockOauth2Version = "2.0.0"
 val jupiterVersion = "5.10.0"
 val testcontainersVersion = "1.19.1"
-val mockkVersion = "1.13.7"
+val mockkVersion = "1.13.8"
 val wiremockVersion = "3.0.0"
 
 plugins {
