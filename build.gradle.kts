@@ -26,7 +26,7 @@ val wiremockVersion = "3.0.0"
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
-    id("io.ktor.plugin") version "2.3.3"
+    id("io.ktor.plugin") version "2.3.5"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
