@@ -57,7 +57,7 @@ spec:
       enabled: true
   gcp:
     sqlInstances:
-      - autoBackupTime: "05:00"
+      - autoBackupHour: 5
         collation: nb_NO.UTF8
         databases:
           - envVarPrefix: DB

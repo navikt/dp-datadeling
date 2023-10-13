@@ -3,32 +3,30 @@
  * User Manual available at https://docs.gradle.org/7.6/userguide/building_java_projects.html
  */
 
-project.setProperty("mainClassName", "dp.datadeling.AppKt")
+project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
-val ktorVersion = "2.3.3"
-val micrometerVersion = "1.11.3"
-val jacksonVersion = "2.15.2"
+val micrometerVersion = "1.11.5"
+val ktorVersion = "2.3.5"
+val jacksonVersion = "2.15.3"
 val openApiGeneratorVersion = "0.6.1"
-val tokenValidationVersion = "3.1.5"
+val tokenValidationVersion = "3.1.7"
 val kotlinLoggerVersion = "3.0.5"
 val logbackVersion = "1.4.11"
 val logstashVersion = "7.4"
 val postgresVersion = "42.6.0"
 val hikariVersion = "5.0.1"
-val flywayVersion = "9.22.0"
+val flywayVersion = "9.22.3"
 val kontrakterVersion = "2.0_20230818151805_8ba7bfe"
 val bibliotekerVersion = "2023.04.27-09.33.fcf0798bf943"
-val mockOauth2Version = "1.0.0"
+val mockOauth2Version = "2.0.0"
 val jupiterVersion = "5.10.0"
-val testcontainersVersion = "1.19.0"
-val mockkVersion = "1.13.7"
 val wiremockVersion = "3.0.1"
+val testcontainersVersion = "1.19.1"
+val mockkVersion = "1.13.8"
 
 plugins {
-    // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
-    // Apply io.ktor.plugin to build a fat JAR
-    id("io.ktor.plugin") version "2.3.3"
+    id("io.ktor.plugin") version "2.3.5"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
@@ -100,39 +98,20 @@ dependencies {
     // Test
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
-    // Use the Kotlin JUnit 5 integration.
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    // Use the JUnit 5 integration.
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
-    // Testcontainers
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
-    // MockK
     testImplementation("io.mockk:mockk:$mockkVersion")
-    // Wiremock
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
+    testImplementation("ch.qos.logback:logback-classic:$logbackVersion")
 }
 
 application {
-    // Define the main class for the application.
     mainClass.set(project.property("mainClassName").toString())
 }
 
 tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
     useJUnitPlatform()
-}
-
-tasks {
-    register("runServerTest", JavaExec::class) {
-        environment["ENV"] = "LOCAL"
-        environment["DP_IVERKSETT_URL"] = "http://localhost:8092/api"
-
-        environment["AZURE_APP_WELL_KNOWN_URL"] =
-            "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration"
-        environment["AZURE_APP_CLIENT_ID"] = "test"
-
-        classpath = sourceSets["main"].runtimeClasspath
-        mainClass.set(project.property("mainClassName").toString())
-    }
 }
