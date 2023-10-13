@@ -20,6 +20,7 @@ import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
 import no.nav.dagpenger.datadeling.teknisk.JwtProvider
+import no.nav.dagpenger.datadeling.teknisk.installRetryClient
 import no.nav.dagpenger.datadeling.utils.*
 import no.nav.security.token.support.v2.tokenValidationSupport
 import java.time.LocalDate
@@ -90,6 +91,7 @@ fun Application.module() {
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
         }
+        installRetryClient()
     }
 
     val perioderService = PerioderService(
