@@ -44,18 +44,18 @@ class HttpRetryClientTest : ApiTestBase() {
     fun `http-klienten prøver å nå ressurs på nytt dersom den får en 5xx-respons`() = testApplication {
             respondWith(HttpStatusCode.InternalServerError)
 
-            val maxNumberOfRetries = 5
+            val maxRetries = 5
             var numberOfRequests = 0
 
-            createRetryClient()
+            createRetryClient(maxRetries)
                 .usingInterceptor { numberOfRequests += 1 }
                 .get(PATH)
 
-            assertEquals(maxNumberOfRetries + 1, numberOfRequests)
+            assertEquals(maxRetries + 1, numberOfRequests)
         }
 
-    private fun ApplicationTestBuilder.createRetryClient() =
-        createClient { installRetryClient(delayFunc = {}) }
+    private fun ApplicationTestBuilder.createRetryClient(maxRetries: Int = 5) =
+        createClient { installRetryClient(maxRetries = maxRetries, delayFunc = {}) }
 
     private fun HttpClient.usingInterceptor(block: (HttpRequestBuilder) -> Unit): HttpClient {
         plugin(HttpSend).intercept { request ->
