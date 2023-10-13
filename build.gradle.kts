@@ -20,9 +20,9 @@ val kontrakterVersion = "2.0_20230818151805_8ba7bfe"
 val bibliotekerVersion = "2023.04.27-09.33.fcf0798bf943"
 val mockOauth2Version = "2.0.0"
 val jupiterVersion = "5.10.0"
+val wiremockVersion = "3.0.1"
 val testcontainersVersion = "1.19.1"
 val mockkVersion = "1.13.8"
-val wiremockVersion = "3.0.0"
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
