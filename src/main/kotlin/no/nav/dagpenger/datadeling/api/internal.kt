@@ -1,4 +1,4 @@
-package dp.datadeling.api
+package no.nav.dagpenger.datadeling.api
 
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.path.normal.get
