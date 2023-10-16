@@ -88,11 +88,11 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.github.seratch:kotliquery:1.9.0")
 
-    // Kontrakter
+    // Nav
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
-
     implementation("com.github.navikt.dp-biblioteker:oauth2-klient:$bibliotekerVersion")
 
     // Test

@@ -20,6 +20,7 @@ import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
 import no.nav.dagpenger.datadeling.teknisk.JwtProvider
+import no.nav.dagpenger.datadeling.teknisk.configureDataSource
 import no.nav.dagpenger.datadeling.teknisk.installRetryClient
 import no.nav.dagpenger.datadeling.utils.*
 import no.nav.security.token.support.v2.tokenValidationSupport
@@ -33,6 +34,8 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 @Suppress("unused") // application.conf refererer til modulen
 fun Application.module() {
+    val dataSource = configureDataSource(System.getenv())
+
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
