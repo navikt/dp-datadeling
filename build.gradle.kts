@@ -100,12 +100,14 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
     testImplementation("ch.qos.logback:logback-classic:$logbackVersion")
+    testImplementation("io.ktor:ktor-server-cio:$ktorVersion")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter:$jupiterVersion")
 }
 
 application {

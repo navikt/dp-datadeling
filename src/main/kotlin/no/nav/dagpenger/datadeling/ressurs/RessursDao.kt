@@ -1,28 +1,34 @@
-package no.nav.dagpenger.datadeling.perioder
+package no.nav.dagpenger.datadeling.ressurs
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotliquery.Row
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.teknisk.asQuery
+import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
-import no.nav.dagpenger.kontrakter.felles.objectMapper
 import javax.sql.DataSource
 
 class RessursDao(private val dataSource: DataSource) {
-    fun opprettRessurs() = sessionOf(dataSource, returnGeneratedKey = true).use {
-        it.run(
-            asQuery("insert into ressurs(status) values ('opprettet')").asUpdateAndReturnGeneratedKey
+    fun opprett(request: DatadelingRequest) = sessionOf(dataSource).use { session ->
+        val requestId = session.run(
+            asQuery(
+                "insert into request(data) values (CAST(? as json)) returning id",
+                objectMapper.writeValueAsString(request),
+            )
+                .map { it.long("id") }
+                .asSingle
+        )
+        session.run(
+            asQuery("insert into ressurs(status, requestRef) values ('opprettet', ?) returning *", requestId)
+                .map(::mapRessurs)
+                .asSingle
         )
     }
 
-    fun hentRessurs(id: Long): Ressurs<DatadelingResponse>? = sessionOf(dataSource).use { session ->
+    fun hent(id: Long) = sessionOf(dataSource).use { session ->
         session.run(
-            asQuery("select * from ressurs where id = ?", id).map { row ->
-                Ressurs(
-                    id = row.long("id"),
-                    status = row.string("status").tilRessursStatus(),
-                    data = row.stringOrNull("data")?.let { objectMapper.readValue<DatadelingResponse>(it) },
-                )
-            }.asSingle
+            asQuery("select * from ressurs where id = ?", id).map(::mapRessurs).asSingle
         )
     }
 
@@ -42,6 +48,12 @@ class RessursDao(private val dataSource: DataSource) {
         )
     }
 }
+
+private fun mapRessurs(row: Row): Ressurs = Ressurs(
+    id = row.long("id"),
+    status = row.string("status").tilRessursStatus(),
+    data = row.stringOrNull("data")?.let { objectMapper.readValue<DatadelingResponse>(it) },
+)
 
 private fun String.tilRessursStatus(): RessursStatus = when (this) {
     "opprettet" -> RessursStatus.OPPRETTET

@@ -7,9 +7,16 @@ $$
     END
 $$;
 
+CREATE TABLE IF NOT EXISTS request
+(
+    id   serial primary key,
+    data json
+);
+
 CREATE TABLE IF NOT EXISTS ressurs
 (
-    id     serial primary key,
-    status ressurs_status not null,
-    data   json
+    id         serial primary key,
+    status     ressurs_status not null,
+    data       json,
+    requestRef bigint         not null references request (id)
 );

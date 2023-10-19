@@ -2,6 +2,7 @@ package no.nav.dagpenger.datadeling.teknisk
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.server.config.*
 import io.micrometer.core.instrument.Clock
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
@@ -10,12 +11,12 @@ import org.flywaydb.core.Flyway
 import java.time.Duration
 import javax.sql.DataSource
 
-internal fun configureDataSource(env: Map<String, String>): DataSource {
-    val databaseHost: String = requireNotNull(env["DATABASE_HOST"]) { "host må settes" }
-    val databasePort: String = requireNotNull(env["DATABASE_PORT"]) { "port må settes" }
-    val databaseName: String = requireNotNull(env["DATABASE_DATABASE"]) { "databasenavn må settes" }
-    val databaseUsername: String = requireNotNull(env["DATABASE_USERNAME"]) { "brukernavn må settes" }
-    val databasePassword: String = requireNotNull(env["DATABASE_PASSWORD"]) { "passord må settes" }
+internal fun configureDataSource(config: ApplicationConfig): DataSource {
+    val databaseHost: String = requireNotNull(config.property("DB_HOST").getString()) { "host må settes" }
+    val databasePort: String = requireNotNull(config.property("DB_PORT").getString()) { "port må settes" }
+    val databaseName: String = requireNotNull(config.property("DB_DATABASE").getString()) { "databasenavn må settes" }
+    val databaseUsername: String = requireNotNull(config.property("DB_USERNAME").getString()) { "brukernavn må settes" }
+    val databasePassword: String = requireNotNull(config.property("DB_PASSWORD").getString()) { "passord må settes" }
 
     val dbUrl = "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"
 

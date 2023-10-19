@@ -1,5 +1,7 @@
 package no.nav.dagpenger.datadeling
 
+import no.nav.dagpenger.datadeling.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.ressurs.RessursStatus
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
@@ -25,6 +27,17 @@ internal fun enDatadelingRequest(
         personIdent = fnr,
         fraOgMedDato = fraOgMed,
         tilOgMedDato = tilOgMed,
+    )
+
+internal fun enRessurs(
+    id: Long = 1L,
+    status: RessursStatus = RessursStatus.OPPRETTET,
+    data: DatadelingResponse? = null,
+) =
+    Ressurs(
+        id = id,
+        status = status,
+        data = data,
     )
 
 internal fun enDatadelingResponse(vararg perioder: Periode, fnr: String = FNR) =
