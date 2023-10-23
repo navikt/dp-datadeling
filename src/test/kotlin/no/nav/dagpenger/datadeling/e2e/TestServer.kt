@@ -11,26 +11,29 @@ import no.nav.dagpenger.datadeling.testModule
 import java.net.ServerSocket
 import javax.sql.DataSource
 
-class TestServer(
-    private val dataSource: DataSource,
-    private val httpPort: Int = ServerSocket(0).use { it.localPort }
-) {
-    fun start(): TestServerRuntime {
-        return TestServerRuntime(dataSource, httpPort)
-    }
+class TestServer(private val dataSource: DataSource, ) {
+    fun start(): TestServerRuntime = TestServerRuntime(dataSource)
 }
 
 class TestServerRuntime(
     dataSource: DataSource,
-    private val httpPort: Int
+    private val httpPort: Int = ServerSocket(0).use { it.localPort },
 ) : AutoCloseable {
-    private val server = createEmbeddedServer(dataSource, httpPort)
+    private val server = createEmbeddedServer(
+        dataSource = dataSource,
+        httpPort = httpPort,
+    )
 
     companion object {
-        private fun createEmbeddedServer(dataSource: DataSource, httpPort: Int) =
+        private fun createEmbeddedServer(
+            dataSource: DataSource,
+            httpPort: Int,
+        ) =
             embeddedServer(CIO, applicationEngineEnvironment {
                 connector { port = httpPort }
-                module { testModule(dataSource, httpPort) }
+                module {
+                    testModule(dataSource = dataSource, port = httpPort)
+                }
             })
     }
 
@@ -41,7 +44,6 @@ class TestServerRuntime(
     override fun close() {
         server.stop(0, 0)
     }
-
 
     fun restClient(): HttpClient {
         return HttpClient {

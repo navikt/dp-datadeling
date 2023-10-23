@@ -1,6 +1,11 @@
 package no.nav.dagpenger.datadeling.e2e
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.dagpenger.datadeling.TestDatabase
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -11,14 +16,20 @@ abstract class AbstractE2ETest {
     private lateinit var testServerRuntime: TestServerRuntime
     private lateinit var testDatabase: TestDatabase
 
-    protected val server get() = testServerRuntime
-    protected val database get() = testDatabase
-    protected val client get() = server.restClient()
+    private lateinit var iverksettMockServer: WireMockServer
+    private lateinit var proxyMockServer: WireMockServer
+    private lateinit var mockOAuth2Server: MockOAuth2Server
+
+    protected val client get() = testServerRuntime.restClient()
+    protected val dataSource get() = testDatabase.dataSource
 
     @BeforeAll
     fun setupServer() {
+        mockOAuth2Server = MockOAuth2Server().also { it.start() }
         testDatabase = TestDatabase()
-        testServerRuntime = TestServer(database.dataSource).start()
+        testServerRuntime = TestServer(testDatabase.dataSource).start()
+        iverksettMockServer = WireMockServer(8094).also { it.start() }
+        proxyMockServer = WireMockServer(8092).also { it.start() }
     }
 
     @AfterAll
@@ -28,6 +39,22 @@ abstract class AbstractE2ETest {
 
     @BeforeEach
     fun resetDatabase() {
-        database.reset()
+        testDatabase.reset()
+    }
+
+    val token get() = mockOAuth2Server.issueToken("default", "dp-datadeling", DefaultOAuth2TokenCallback())
+
+    fun mockIverksettResponse(response: DatadelingResponse) {
+        iverksettMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/api/dagpengerperioder"))
+                .willReturn(WireMock.jsonResponse(response, 200))
+        )
+    }
+
+    fun mockProxyResponse(response: DatadelingResponse) {
+        proxyMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
+                .willReturn(WireMock.jsonResponse(response, 200))
+        )
     }
 }
