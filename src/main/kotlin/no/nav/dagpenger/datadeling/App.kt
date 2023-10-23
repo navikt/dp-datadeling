@@ -36,6 +36,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 fun Application.module(
     dataSource: DataSource = configureDataSource(environment.config),
     appConfig: AppConfig = AppConfig.fra(environment.config),
+    tokenProvider: CachedOauth2Client = cachedTokenProvider,
 ) {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
@@ -102,8 +103,8 @@ fun Application.module(
     val ressursDao = RessursDao(dataSource)
 
     val perioderService = PerioderService(
-        iverksettClient = IverksettClient(appConfig, client),
-        proxyClient = ProxyClient(appConfig, client),
+        iverksettClient = IverksettClient(appConfig, client, tokenProvider),
+        proxyClient = ProxyClient(appConfig, client, tokenProvider),
     )
 
     val ressursService = RessursService(ressursDao)
