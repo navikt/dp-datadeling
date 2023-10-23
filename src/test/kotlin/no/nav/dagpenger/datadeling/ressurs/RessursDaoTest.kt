@@ -16,7 +16,6 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RessursDaoTest : AbstractDatabaseTest() {
-
     private val ressursDao = RessursDao(database.dataSource)
 
     @Test
@@ -25,22 +24,15 @@ class RessursDaoTest : AbstractDatabaseTest() {
         ressursDao.opprett(DatadelingRequest("234", LocalDate.now(), LocalDate.now()))
         ressursDao.opprett(DatadelingRequest("345", LocalDate.now(), LocalDate.now()))
 
-        val ids = sessionOf(database.dataSource).use { session ->
-            session.run(asQuery("select * from ressurs").map {
-                Ressurs(
-                    id = it.long("id"),
-                    status = RessursStatus.valueOf(it.string("status").uppercase()),
-                    data = null,
-                )
-            }.asList)
+        alleRessurser().let { ressurser ->
+            assertEquals(listOf(1L, 2L, 3L), ressurser.map { it.id })
+            assertTrue { ressurser.all { it.status == RessursStatus.OPPRETTET } }
         }
 
-        assertEquals(listOf(1L, 2L, 3L), ids.map { it.id })
-        assertTrue { ids.all { it.status == RessursStatus.OPPRETTET } }
     }
 
     @Test
-    fun `hent ressurs`() {
+    fun `henter ressurs`() {
         val request = DatadelingRequest(
             personIdent = "EN-IDENT",
             fraOgMedDato = LocalDate.now(),
@@ -51,54 +43,18 @@ class RessursDaoTest : AbstractDatabaseTest() {
             perioder = emptyList(),
         )
 
-        sessionOf(database.dataSource).use { session ->
-            session.transaction { transaction ->
-                transaction.run(
-                    asQuery(
-                        """
-                            insert into request(data) 
-                            values (CAST(? as json)), 
-                                (CAST(? as json)), 
-                                (CAST(? as json)) 
-                        """.trimIndent(),
-                        objectMapper.writeValueAsString(request),
-                        objectMapper.writeValueAsString(request),
-                        objectMapper.writeValueAsString(request),
-                    ).asUpdate
-                )
-                transaction.run(
-                    asQuery(
-                        """
-                            insert into ressurs(status, data, requestRef) 
-                            values ('ferdig', null, ?), 
-                                ('opprettet', null, ?), 
-                                ('feilet', CAST(? as json), ?)
-                        """.trimIndent(),
-                        1L,
-                        2L,
-                        objectMapper.writeValueAsString(response),
-                        3L,
-                    ).asExecute
-                )
-            }
-        }
+        insertRequest(request)
+        insertRessurs(RessursStatus.FERDIG, 1L, response)
 
         ressursDao.hent(1L).let {
             assertNotNull(it)
             assertEquals(it.status, RessursStatus.FERDIG)
         }
+    }
 
-        ressursDao.hent(2L).let {
-            assertNotNull(it)
-            assertEquals(it.status, RessursStatus.OPPRETTET)
-        }
-
-        ressursDao.hent(3L).let {
-            assertNotNull(it)
-            assertEquals(it.status, RessursStatus.FEILET)
-        }
-
-        assertNull(ressursDao.hent(4L))
+    @Test
+    fun `returnerer null om ressurs ikke finnes`() {
+        assertNull(ressursDao.hent(1L))
     }
 
     @Test
@@ -129,4 +85,39 @@ class RessursDaoTest : AbstractDatabaseTest() {
         assertEquals(RessursStatus.FEILET, ressursDao.hent(ressurs.id)!!.status)
     }
 
+    private fun alleRessurser() = sessionOf(database.dataSource).use { session ->
+        session.run(
+            asQuery("select * from ressurs").map { row ->
+                Ressurs(
+                    id = row.long("id"),
+                    status = RessursStatus.valueOf(row.string("status").uppercase()),
+                    data = row.stringOrNull("data")?.let { objectMapper.readValue(it, DatadelingResponse::class.java)  }
+                )
+            }.asList
+        )
+    }
+
+    private fun insertRequest(request: DatadelingRequest) {
+        sessionOf(database.dataSource).use { session ->
+            session.run(
+                asQuery(
+                    "insert into request(data) values (CAST(? as json))",
+                    objectMapper.writeValueAsString(request),
+                ).asUpdate
+            )
+        }
+    }
+
+    private fun insertRessurs(status: RessursStatus, requestRef: Long, data: DatadelingResponse?) {
+        sessionOf(database.dataSource).use { session ->
+            session.run(
+                asQuery(
+                    "insert into ressurs(status, data, requestRef) values(CAST(? as ressurs_status), CAST(? as json), ?)",
+                    status.name.lowercase(),
+                    if (data != null) objectMapper.writeValueAsString(data) else null,
+                    requestRef,
+                ).asUpdate
+            )
+        }
+    }
 }
