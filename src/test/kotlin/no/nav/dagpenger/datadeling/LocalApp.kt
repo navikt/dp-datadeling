@@ -10,7 +10,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 @Suppress("unused")
 fun Application.testModule(
-    dataSource: DataSource = mockk(relaxed = true),
+    dataSource: DataSource = TestDatabase().dataSource,
     port: Int = 8080,
 ) {
     val config = MapApplicationConfig(
