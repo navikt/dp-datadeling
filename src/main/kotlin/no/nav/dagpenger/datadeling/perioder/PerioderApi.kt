@@ -6,6 +6,9 @@ import com.papsign.ktor.openapigen.route.path.auth.get
 import com.papsign.ktor.openapigen.route.path.auth.post
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
 import com.papsign.ktor.openapigen.route.route
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.ressurs.Ressurs
@@ -25,6 +28,7 @@ import java.time.LocalDate
 fun NormalOpenAPIRoute.perioderApi(
     appConfig: AppConfig,
     ressursService: RessursService,
+    perioderService: PerioderService,
 ) {
     auth {
         route("/dagpenger/v1/periode") {
@@ -33,15 +37,21 @@ fun NormalOpenAPIRoute.perioderApi(
                 exampleRequest = requestExample,
                 exampleResponse = "http://localhost:8080/api/dagpenger/v1/periode/{ressursId}"
             ) { _, request ->
-                try {
-                    val ressurs = requireNotNull(ressursService.opprett(request)) {
-                        "Kunne ikke opprette ressurs"
+                withContext(Dispatchers.IO) {
+                    try {
+                        val ressurs = requireNotNull(ressursService.opprett(request)) { "Kunne ikke opprette ressurs" }
+                        val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.id}"
+
+                        launch {
+                            val perioder = perioderService.hentDagpengeperioder(request)
+                            ressursService.ferdigstill(ressurs.id, perioder)
+                        }
+
+                        respondCreated(ressursUrl)
+                    } catch (e: Exception) {
+                        defaultLogger.error { e }
+                        respondError("Kunne ikke opprette ressurs")
                     }
-                    val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.id}"
-                    respondCreated(ressursUrl)
-                } catch (e: Exception) {
-                    defaultLogger.error { e }
-                    respondError("Kunne ikke opprette ressurs")
                 }
             }
 

@@ -15,13 +15,21 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.api.internalApi
-import no.nav.dagpenger.datadeling.perioder.*
+import no.nav.dagpenger.datadeling.perioder.IverksettClient
+import no.nav.dagpenger.datadeling.perioder.PerioderService
+import no.nav.dagpenger.datadeling.perioder.ProxyClient
+import no.nav.dagpenger.datadeling.perioder.perioderApi
 import no.nav.dagpenger.datadeling.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.teknisk.JwtProvider
+import no.nav.dagpenger.datadeling.teknisk.cachedTokenProvider
 import no.nav.dagpenger.datadeling.teknisk.configureDataSource
 import no.nav.dagpenger.datadeling.teknisk.installRetryClient
-import no.nav.dagpenger.datadeling.utils.*
+import no.nav.dagpenger.datadeling.utils.LocalDateDeserializer
+import no.nav.dagpenger.datadeling.utils.LocalDateSerializer
+import no.nav.dagpenger.datadeling.utils.LocalDateTimeDeserializer
+import no.nav.dagpenger.datadeling.utils.LocalDateTimeSerializer
+import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.security.token.support.v2.tokenValidationSupport
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -111,6 +119,6 @@ fun Application.module(
 
     apiRouting {
         internalApi(appMicrometerRegistry)
-        perioderApi(appConfig, ressursService)
+        perioderApi(appConfig, ressursService, perioderService)
     }
 }

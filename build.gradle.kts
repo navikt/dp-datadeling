@@ -106,7 +106,7 @@ dependencies {
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
     testImplementation("ch.qos.logback:logback-classic:$logbackVersion")
     testImplementation("io.ktor:ktor-server-cio:$ktorVersion")
-
+    testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter:$jupiterVersion")
 }
 

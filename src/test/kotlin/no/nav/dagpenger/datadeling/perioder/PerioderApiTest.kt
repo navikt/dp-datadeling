@@ -16,7 +16,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class PerioderApiTest : AbstractApiTest() {
-    private val ressursService: RessursService = mockk()
+    private val ressursService: RessursService = mockk(relaxed = true)
+    private val perioderService: PerioderService = mockk(relaxed = true)
 
     @Test
     fun `returnerer 401 uten token`() = testPerioderEndpoint {
@@ -38,6 +39,7 @@ class PerioderApiTest : AbstractApiTest() {
     fun `returnerer 200 og url til ressurs`() = testPerioderEndpoint {
         val ressurs = enRessurs()
         coEvery { ressursService.opprett(any()) } returns ressurs
+        coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
 
         client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), server.createToken())
             .apply { assertEquals(HttpStatusCode.Created, this.status) }
@@ -73,7 +75,11 @@ class PerioderApiTest : AbstractApiTest() {
             testModule(server.config) {
                 val appConfig = AppConfig.fra(environment!!.config)
                 apiRouting {
-                    perioderApi(appConfig, ressursService)
+                    perioderApi(
+                        appConfig,
+                        ressursService,
+                        perioderService
+                    )
                 }
             }
             block()
