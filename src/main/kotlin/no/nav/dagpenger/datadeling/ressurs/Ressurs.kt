@@ -1,6 +1,7 @@
 package no.nav.dagpenger.datadeling.ressurs
 
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import java.util.*
 
 enum class RessursStatus {
     OPPRETTET,
@@ -9,7 +10,7 @@ enum class RessursStatus {
 }
 
 data class Ressurs(
-    val id: Long,
+    val uuid: UUID,
     val status: RessursStatus,
-    val data: DatadelingResponse?
+    val response: DatadelingResponse?
 )

@@ -2,6 +2,7 @@ package no.nav.dagpenger.datadeling.ressurs
 
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.AbstractDatabaseTest
+import no.nav.dagpenger.datadeling.enDatadelingRequest
 import no.nav.dagpenger.datadeling.teknisk.asQuery
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
@@ -9,6 +10,7 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -25,7 +27,7 @@ class RessursDaoTest : AbstractDatabaseTest() {
         ressursDao.opprett(DatadelingRequest("345", LocalDate.now(), LocalDate.now()))
 
         alleRessurser().let { ressurser ->
-            assertEquals(listOf(1L, 2L, 3L), ressurser.map { it.id })
+            assertEquals(3, ressurser.size)
             assertTrue { ressurser.all { it.status == RessursStatus.OPPRETTET } }
         }
 
@@ -33,20 +35,15 @@ class RessursDaoTest : AbstractDatabaseTest() {
 
     @Test
     fun `henter ressurs`() {
-        val request = DatadelingRequest(
-            personIdent = "EN-IDENT",
-            fraOgMedDato = LocalDate.now(),
-            tilOgMedDato = LocalDate.now(),
-        )
+        val request = enDatadelingRequest()
         val response = DatadelingResponse(
             personIdent = "EN-IDENT",
             perioder = emptyList(),
         )
 
-        insertRequest(request)
-        insertRessurs(RessursStatus.FERDIG, 1L, response)
+        val id = insertRessurs(RessursStatus.FERDIG, request, response)
 
-        ressursDao.hent(1L).let {
+        ressursDao.hent(id!!).let {
             assertNotNull(it)
             assertEquals(it.status, RessursStatus.FERDIG)
         }
@@ -54,7 +51,7 @@ class RessursDaoTest : AbstractDatabaseTest() {
 
     @Test
     fun `returnerer null om ressurs ikke finnes`() {
-        assertNull(ressursDao.hent(1L))
+        assertNull(ressursDao.hent(UUID.randomUUID()))
     }
 
     @Test
@@ -67,12 +64,12 @@ class RessursDaoTest : AbstractDatabaseTest() {
             personIdent = "EN-IDENT",
             perioder = emptyList(),
         )
-        ressursDao.ferdigstill(opprettet.id, response)
-        val ferdigstilt = ressursDao.hent(opprettet.id)
+        ressursDao.ferdigstill(opprettet.uuid, response)
+        val ferdigstilt = ressursDao.hent(opprettet.uuid)
 
         assertNotNull(ferdigstilt)
         assertEquals(RessursStatus.FERDIG, ferdigstilt.status)
-        assertEquals(response.personIdent, ferdigstilt.data!!.personIdent)
+        assertEquals(response.personIdent, ferdigstilt.response!!.personIdent)
     }
 
     @Test
@@ -81,43 +78,35 @@ class RessursDaoTest : AbstractDatabaseTest() {
         assertNotNull(ressurs)
         assertEquals(RessursStatus.OPPRETTET, ressurs.status)
 
-        ressursDao.markerSomFeilet(ressurs.id)
-        assertEquals(RessursStatus.FEILET, ressursDao.hent(ressurs.id)!!.status)
+        ressursDao.markerSomFeilet(ressurs.uuid)
+        assertEquals(RessursStatus.FEILET, ressursDao.hent(ressurs.uuid)!!.status)
     }
 
     private fun alleRessurser() = sessionOf(database.dataSource).use { session ->
         session.run(
             asQuery("select * from ressurs").map { row ->
                 Ressurs(
-                    id = row.long("id"),
+                    uuid = row.uuid("uuid"),
                     status = RessursStatus.valueOf(row.string("status").uppercase()),
-                    data = row.stringOrNull("data")?.let { objectMapper.readValue(it, DatadelingResponse::class.java)  }
+                    response = row.stringOrNull("response")
+                        ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) }
                 )
             }.asList
         )
     }
 
-    private fun insertRequest(request: DatadelingRequest) {
+    private fun insertRessurs(status: RessursStatus, request: DatadelingRequest, response: DatadelingResponse?) =
         sessionOf(database.dataSource).use { session ->
             session.run(
                 asQuery(
-                    "insert into request(data) values (CAST(? as json))",
-                    objectMapper.writeValueAsString(request),
-                ).asUpdate
-            )
-        }
-    }
-
-    private fun insertRessurs(status: RessursStatus, requestRef: Long, data: DatadelingResponse?) {
-        sessionOf(database.dataSource).use { session ->
-            session.run(
-                asQuery(
-                    "insert into ressurs(status, data, requestRef) values(CAST(? as ressurs_status), CAST(? as json), ?)",
+                    "insert into ressurs(uuid, status, response, request) values(?, CAST(? as ressurs_status), CAST(? as json), CAST(? as json)) returning uuid",
+                    UUID.randomUUID(),
                     status.name.lowercase(),
-                    if (data != null) objectMapper.writeValueAsString(data) else null,
-                    requestRef,
-                ).asUpdate
+                    if (response != null) objectMapper.writeValueAsString(response) else null,
+                    objectMapper.writeValueAsString(request),
+                ).map {
+                    it.uuid("uuid")
+                }.asSingle
             )
         }
-    }
 }

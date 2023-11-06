@@ -18,6 +18,7 @@ import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import java.util.*
 import kotlin.test.assertNull
 
 class RessursE2ETest : AbstractE2ETest() {
@@ -31,8 +32,7 @@ class RessursE2ETest : AbstractE2ETest() {
     @Test
     fun `opprett ressurs og poll til ressurs har status FERDIG`() = runBlocking {
         val response = DatadelingResponse(
-            personIdent = "123",
-            perioder = listOf(
+            personIdent = "123", perioder = listOf(
                 Periode(
                     fraOgMedDato = 10.januar(),
                     tilOgMedDato = 25.januar(),
@@ -42,7 +42,7 @@ class RessursE2ETest : AbstractE2ETest() {
             )
         )
 
-        mockIverksettResponse(response)
+        mockIverksettResponse(response, delayMs = 200)
         mockProxyResponse(response)
 
         val request = DatadelingRequest(
@@ -58,24 +58,23 @@ class RessursE2ETest : AbstractE2ETest() {
                 append(HttpHeaders.Authorization, "Bearer  $token")
             }
             setBody(objectMapper.writeValueAsString(request))
-        }
-            .apply { assertEquals(HttpStatusCode.Created, this.status) }
-            .bodyAsText()
+        }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
 
         ressursUrl.fetchRessursResponse {
             assertEquals(RessursStatus.OPPRETTET, this.status)
-            assertNull(this.data)
+            assertNull(this.response)
         }
 
+        val uuid = UUID.fromString(ressursUrl.split("/").last())
         runBlocking {
             await.until {
-                ressursService.hent(1L)?.status == RessursStatus.FERDIG
+                ressursService.hent(uuid)?.status == RessursStatus.FERDIG
             }
         }
 
         ressursUrl.fetchRessursResponse {
             assertEquals(RessursStatus.FERDIG, this.status)
-            assertEquals(response, this.data)
+            assertEquals(response, this.response)
         }
     }
 
@@ -85,10 +84,8 @@ class RessursE2ETest : AbstractE2ETest() {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
                 append(HttpHeaders.Authorization, "Bearer $token")
             }
-        }
-            .apply { assertEquals(HttpStatusCode.OK, this.status) }
-            .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }
-            .apply { block() }
+        }.apply { assertEquals(HttpStatusCode.OK, this.status) }
+            .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }.apply { block() }
     }
 
 }

@@ -12,6 +12,7 @@ import no.nav.dagpenger.datadeling.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -44,29 +45,29 @@ class PerioderApiTest : AbstractApiTest() {
         client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), server.createToken())
             .apply { assertEquals(HttpStatusCode.Created, this.status) }
             .bodyAsText()
-            .apply { assertEquals("http://localhost:8080/dagpenger/v1/periode/${ressurs.id}", this) }
+            .apply { assertEquals("http://localhost:8080/dagpenger/v1/periode/${ressurs.uuid}", this) }
     }
 
     @Test
     fun `returnerer ressurs om den finnes`() = testPerioderEndpoint {
-        val id = 1L
+        val uuid = UUID.randomUUID()
         val response = enRessurs(
-            id = id,
+            uuid = uuid,
             status = RessursStatus.FERDIG,
             data = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null))
         )
 
-        coEvery { ressursService.hent(id) } returns response
+        coEvery { ressursService.hent(uuid) } returns response
 
-        client.testGet("/dagpenger/v1/periode/$id", token = server.createToken())
+        client.testGet("/dagpenger/v1/periode/$uuid", token = server.createToken())
             .apply { assertEquals(HttpStatusCode.OK, this.status) }
             .let {
                 objectMapper.readValue(it.bodyAsText(), Ressurs::class.java)
             }
             .apply {
-                assertEquals(1L, this.id)
+                assertEquals(uuid, this.uuid)
                 assertEquals(RessursStatus.FERDIG, this.status)
-                assertEquals(response.data, this.data)
+                assertEquals(response.response, this.response)
             }
     }
 

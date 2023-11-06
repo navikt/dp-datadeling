@@ -7,52 +7,47 @@ import no.nav.dagpenger.datadeling.teknisk.asQuery
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import java.util.*
 import javax.sql.DataSource
 
 class RessursDao(private val dataSource: DataSource) {
     fun opprett(request: DatadelingRequest) = sessionOf(dataSource).use { session ->
-        val requestId = session.run(
+        session.run(
             asQuery(
-                "insert into request(data) values (CAST(? as json)) returning id",
+                "insert into ressurs(uuid, status, request) values (?, 'opprettet', CAST(? as json)) returning *",
+                UUID.randomUUID(),
                 objectMapper.writeValueAsString(request),
-            )
-                .map { it.long("id") }
-                .asSingle
-        )
-        session.run(
-            asQuery("insert into ressurs(status, requestRef) values ('opprettet', ?) returning *", requestId)
-                .map(::mapRessurs)
-                .asSingle
+            ).map(::mapRessurs).asSingle
         )
     }
 
-    fun hent(id: Long) = sessionOf(dataSource).use { session ->
+    fun hent(uuid: UUID) = sessionOf(dataSource).use { session ->
         session.run(
-            asQuery("select * from ressurs where id = ?", id).map(::mapRessurs).asSingle
+            asQuery("select * from ressurs where uuid = ?", uuid).map(::mapRessurs).asSingle
         )
     }
 
-    fun ferdigstill(id: Long, data: DatadelingResponse) = sessionOf(dataSource).use {
+    fun ferdigstill(uuid: UUID, data: DatadelingResponse) = sessionOf(dataSource).use {
         it.run(
             asQuery(
-                "update ressurs set status = 'ferdig', data = CAST(? as json) where id = ?",
+                "update ressurs set status = 'ferdig', response = CAST(? as json) where uuid = ?",
                 objectMapper.writeValueAsString(data),
-                id,
+                uuid,
             ).asUpdate
         )
     }
 
-    fun markerSomFeilet(id: Long) = sessionOf(dataSource).use {
+    fun markerSomFeilet(uuid: UUID) = sessionOf(dataSource).use {
         it.run(
-            asQuery("update ressurs set status = 'feilet' where id = ?", id).asUpdate
+            asQuery("update ressurs set status = 'feilet' where uuid = ?", uuid).asUpdate
         )
     }
 }
 
 private fun mapRessurs(row: Row): Ressurs = Ressurs(
-    id = row.long("id"),
+    uuid = row.uuid("uuid"),
     status = row.string("status").tilRessursStatus(),
-    data = row.stringOrNull("data")?.let { objectMapper.readValue<DatadelingResponse>(it) },
+    response = row.stringOrNull("response")?.let { objectMapper.readValue<DatadelingResponse>(it) },
 )
 
 private fun String.tilRessursStatus(): RessursStatus = when (this) {

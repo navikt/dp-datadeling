@@ -24,6 +24,7 @@ import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import java.time.LocalDate
+import java.util.*
 
 fun NormalOpenAPIRoute.perioderApi(
     appConfig: AppConfig,
@@ -40,11 +41,11 @@ fun NormalOpenAPIRoute.perioderApi(
                 withContext(Dispatchers.IO) {
                     try {
                         val ressurs = requireNotNull(ressursService.opprett(request)) { "Kunne ikke opprette ressurs" }
-                        val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.id}"
+                        val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
 
                         launch {
                             val perioder = perioderService.hentDagpengeperioder(request)
-                            ressursService.ferdigstill(ressurs.id, perioder)
+                            ressursService.ferdigstill(ressurs.uuid, perioder)
                         }
 
                         respondCreated(ressursUrl)
@@ -55,13 +56,13 @@ fun NormalOpenAPIRoute.perioderApi(
                 }
             }
 
-            route("/{id}") {
+            route("/{uuid}") {
                 get<RessursId, Ressurs, TokenValidationContextPrincipal?>(
                     info("Hent ressurs"),
                     example = responseExample
                 ) { params ->
                     try {
-                        val response = requireNotNull(ressursService.hent(params.id)) {
+                        val response = requireNotNull(ressursService.hent(params.uuid)) {
                             "Kunne ikke hente ressurs"
                         }
                         respondOk(response)
@@ -75,7 +76,7 @@ fun NormalOpenAPIRoute.perioderApi(
     }
 }
 
-data class RessursId(@PathParam("Id for ressurs") val id: Long)
+data class RessursId(@PathParam("Id for ressurs") val uuid: UUID)
 
 private val requestExample = DatadelingRequest(
     personIdent = "01020312345",
@@ -84,9 +85,9 @@ private val requestExample = DatadelingRequest(
 )
 
 private val responseExample = Ressurs(
-    id = 1L,
+    uuid = UUID.randomUUID(),
     status = RessursStatus.FERDIG,
-    data = DatadelingResponse(
+    response = DatadelingResponse(
         personIdent = "01020312345",
         perioder = listOf(
             Periode(

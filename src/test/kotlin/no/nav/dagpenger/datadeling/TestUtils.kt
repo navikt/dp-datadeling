@@ -7,6 +7,7 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
 import java.time.LocalDate
+import java.util.UUID
 
 
 internal const val FNR = "01020312342"
@@ -30,14 +31,14 @@ internal fun enDatadelingRequest(
     )
 
 internal fun enRessurs(
-    id: Long = 1L,
+    uuid: UUID = UUID.randomUUID(),
     status: RessursStatus = RessursStatus.OPPRETTET,
     data: DatadelingResponse? = null,
 ) =
     Ressurs(
-        id = id,
+        uuid = uuid,
         status = status,
-        data = data,
+        response = data,
     )
 
 internal fun enDatadelingResponse(vararg perioder: Periode, fnr: String = FNR) =

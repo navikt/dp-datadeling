@@ -44,10 +44,10 @@ abstract class AbstractE2ETest {
 
     val token get() = mockOAuth2Server.issueToken("default", "dp-datadeling", DefaultOAuth2TokenCallback())
 
-    fun mockIverksettResponse(response: DatadelingResponse) {
+    fun mockIverksettResponse(response: DatadelingResponse, delayMs: Int = 0) {
         iverksettMockServer.stubFor(
             WireMock.post(WireMock.urlEqualTo("/api/dagpengerperioder"))
-                .willReturn(WireMock.jsonResponse(response, 200))
+                .willReturn(WireMock.jsonResponse(response, 200).withFixedDelay(delayMs))
         )
     }
 
