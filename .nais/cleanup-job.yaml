@@ -1,0 +1,12 @@
+apiVersion: nais.io/v1
+kind: Naisjob
+metadata:
+  labels:
+    team: teamdagpenger
+  name: dp-datadeling-cleanup
+  namespace: teamdagpenger
+spec:
+  image: docker.io/curlimages/curl:latest
+  schedule: "* * * * *"
+  command:
+    - curl -X POST http://dp-datadeling/internal/cleanup

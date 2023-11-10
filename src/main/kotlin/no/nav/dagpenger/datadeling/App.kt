@@ -19,21 +19,35 @@ import no.nav.dagpenger.datadeling.perioder.IverksettClient
 import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
+import no.nav.dagpenger.datadeling.ressurs.RessursDao
+import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.teknisk.JwtProvider
+import no.nav.dagpenger.datadeling.teknisk.cachedTokenProvider
+import no.nav.dagpenger.datadeling.teknisk.configureDataSource
 import no.nav.dagpenger.datadeling.teknisk.installRetryClient
-import no.nav.dagpenger.datadeling.utils.*
+import no.nav.dagpenger.datadeling.utils.LocalDateDeserializer
+import no.nav.dagpenger.datadeling.utils.LocalDateSerializer
+import no.nav.dagpenger.datadeling.utils.LocalDateTimeDeserializer
+import no.nav.dagpenger.datadeling.utils.LocalDateTimeSerializer
+import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.security.token.support.v2.tokenValidationSupport
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.sql.DataSource
 
 val defaultLogger = KotlinLogging.logger {}
 val defaultAuthProvider = JwtProvider()
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-@Suppress("unused") // application.conf refererer til modulen
-fun Application.module() {
+@Suppress("unused")
+fun Application.module(
+    dataSource: DataSource = configureDataSource(environment.config),
+    appConfig: AppConfig = AppConfig.fra(environment.config),
+    tokenProvider: CachedOauth2Client = cachedTokenProvider,
+) {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
     }
@@ -75,7 +89,7 @@ fun Application.module() {
 
     val config = environment.config
     install(Authentication) {
-        if (isLocal(config)) {
+        if (appConfig.isLocal) {
             basic {
                 skipWhen { true }
             }
@@ -94,13 +108,17 @@ fun Application.module() {
         installRetryClient()
     }
 
+    val ressursDao = RessursDao(dataSource)
+
     val perioderService = PerioderService(
-        iverksettClient = IverksettClient(client),
-        proxyClient = ProxyClient(client)
+        iverksettClient = IverksettClient(appConfig, client, tokenProvider),
+        proxyClient = ProxyClient(appConfig, client, tokenProvider),
     )
+
+    val ressursService = RessursService(ressursDao)
 
     apiRouting {
         internalApi(appMicrometerRegistry)
-        perioderApi(perioderService)
+        perioderApi(appConfig, ressursService, perioderService)
     }
 }

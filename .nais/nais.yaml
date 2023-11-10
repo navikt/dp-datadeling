@@ -52,6 +52,8 @@ spec:
       value: https://{{ dpProxyHost }}
     - name: DP_PROXY_SCOPE
       value: {{ dpProxyScope }}
+    - name: DP_DATADELING_URL
+      value: https://{{ dpDatadelingHost }}
   azure:
     application:
       enabled: true

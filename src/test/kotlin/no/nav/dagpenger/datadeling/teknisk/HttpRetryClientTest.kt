@@ -8,11 +8,11 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
-import no.nav.dagpenger.datadeling.api.ApiTestBase
+import no.nav.dagpenger.datadeling.AbstractApiTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class HttpRetryClientTest : ApiTestBase() {
+class HttpRetryClientTest : AbstractApiTest() {
 
     @Test
     fun `http-klienten prøver ikke retry om den får en 2xx-respons`() = testApplication {
@@ -42,17 +42,17 @@ class HttpRetryClientTest : ApiTestBase() {
 
     @Test
     fun `http-klienten prøver å nå ressurs på nytt dersom den får en 5xx-respons`() = testApplication {
-            respondWith(HttpStatusCode.InternalServerError)
+        respondWith(HttpStatusCode.InternalServerError)
 
-            val maxRetries = 5
-            var numberOfRequests = 0
+        val maxRetries = 5
+        var numberOfRequests = 0
 
-            createRetryClient(maxRetries)
-                .usingInterceptor { numberOfRequests += 1 }
-                .get(PATH)
+        createRetryClient(maxRetries)
+            .usingInterceptor { numberOfRequests += 1 }
+            .get(PATH)
 
-            assertEquals(maxRetries + 1, numberOfRequests)
-        }
+        assertEquals(maxRetries + 1, numberOfRequests)
+    }
 
     private fun ApplicationTestBuilder.createRetryClient(maxRetries: Int = 5) =
         createClient { installRetryClient(maxRetries = maxRetries, delayFunc = {}) }

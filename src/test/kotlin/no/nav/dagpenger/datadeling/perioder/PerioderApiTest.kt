@@ -1,79 +1,87 @@
 package no.nav.dagpenger.datadeling.perioder
 
-import com.nimbusds.jwt.SignedJWT
-import no.nav.dagpenger.datadeling.api.ApiTestBase
-import no.nav.dagpenger.datadeling.enDatadelingRequest
-import no.nav.dagpenger.datadeling.enDatadelingResponse
-import no.nav.dagpenger.datadeling.enPeriode
-import no.nav.dagpenger.datadeling.januar
-import no.nav.dagpenger.datadeling.utils.defaultObjectMapper
-import io.ktor.client.*
-import io.ktor.client.request.*
+import com.papsign.ktor.openapigen.route.apiRouting
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.mockk
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.*
+import no.nav.dagpenger.datadeling.AbstractApiTest
+import no.nav.dagpenger.datadeling.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.ressurs.RessursService
+import no.nav.dagpenger.datadeling.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class PerioderApiTest : ApiTestBase() {
-
-    private val perioderService: PerioderService = mockk()
+class PerioderApiTest : AbstractApiTest() {
+    private val ressursService: RessursService = mockk(relaxed = true)
+    private val perioderService: PerioderService = mockk(relaxed = true)
 
     @Test
     fun `returnerer 401 uten token`() = testPerioderEndpoint {
-        client.post(enDatadelingRequest(), null).apply {
+        client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), token = null).apply {
             assertEquals(HttpStatusCode.Unauthorized, this.status)
         }
     }
 
     @Test
-    fun `returnerer 500 hvis henting av data feiler`() = testPerioderEndpoint {
-        coEvery { perioderService.hentDagpengeperioder(any()) }.throws(Exception())
+    fun `returnerer 500 hvis oppretting av ressurs feiler`() = testPerioderEndpoint {
+        coEvery { ressursService.opprett(any()) }.throws(Exception())
 
-        client.post(enDatadelingRequest()).apply {
+        client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), server.createToken()).apply {
             assertEquals(HttpStatusCode.InternalServerError, this.status)
         }
     }
 
     @Test
-    fun `returnerer 200 og perioder`() = testPerioderEndpoint {
-        val response = enDatadelingResponse(enPeriode(1.januar()..15.januar()))
+    fun `returnerer 200 og url til ressurs`() = testPerioderEndpoint {
+        val ressurs = enRessurs()
+        coEvery { ressursService.opprett(any()) } returns ressurs
+        coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
 
-        coEvery { perioderService.hentDagpengeperioder(any()) } returns response
+        client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), server.createToken())
+            .apply { assertEquals(HttpStatusCode.Created, this.status) }
+            .bodyAsText()
+            .apply { assertEquals("http://localhost:8080/dagpenger/v1/periode/${ressurs.uuid}", this) }
+    }
 
-        client.post(enDatadelingRequest())
+    @Test
+    fun `returnerer ressurs om den finnes`() = testPerioderEndpoint {
+        val uuid = UUID.randomUUID()
+        val response = enRessurs(
+            uuid = uuid,
+            status = RessursStatus.FERDIG,
+            data = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null))
+        )
+
+        coEvery { ressursService.hent(uuid) } returns response
+
+        client.testGet("/dagpenger/v1/periode/$uuid", token = server.createToken())
             .apply { assertEquals(HttpStatusCode.OK, this.status) }
-            .let { defaultObjectMapper.readValue(it.bodyAsText(), DatadelingResponse::class.java) }
+            .let {
+                objectMapper.readValue(it.bodyAsText(), Ressurs::class.java)
+            }
             .apply {
-                assertEquals(1, this.perioder.size)
-                assertEquals(response.personIdent, this.personIdent)
-                assertEquals(response.perioder, this.perioder)
+                assertEquals(uuid, this.uuid)
+                assertEquals(RessursStatus.FERDIG, this.status)
+                assertEquals(response.response, this.response)
             }
     }
 
-    private suspend fun HttpClient.post(
-        request: DatadelingRequest,
-        token: SignedJWT? = createToken()
-    ) =
-        post(perioderApiPath) {
-            headers {
-                append(HttpHeaders.Accept, ContentType.Application.Json)
-                append(HttpHeaders.ContentType, ContentType.Application.Json)
-                if (token != null) {
-                    append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
-                }
-            }
-            setBody(defaultObjectMapper.writeValueAsString(request))
-        }
-
     private fun testPerioderEndpoint(block: suspend ApplicationTestBuilder.() -> Unit) {
         testApplication {
-            module {
-                perioderApi(perioderService)
+            testModule(server.config) {
+                val appConfig = AppConfig.fra(environment!!.config)
+                apiRouting {
+                    perioderApi(
+                        appConfig,
+                        ressursService,
+                        perioderService
+                    )
+                }
             }
             block()
         }
