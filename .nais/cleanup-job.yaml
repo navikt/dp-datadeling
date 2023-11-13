@@ -6,7 +6,7 @@ metadata:
   name: dp-datadeling-cleanup
   namespace: teamdagpenger
 spec:
-  image: docker.io/curlimages/curl:latest
+  image: europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/curl:8.4.0
   schedule: "* * * * *"
   command:
     - curl -X POST http://dp-datadeling/internal/cleanup
