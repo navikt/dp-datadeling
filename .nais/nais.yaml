@@ -41,6 +41,7 @@ spec:
         - application: dp-iverksett
       external:
         - host: {{ dpProxyHost }}
+  leaderElection: true
   # envFrom:
   #  - secret: dp-datadeling
   env:
