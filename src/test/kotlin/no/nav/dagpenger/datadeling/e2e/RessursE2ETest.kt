@@ -3,12 +3,10 @@ package no.nav.dagpenger.datadeling.e2e
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.januar
-import no.nav.dagpenger.datadeling.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.ressurs.RessursService
-import no.nav.dagpenger.datadeling.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.ressurs.*
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
@@ -26,7 +24,11 @@ class RessursE2ETest : AbstractE2ETest() {
 
     @BeforeAll
     fun setup() {
-        ressursService = RessursService(RessursDao(dataSource))
+        ressursService = RessursService(
+            ressursDao = RessursDao(dataSource),
+            leaderElector = mockk(relaxed = true),
+            config = mockk(relaxed = true),
+        )
     }
 
     @Test

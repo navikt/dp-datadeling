@@ -7,6 +7,7 @@ import no.nav.dagpenger.datadeling.teknisk.asQuery
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import java.time.LocalDateTime
 import java.util.*
 import javax.sql.DataSource
 
@@ -40,6 +41,15 @@ class RessursDao(private val dataSource: DataSource) {
     fun markerSomFeilet(uuid: UUID) = sessionOf(dataSource).use {
         it.run(
             asQuery("update ressurs set status = 'feilet' where uuid = ?", uuid).asUpdate
+        )
+    }
+
+    fun slettFerdigeRessurser(eldreEnn: LocalDateTime): Int = sessionOf(dataSource).use { session ->
+        session.run(
+            asQuery(
+                "delete from ressurs where status = 'ferdig' and opprettet < ?",
+                eldreEnn
+            ).asUpdate
         )
     }
 }

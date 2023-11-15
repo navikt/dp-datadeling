@@ -13,18 +13,18 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.api.internalApi
 import no.nav.dagpenger.datadeling.perioder.IverksettClient
 import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
+import no.nav.dagpenger.datadeling.ressurs.RessursConfig
 import no.nav.dagpenger.datadeling.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.ressurs.RessursService
-import no.nav.dagpenger.datadeling.teknisk.JwtProvider
-import no.nav.dagpenger.datadeling.teknisk.cachedTokenProvider
+import no.nav.dagpenger.datadeling.teknisk.*
 import no.nav.dagpenger.datadeling.teknisk.configureDataSource
-import no.nav.dagpenger.datadeling.teknisk.installRetryClient
 import no.nav.dagpenger.datadeling.utils.LocalDateDeserializer
 import no.nav.dagpenger.datadeling.utils.LocalDateSerializer
 import no.nav.dagpenger.datadeling.utils.LocalDateTimeDeserializer
@@ -44,6 +44,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 fun Application.module(
     dataSource: DataSource = configureDataSource(environment.config),
     appConfig: AppConfig = AppConfig.fra(environment.config),
+    ressursConfig: RessursConfig = RessursConfig.fra(environment.config),
     tokenProvider: CachedOauth2Client = cachedTokenProvider,
 ) {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
@@ -115,7 +116,12 @@ fun Application.module(
         proxyClient = ProxyClient(appConfig, client, tokenProvider),
     )
 
-    val ressursService = RessursService(ressursDao)
+    val leaderElector = LeaderElector(client)
+    val ressursService = RessursService(ressursDao, leaderElector, ressursConfig)
+
+    launch {
+        ressursService.scheduleRessursCleanup()
+    }
 
     apiRouting {
         internalApi(appMicrometerRegistry)

@@ -10,6 +10,7 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -82,6 +83,19 @@ class RessursDaoTest : AbstractDatabaseTest() {
         assertEquals(RessursStatus.FEILET, ressursDao.hent(ressurs.uuid)!!.status)
     }
 
+    @Test
+    fun `sletter ferdige ressurser`() {
+        val now = LocalDateTime.now()
+        insertRessurs(RessursStatus.OPPRETTET, opprettet = now.minusMinutes(10))
+        insertRessurs(RessursStatus.FERDIG, opprettet = now.minusMinutes(10))
+        insertRessurs(RessursStatus.FERDIG, opprettet = now)
+        insertRessurs(RessursStatus.FEILET, opprettet = now)
+
+        val antallSlettet = ressursDao.slettFerdigeRessurser(eldreEnn = now.minusMinutes(5))
+        assertEquals(1, antallSlettet)
+        assertEquals(3, alleRessurser().size)
+    }
+
     private fun alleRessurser() = sessionOf(database.dataSource).use { session ->
         session.run(
             asQuery("select * from ressurs").map { row ->
@@ -95,15 +109,25 @@ class RessursDaoTest : AbstractDatabaseTest() {
         )
     }
 
-    private fun insertRessurs(status: RessursStatus, request: DatadelingRequest, response: DatadelingResponse?) =
+    private fun insertRessurs(
+        status: RessursStatus = RessursStatus.OPPRETTET,
+        request: DatadelingRequest = enDatadelingRequest(),
+        response: DatadelingResponse? = null,
+        opprettet: LocalDateTime = LocalDateTime.now()
+    ) =
         sessionOf(database.dataSource).use { session ->
             session.run(
                 asQuery(
-                    "insert into ressurs(uuid, status, response, request) values(?, CAST(? as ressurs_status), CAST(? as json), CAST(? as json)) returning uuid",
+                    """
+                        insert into ressurs(uuid, status, response, request, opprettet) 
+                        values(?, CAST(? as ressurs_status), CAST(? as json), CAST(? as json), ?) 
+                        returning uuid
+                    """.trimIndent(),
                     UUID.randomUUID(),
                     status.name.lowercase(),
                     if (response != null) objectMapper.writeValueAsString(response) else null,
                     objectMapper.writeValueAsString(request),
+                    opprettet
                 ).map {
                     it.uuid("uuid")
                 }.asSingle
