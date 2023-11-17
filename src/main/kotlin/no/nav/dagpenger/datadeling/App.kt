@@ -116,7 +116,7 @@ fun Application.module(
         proxyClient = ProxyClient(appConfig, client, tokenProvider),
     )
 
-    val leaderElector = LeaderElector(client)
+    val leaderElector = LeaderElector(client, appConfig)
     val ressursService = RessursService(ressursDao, leaderElector, ressursConfig)
 
     launch {
