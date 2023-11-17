@@ -44,8 +44,12 @@ fun NormalOpenAPIRoute.perioderApi(
                         val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
 
                         launch {
-                            val perioder = perioderService.hentDagpengeperioder(request)
-                            ressursService.ferdigstill(ressurs.uuid, perioder)
+                            try {
+                                val perioder = perioderService.hentDagpengeperioder(request)
+                                ressursService.ferdigstill(ressurs.uuid, perioder)
+                            } catch (e: Exception) {
+                                ressursService.markerSomFeilet(ressurs.uuid)
+                            }
                         }
 
                         respondCreated(ressursUrl)

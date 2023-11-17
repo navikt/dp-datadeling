@@ -84,6 +84,16 @@ class RessursDaoTest : AbstractDatabaseTest() {
     }
 
     @Test
+    fun `marker gamle ressurser som feilet`() {
+        val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+        assertNotNull(ressurs)
+        assertEquals(RessursStatus.OPPRETTET, ressurs.status)
+
+        ressursDao.markerSomFeilet(LocalDateTime.now())
+        assertEquals(RessursStatus.FEILET, ressursDao.hent(ressurs.uuid)!!.status)
+    }
+
+    @Test
     fun `sletter ferdige ressurser`() {
         val now = LocalDateTime.now()
         insertRessurs(RessursStatus.OPPRETTET, opprettet = now.minusMinutes(10))

@@ -44,10 +44,16 @@ class RessursDao(private val dataSource: DataSource) {
         )
     }
 
+    fun markerSomFeilet(eldreEnn: LocalDateTime) = sessionOf(dataSource).use {
+        it.run(
+            asQuery("update ressurs set status = 'feilet' where opprettet < ?", eldreEnn).asUpdate
+        )
+    }
+
     fun slettFerdigeRessurser(eldreEnn: LocalDateTime): Int = sessionOf(dataSource).use { session ->
         session.run(
             asQuery(
-                "delete from ressurs where status = 'ferdig' and opprettet < ?",
+                "delete from ressurs where status <> 'opprettet' and opprettet < ?",
                 eldreEnn
             ).asUpdate
         )

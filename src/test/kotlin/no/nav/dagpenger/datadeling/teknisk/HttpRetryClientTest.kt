@@ -55,7 +55,7 @@ class HttpRetryClientTest : AbstractApiTest() {
     }
 
     private fun ApplicationTestBuilder.createRetryClient(maxRetries: Int = 5) =
-        createClient { installRetryClient(maxRetries = maxRetries, delayFunc = {}) }
+        createClient { installRetryClient(maksRetries = maxRetries, delayFunc = {}) }
 
     private fun HttpClient.usingInterceptor(block: (HttpRequestBuilder) -> Unit): HttpClient {
         plugin(HttpSend).intercept { request ->

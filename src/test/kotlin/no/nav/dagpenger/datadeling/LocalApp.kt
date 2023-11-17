@@ -14,6 +14,7 @@ fun Application.testModule(
     dataSource: DataSource = TestDatabase().dataSource,
     port: Int = 8080,
 ) {
+
     val config = MapApplicationConfig(
         "ENV" to "LOCAL",
         "DP_IVERKSETT_URL" to "http://0.0.0.0:8094",
@@ -27,8 +28,10 @@ fun Application.testModule(
         "no.nav.security.jwt.issuers.0.issuer_name" to "default",
         "no.nav.security.jwt.issuers.0.discoveryurl" to "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration\"",
         "no.nav.security.jwt.issuers.0.accepted_audience" to "default",
-        "ressurs.levetidMinutter" to "60",
-        "ressurs.oppryddingsfrekvensMinutter" to "1440"
+        "ressurs.minutterLevetidOpprettet" to "120",
+        "ressurs.minutterLevetidFerdig" to "1440",
+        "ressurs.oppryddingsfrekvensMinutter" to "60",
+        "httpClient.retries" to "0"
     )
 
     module(

@@ -27,19 +27,24 @@ class RessursService(
 
     fun ferdigstill(uuid: UUID, response: DatadelingResponse) = ressursDao.ferdigstill(uuid, response)
 
+    fun markerSomFeilet(uuid: UUID) = ressursDao.markerSomFeilet(uuid)
+
     suspend fun scheduleRessursCleanup(
         delay: Duration = Duration.ofMinutes(config.oppryddingsfrekvensMinutter),
-        timeToLive: Duration = Duration.ofHours(config.levetidMinutter),
+        minutterLevetidOpprettet: Duration = Duration.ofHours(config.minutterLevetidOpprettet),
+        minutterLevetidFerdig: Duration = Duration.ofHours(config.minutterLevetidFerdig),
     ) {
         schedule(delay) {
             if (!leaderElector.isLeader()) {
                 return@schedule
             }
-            logger.info("Starter sletting av ferdige ressurser")
-            val antallSlettet = ressursDao.slettFerdigeRessurser(
-                eldreEnn = LocalDateTime.now().minus(timeToLive)
-            )
-            logger.info("Slettet $antallSlettet ressurs(er)")
+            logger.info("Starter opprydding av ressurser")
+            val antallMarkertSomFeilet =
+                ressursDao.markerSomFeilet(eldreEnn = LocalDateTime.now().minus(minutterLevetidOpprettet))
+            logger.info("Markerte $antallMarkertSomFeilet ressurs(er) som feilet")
+            val antallSlettet =
+                ressursDao.slettFerdigeRessurser(eldreEnn = LocalDateTime.now().minus(minutterLevetidFerdig))
+            logger.info("Slettet $antallSlettet ferdige og feilede ressurs(er)")
         }
     }
 

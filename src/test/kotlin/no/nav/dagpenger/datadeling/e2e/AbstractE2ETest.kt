@@ -51,6 +51,13 @@ abstract class AbstractE2ETest {
         )
     }
 
+    fun mockIverksettError(delayMs: Int = 0) {
+        iverksettMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/api/dagpengerperioder"))
+                .willReturn(WireMock.serverError().withFixedDelay(delayMs))
+        )
+    }
+
     fun mockProxyResponse(response: DatadelingResponse) {
         proxyMockServer.stubFor(
             WireMock.post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))

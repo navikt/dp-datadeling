@@ -44,7 +44,8 @@ class TestApiServer {
             "no.nav.security.jwt.issuers.size" to "1",
             "no.nav.security.jwt.issuers.0.issuer_name" to ISSUER,
             "no.nav.security.jwt.issuers.0.discoveryurl" to mockOAuth2Server.wellKnownUrl(ISSUER).toString(),
-            "no.nav.security.jwt.issuers.0.accepted_audience" to "default"
+            "no.nav.security.jwt.issuers.0.accepted_audience" to "default",
+            "httpClient.retries" to "0"
         )
 
 }

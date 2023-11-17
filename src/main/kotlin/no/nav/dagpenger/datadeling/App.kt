@@ -106,7 +106,7 @@ fun Application.module(
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
         }
-        installRetryClient()
+        installRetryClient(maksRetries = appConfig.maksRetries)
     }
 
     val ressursDao = RessursDao(dataSource)
