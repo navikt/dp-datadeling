@@ -7,15 +7,14 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 
-class PerioderService(
-    private val iverksettClient: IverksettClient,
-    private val proxyClient: ProxyClient,
-) {
+class PerioderService(private val proxyClient: ProxyClient) {
     fun hentDagpengeperioder(request: DatadelingRequest) = runBlocking {
-        val iverksettResponse = async { iverksettClient.hentDagpengeperioder(request) }
         val proxyResponse = async { proxyClient.hentDagpengeperioder(request) }
 
-        val perioder = awaitAll(iverksettResponse, proxyResponse)
+        // Sammenfletter og sorterer dagpengeperioder fra forskjellige kilder.
+        // Vi henter foreløpig bare perioder fra dp-proxy, men kommer til å måtte hente perioder fra vedtak produsert i
+        // egen løsning senere.
+        val perioder = awaitAll(proxyResponse)
             .flatMap { it.perioder }
             .sortedBy { it.fraOgMedDato }
             .sammenslått()

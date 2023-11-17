@@ -13,9 +13,8 @@ import org.junit.jupiter.api.Test
 
 class PerioderServiceTest {
 
-    private val iverksettClient = mockk<IverksettClient>()
     private val proxyClient = mockk<ProxyClient>()
-    private val perioderService = PerioderService(iverksettClient, proxyClient)
+    private val perioderService = PerioderService(proxyClient)
 
     @AfterEach
     fun cleanup() {
@@ -24,7 +23,6 @@ class PerioderServiceTest {
 
     @Test
     fun `ingen perioder`() = runTest {
-        coEvery { iverksettClient.hentDagpengeperioder(any()) } returns emptyResponse()
         coEvery { proxyClient.hentDagpengeperioder(any()) } returns emptyResponse()
 
         val request = enDatadelingRequest(1.januar()..10.januar())
@@ -38,8 +36,7 @@ class PerioderServiceTest {
         val request = enDatadelingRequest(1.januar()..6.januar())
         val response = enDatadelingResponse(enPeriode(1.januar()..6.januar()))
 
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns response
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns emptyResponse()
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
         assertEquals(response.perioder, perioderService.hentDagpengeperioder(request).perioder)
     }
@@ -53,8 +50,7 @@ class PerioderServiceTest {
             enPeriode(7.januar()..11.januar()),
         )
 
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns response
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns emptyResponse()
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
         perioderService.hentDagpengeperioder(request).let {
             assertEquals(1, it.perioder.size)
@@ -72,8 +68,7 @@ class PerioderServiceTest {
             enPeriode(7.januar()..11.januar()),
         )
 
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns response
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns emptyResponse()
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
         perioderService.hentDagpengeperioder(request).let {
             assertEquals(2, it.perioder.size)
@@ -90,8 +85,7 @@ class PerioderServiceTest {
             enPeriode(7.januar()..11.januar(), StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER),
         )
 
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns response
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns emptyResponse()
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
         perioderService.hentDagpengeperioder(request).let {
             assertEquals(2, it.perioder.size)
@@ -100,28 +94,11 @@ class PerioderServiceTest {
     }
 
     @Test
-    fun `slår sammen perioder fra iverksett og proxy`() = runTest {
-        val request = enDatadelingRequest(1.januar()..15.januar())
-        val iverksettResponse = enDatadelingResponse(enPeriode(1.januar()..6.januar()))
-        val proxyResponse = enDatadelingResponse(enPeriode(7.januar()..11.januar()))
-
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns iverksettResponse
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns proxyResponse
-
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(iverksettResponse.perioder.first().fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(proxyResponse.perioder.first().tilOgMedDato, it.perioder.first().tilOgMedDato)
-        }
-    }
-
-    @Test
     fun `avkorter perioden mot forespørsel`() = runTest {
         val request = enDatadelingRequest(3.januar()..8.januar())
         val response = enDatadelingResponse(enPeriode(1.januar()..11.januar()))
 
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns response
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns emptyResponse()
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
         perioderService.hentDagpengeperioder(request).let {
             assertEquals(1, it.perioder.size)
@@ -135,8 +112,7 @@ class PerioderServiceTest {
         val request = enDatadelingRequest(3.januar()..8.januar())
         val response = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null))
 
-        coEvery { iverksettClient.hentDagpengeperioder(request) } returns response
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns emptyResponse()
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
         perioderService.hentDagpengeperioder(request).let {
             assertEquals(1, it.perioder.size)

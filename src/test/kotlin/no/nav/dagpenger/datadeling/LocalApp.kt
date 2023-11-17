@@ -17,8 +17,6 @@ fun Application.testModule(
 
     val config = MapApplicationConfig(
         "ENV" to "LOCAL",
-        "DP_IVERKSETT_URL" to "http://0.0.0.0:8094",
-        "DP_IVERKSETT_SCOPE" to "scope",
         "DP_PROXY_URL" to "http://0.0.0.0:8092",
         "DP_PROXY_SCOPE" to "scope",
         "DP_DATADELING_URL" to "http://localhost:$port",

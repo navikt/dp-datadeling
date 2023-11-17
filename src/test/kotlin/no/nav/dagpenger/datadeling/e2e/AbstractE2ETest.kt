@@ -16,7 +16,6 @@ abstract class AbstractE2ETest {
     private lateinit var testServerRuntime: TestServerRuntime
     private lateinit var testDatabase: TestDatabase
 
-    private lateinit var iverksettMockServer: WireMockServer
     private lateinit var proxyMockServer: WireMockServer
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
@@ -28,7 +27,6 @@ abstract class AbstractE2ETest {
         mockOAuth2Server = MockOAuth2Server().also { it.start() }
         testDatabase = TestDatabase()
         testServerRuntime = TestServer(testDatabase.dataSource).start()
-        iverksettMockServer = WireMockServer(8094).also { it.start() }
         proxyMockServer = WireMockServer(8092).also { it.start() }
     }
 
@@ -44,24 +42,17 @@ abstract class AbstractE2ETest {
 
     val token get() = mockOAuth2Server.issueToken("default", "dp-datadeling", DefaultOAuth2TokenCallback())
 
-    fun mockIverksettResponse(response: DatadelingResponse, delayMs: Int = 0) {
-        iverksettMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/dagpengerperioder"))
-                .willReturn(WireMock.jsonResponse(response, 200).withFixedDelay(delayMs))
-        )
-    }
-
-    fun mockIverksettError(delayMs: Int = 0) {
-        iverksettMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/dagpengerperioder"))
+    fun mockProxyError(delayMs: Int = 0) {
+        proxyMockServer.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
                 .willReturn(WireMock.serverError().withFixedDelay(delayMs))
         )
     }
 
-    fun mockProxyResponse(response: DatadelingResponse) {
+    fun mockProxyResponse(response: DatadelingResponse, delayMs: Int = 0) {
         proxyMockServer.stubFor(
             WireMock.post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
-                .willReturn(WireMock.jsonResponse(response, 200))
+                .willReturn(WireMock.jsonResponse(response, 200).withFixedDelay(delayMs))
         )
     }
 }

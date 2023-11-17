@@ -48,8 +48,7 @@ class RessursE2ETest : AbstractE2ETest() {
             )
         )
 
-        mockIverksettResponse(response, delayMs = 200)
-        mockProxyResponse(response)
+        mockProxyResponse(response, delayMs = 200)
 
         val request = DatadelingRequest(
             personIdent = response.personIdent,
@@ -97,8 +96,7 @@ class RessursE2ETest : AbstractE2ETest() {
             )
         )
 
-        mockIverksettError()
-        mockProxyResponse(response)
+        mockProxyError()
 
         val request = DatadelingRequest(
             personIdent = response.personIdent,

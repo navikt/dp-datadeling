@@ -16,7 +16,6 @@ import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.api.internalApi
-import no.nav.dagpenger.datadeling.perioder.IverksettClient
 import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
@@ -111,10 +110,7 @@ fun Application.module(
 
     val ressursDao = RessursDao(dataSource)
 
-    val perioderService = PerioderService(
-        iverksettClient = IverksettClient(appConfig, client, tokenProvider),
-        proxyClient = ProxyClient(appConfig, client, tokenProvider),
-    )
+    val perioderService = PerioderService(proxyClient = ProxyClient(appConfig, client, tokenProvider))
 
     val leaderElector = LeaderElector(client, appConfig)
     val ressursService = RessursService(ressursDao, leaderElector, ressursConfig)

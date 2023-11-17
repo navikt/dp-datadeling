@@ -4,8 +4,6 @@ requestsCpu: 500m
 db_tier: "db-f1-micro"
 ingresses:
   - https://dp-datadeling.intern.dev.nav.no
-dpIverksettUrl: http://dp-iverksett
-dpIverksettScope: api://dev-gcp.teamdagpenger.dp-iverksett/.default
 dpProxyHost: dp-proxy.dev-fss-pub.nais.io
 dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: dp-datadeling.intern.dev.nav.no

@@ -4,8 +4,6 @@ requestsCpu: 500m
 db_tier: "db-custom-4-8192"
 ingresses:
   - https://dp-datadeling.intern.nav.no
-dpIverksettUrl: http://dp-iverksett
-dpIverksettScope: api://prod-gcp.teamdagpenger.dp-iverksett/.default
 dpProxyHost: dp-proxy.prod-fss-pub.nais.io
 dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: dp-datadeling.intern.nav.no
