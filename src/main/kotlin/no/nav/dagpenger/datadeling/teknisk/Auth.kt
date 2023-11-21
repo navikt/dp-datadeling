@@ -11,19 +11,33 @@ import com.papsign.ktor.openapigen.model.security.SecuritySchemeType
 import com.papsign.ktor.openapigen.modules.providers.AuthProvider
 import com.papsign.ktor.openapigen.route.path.auth.OpenAPIAuthenticatedRoute
 import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
-import no.nav.dagpenger.datadeling.defaultAuthProvider
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.util.pipeline.*
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 
-enum class Scopes(override val description: String) : Described {
-    Profile("Some scope")
+enum class Scopes(override val description: String) : Described
+
+fun AuthenticationConfig.jwtScope(realm: String, scope: String) {
+    jwt(realm) {
+        validate {
+            credential ->
+            if (scope == credential.getClaim("scope", String::class)) {
+                return@validate null
+            }
+            JWTPrincipal(credential.payload)
+        }
+    }
 }
 
-class JwtProvider : AuthProvider<TokenValidationContextPrincipal?> {
+class JwtProvider(
+    referenceName: String,
+    discoveryUrl: String? = null,
+    private val realm: String? = null,
+) : AuthProvider<TokenValidationContextPrincipal?> {
     override val security: Iterable<Iterable<AuthProvider.Security<*>>> =
         listOf(
             listOf(
@@ -32,7 +46,8 @@ class JwtProvider : AuthProvider<TokenValidationContextPrincipal?> {
                         SecuritySchemeType.http,
                         scheme = HttpSecurityScheme.bearer,
                         bearerFormat = "JWT",
-                        referenceName = "jwtAuth",
+                        referenceName = referenceName,
+                        openIdConnectUrl = discoveryUrl
                     ),
                     emptyList<Scopes>()
                 )
@@ -44,17 +59,36 @@ class JwtProvider : AuthProvider<TokenValidationContextPrincipal?> {
     }
 
     override fun apply(route: NormalOpenAPIRoute): OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?> {
-        val authenticatedKtorRoute = route.ktorRoute.authenticate { }
+        val authenticatedKtorRoute = route.ktorRoute.authenticate(realm) { }
         return OpenAPIAuthenticatedRoute(authenticatedKtorRoute, route.provider.child(), this)
     }
 }
 
-inline fun NormalOpenAPIRoute.auth(route: OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?>.() -> Unit): OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?> {
+inline fun NormalOpenAPIRoute.authAzureAd(
+    realm: String?,
+    route: OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?>.() -> Unit
+): OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?> {
     val authenticatedKtorRoute = this.ktorRoute.authenticate { }
     val openAPIAuthenticatedRoute = OpenAPIAuthenticatedRoute(
         authenticatedKtorRoute,
         this.provider.child(),
-        authProvider = defaultAuthProvider
+        authProvider = JwtProvider("azureAd", )
+    )
+    return openAPIAuthenticatedRoute.apply {
+        route()
+    }
+}
+inline fun NormalOpenAPIRoute.authMaskinporten(
+    realm: String,
+    discoveryUrl: String,
+    route: OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?>.() -> Unit): OpenAPIAuthenticatedRoute<TokenValidationContextPrincipal?> {
+
+    val authenticatedKtorRoute = this.ktorRoute.authenticate(realm) { }
+
+    val openAPIAuthenticatedRoute = OpenAPIAuthenticatedRoute(
+        authenticatedKtorRoute,
+        this.provider.child(),
+        authProvider = JwtProvider(realm, discoveryUrl)
     )
     return openAPIAuthenticatedRoute.apply {
         route()

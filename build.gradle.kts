@@ -78,6 +78,7 @@ dependencies {
 
     // Security
     implementation("no.nav.security:token-validation-ktor-v2:$tokenValidationVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
 
     // Log
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggerVersion")

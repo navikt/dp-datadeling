@@ -35,7 +35,6 @@ import java.time.LocalDateTime
 import javax.sql.DataSource
 
 val defaultLogger = KotlinLogging.logger {}
-val defaultAuthProvider = JwtProvider()
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -60,7 +59,7 @@ fun Application.module(
             title = "DP datadeling API"
         }
         // Use JWT authentication (Authorize button appears in Swagger UI)
-        addModules(defaultAuthProvider)
+        addModules(JwtProvider("default"))
     }
 
     install(ContentNegotiation) {
@@ -93,8 +92,10 @@ fun Application.module(
             basic {
                 skipWhen { true }
             }
+            jwtScope("afpprivat", "nav:dagpenger:afpprivat.read", )
         } else {
             tokenValidationSupport(config = config)
+            jwtScope("afpprivat", "nav:dagpenger:afpprivat.read", )
         }
     }
 

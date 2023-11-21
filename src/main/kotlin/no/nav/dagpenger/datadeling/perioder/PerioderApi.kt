@@ -14,7 +14,8 @@ import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.teknisk.auth
+import no.nav.dagpenger.datadeling.teknisk.authAzureAd
+import no.nav.dagpenger.datadeling.teknisk.authMaskinporten
 import no.nav.dagpenger.datadeling.utils.respondCreated
 import no.nav.dagpenger.datadeling.utils.respondError
 import no.nav.dagpenger.datadeling.utils.respondOk
@@ -31,7 +32,14 @@ fun NormalOpenAPIRoute.perioderApi(
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
-    auth {
+    authMaskinporten("afpprivat", appConfig.maskinportenUrl) {
+        route("/maskinporten-test") {
+            get<Unit, Ressurs, TokenValidationContextPrincipal?> {
+                defaultLogger.info("heipaadu")
+            }
+        }
+    }
+    authAzureAd("azureAD") {
         route("/dagpenger/v1/periode") {
             post<Unit, String, DatadelingRequest, TokenValidationContextPrincipal?>(
                 info("Opprett ressurs og motta endepunkt for å hente ressurs"),

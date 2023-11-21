@@ -8,6 +8,7 @@ data class AppConfig(
     val dpDatadelingUrl: String,
     val isLocal: Boolean,
     val maksRetries: Int,
+    val maskinportenUrl: String,
 ) {
     companion object {
         fun fra(config: ApplicationConfig) = AppConfig(
@@ -16,6 +17,7 @@ data class AppConfig(
             dpDatadelingUrl = config.property("DP_DATADELING_URL").getString(),
             isLocal = config.propertyOrNull("ENV")?.getString() == "LOCAL",
             maksRetries = config.property("httpClient.retries").getString().toInt(),
+            maskinportenUrl = config.property("maskinporten.discoveryurl").getString()
         )
     }
 }
