@@ -30,8 +30,10 @@ fun Application.testModule(
         "ressurs.minutterLevetidFerdig" to "1440",
         "ressurs.oppryddingsfrekvensMinutter" to "60",
         "httpClient.retries" to "0",
-        "maskinporten.discoveryurl" to "https://maskinporten.no/.well-known/oauth-authorization-server/",
-        "maskinporten.scope" to "nav:dagpenger:afpprivat.read"
+        "maskinporten.discoveryurl" to "https://test.maskinporten.no/.well-known/oauth-authorization-server",
+        "maskinporten.scope" to "nav:dagpenger:vedtak.read",
+        "maskinporten.issuer" to "https://test.maskinporten.no/",
+        "maskinporten.jwks_uri" to "https://test.maskinporten.no/jwk",
     )
 
     module(

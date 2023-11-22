@@ -1,11 +1,12 @@
 package no.nav.dagpenger.datadeling.perioder
 
 import com.papsign.ktor.openapigen.annotations.parameters.PathParam
-import com.papsign.ktor.openapigen.route.info
-import com.papsign.ktor.openapigen.route.path.auth.get
-import com.papsign.ktor.openapigen.route.path.auth.post
-import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
-import com.papsign.ktor.openapigen.route.route
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -14,41 +15,35 @@ import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.teknisk.authAzureAd
-import no.nav.dagpenger.datadeling.teknisk.authMaskinporten
-import no.nav.dagpenger.datadeling.utils.respondCreated
-import no.nav.dagpenger.datadeling.utils.respondError
-import no.nav.dagpenger.datadeling.utils.respondOk
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
-import no.nav.security.token.support.v2.TokenValidationContextPrincipal
+import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.util.*
 
-fun NormalOpenAPIRoute.perioderApi(
+fun Route.perioderApi(
     appConfig: AppConfig,
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
-    authMaskinporten("afpprivat", appConfig.maskinportenUrl) {
-        route("/maskinporten-test") {
-            get<Unit, Ressurs, TokenValidationContextPrincipal?> {
+    authenticate("afpPrivat") {
+        route("/maskinporten-test/") {
+            get {
                 defaultLogger.info("heipaadu")
+                call.respond("Seherja")
             }
         }
     }
-    authAzureAd("azureAD") {
+
+    authenticate("afpPrivat") {
         route("/dagpenger/v1/periode") {
-            post<Unit, String, DatadelingRequest, TokenValidationContextPrincipal?>(
-                info("Opprett ressurs og motta endepunkt for å hente ressurs"),
-                exampleRequest = requestExample,
-                exampleResponse = "http://localhost:8080/api/dagpenger/v1/periode/{ressursId}"
-            ) { _, request ->
+            post {
                 withContext(Dispatchers.IO) {
                     try {
-                        val ressurs = requireNotNull(ressursService.opprett(request)) { "Kunne ikke opprette ressurs" }
+                        val request = call.receive<DatadelingRequest>()
+                        val ressurs = requireNotNull(ressursService.opprett(request))
                         val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
 
                         launch {
@@ -60,31 +55,36 @@ fun NormalOpenAPIRoute.perioderApi(
                             }
                         }
 
-                        respondCreated(ressursUrl)
+                        call.respond(HttpStatusCode.Created, ressursUrl)
+                    } catch (e: ContentTransformationException) {
+                        call.respond(HttpStatusCode.BadRequest, "Kan ikke lese innholdet i forespørselen")
                     } catch (e: Exception) {
                         defaultLogger.error { e }
-                        respondError("Kunne ikke opprette ressurs")
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke opprette ressurs")
                     }
                 }
             }
 
-            route("/{uuid}") {
-                get<RessursId, Ressurs, TokenValidationContextPrincipal?>(
-                    info("Hent ressurs"),
-                    example = responseExample
-                ) { params ->
-                    try {
-                        val response = requireNotNull(ressursService.hent(params.uuid)) {
-                            "Kunne ikke hente ressurs"
-                        }
-                        respondOk(response)
-                    } catch (e: Exception) {
-                        defaultLogger.error { e }
-                        respondError("Kunne ikke hente ressurs")
+            get("/{uuid}") {
+                try {
+                    val ressursRef = UUID.fromString(call.parameters.get("uuid"))
+                    val response = ressursService.hent(ressursRef)
+
+                    if (response == null) {
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        call.respond(HttpStatusCode.OK, response)
                     }
+
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (e: Exception) {
+                    defaultLogger.error { e }
+                    call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente ressurs")
                 }
             }
         }
+
     }
 }
 

@@ -1,5 +1,7 @@
 package no.nav.dagpenger.datadeling
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.LoggerContext
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.papsign.ktor.openapigen.OpenAPIGen
@@ -11,6 +13,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.launch
@@ -30,6 +33,7 @@ import no.nav.dagpenger.datadeling.utils.LocalDateTimeDeserializer
 import no.nav.dagpenger.datadeling.utils.LocalDateTimeSerializer
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.security.token.support.v2.tokenValidationSupport
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.sql.DataSource
@@ -45,6 +49,7 @@ fun Application.module(
     ressursConfig: RessursConfig = RessursConfig.fra(environment.config),
     tokenProvider: CachedOauth2Client = cachedTokenProvider,
 ) {
+
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     install(MicrometerMetrics) {
@@ -58,8 +63,6 @@ fun Application.module(
         info {
             title = "DP datadeling API"
         }
-        // Use JWT authentication (Authorize button appears in Swagger UI)
-        addModules(JwtProvider("default"))
     }
 
     install(ContentNegotiation) {
@@ -88,15 +91,12 @@ fun Application.module(
 
     val config = environment.config
     install(Authentication) {
-        if (appConfig.isLocal) {
-            basic {
-                skipWhen { true }
-            }
-            jwtScope("afpprivat", "nav:dagpenger:afpprivat.read", )
-        } else {
-            tokenValidationSupport(config = config)
-            jwtScope("afpprivat", "nav:dagpenger:afpprivat.read", )
-        }
+        maskinporten(
+            "afpPrivat",
+            config.property("maskinporten.scope").getString(),
+            config.property("maskinporten.jwks_uri").getString(),
+            config.property("maskinporten.issuer").getString(),
+        )
     }
 
     val client = HttpClient {
@@ -120,8 +120,8 @@ fun Application.module(
         ressursService.scheduleRessursCleanup()
     }
 
-    apiRouting {
-        internalApi(appMicrometerRegistry)
+    routing {
+//        internalApi(appMicrometerRegistry)
         perioderApi(appConfig, ressursService, perioderService)
     }
 }
