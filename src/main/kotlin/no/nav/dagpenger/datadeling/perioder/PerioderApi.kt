@@ -44,7 +44,7 @@ fun Route.perioderApi(
                     try {
                         val request = call.receive<DatadelingRequest>()
                         val ressurs = requireNotNull(ressursService.opprett(request))
-                        val ressursUrl = "${appConfig.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
+                        val ressursUrl = "${appConfig.httpClient.host}/dagpenger/v1/periode/${ressurs.uuid}"
 
                         launch {
                             try {

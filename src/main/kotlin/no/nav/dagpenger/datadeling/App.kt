@@ -1,11 +1,8 @@
 package no.nav.dagpenger.datadeling
 
-import ch.qos.logback.classic.Level
-import ch.qos.logback.classic.LoggerContext
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.papsign.ktor.openapigen.OpenAPIGen
-import com.papsign.ktor.openapigen.route.apiRouting
 import io.ktor.client.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -18,22 +15,15 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
-import no.nav.dagpenger.datadeling.api.internalApi
 import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
-import no.nav.dagpenger.datadeling.ressurs.RessursConfig
 import no.nav.dagpenger.datadeling.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.teknisk.*
 import no.nav.dagpenger.datadeling.teknisk.configureDataSource
-import no.nav.dagpenger.datadeling.utils.LocalDateDeserializer
-import no.nav.dagpenger.datadeling.utils.LocalDateSerializer
-import no.nav.dagpenger.datadeling.utils.LocalDateTimeDeserializer
-import no.nav.dagpenger.datadeling.utils.LocalDateTimeSerializer
+import no.nav.dagpenger.datadeling.utils.*
 import no.nav.dagpenger.oauth2.CachedOauth2Client
-import no.nav.security.token.support.v2.tokenValidationSupport
-import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.sql.DataSource
@@ -45,8 +35,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 @Suppress("unused")
 fun Application.module(
     dataSource: DataSource = configureDataSource(environment.config),
-    appConfig: AppConfig = AppConfig.fra(environment.config),
-    ressursConfig: RessursConfig = RessursConfig.fra(environment.config),
+    appConfig: AppConfig = loadConfig(),
     tokenProvider: CachedOauth2Client = cachedTokenProvider,
 ) {
 
@@ -89,13 +78,10 @@ fun Application.module(
         }
     }
 
-    val config = environment.config
     install(Authentication) {
         maskinporten(
             "afpPrivat",
-            config.property("maskinporten.scope").getString(),
-            config.property("maskinporten.jwks_uri").getString(),
-            config.property("maskinporten.issuer").getString(),
+            appConfig.maskinporten
         )
     }
 
@@ -106,15 +92,15 @@ fun Application.module(
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
         }
-        installRetryClient(maksRetries = appConfig.maksRetries)
+        installRetryClient(maksRetries = appConfig.httpClient.retries)
     }
 
     val ressursDao = RessursDao(dataSource)
 
-    val perioderService = PerioderService(proxyClient = ProxyClient(appConfig, client, tokenProvider))
+    val perioderService = PerioderService(proxyClient = ProxyClient(appConfig.dpProxy, client, tokenProvider))
 
     val leaderElector = LeaderElector(client, appConfig)
-    val ressursService = RessursService(ressursDao, leaderElector, ressursConfig)
+    val ressursService = RessursService(ressursDao, leaderElector, appConfig.ressurs)
 
     launch {
         ressursService.scheduleRessursCleanup()

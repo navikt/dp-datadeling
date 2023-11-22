@@ -1,23 +1,34 @@
 package no.nav.dagpenger.datadeling
 
-import io.ktor.server.config.*
+import java.net.URL
 
 data class AppConfig(
-    val dpProxyUrl: String,
-    val dpProxyScope: String,
-    val dpDatadelingUrl: String,
-    val isLocal: Boolean,
-    val maksRetries: Int,
-    val maskinportenUrl: String,
-) {
-    companion object {
-        fun fra(config: ApplicationConfig) = AppConfig(
-            dpProxyUrl = config.property("DP_PROXY_URL").getString(),
-            dpProxyScope = config.property("DP_PROXY_SCOPE").getString(),
-            dpDatadelingUrl = config.property("DP_DATADELING_URL").getString(),
-            isLocal = config.propertyOrNull("ENV")?.getString() == "LOCAL",
-            maksRetries = config.property("httpClient.retries").getString().toInt(),
-            maskinportenUrl = config.property("maskinporten.discoveryurl").getString()
-        )
-    }
-}
+    val isLocal: Boolean = false,
+    val maskinporten: MaskinportenConfig,
+    val ressurs: RessursConfig,
+    val dpProxy: DpProxyConfig,
+    val httpClient: HttpClientConfig,
+)
+
+data class MaskinportenConfig(
+    val discoveryurl: String,
+    val scope: String,
+    val jwks_uri: URL,
+    val issuer: String,
+)
+
+data class RessursConfig(
+    val minutterLevetidOpprettet: Long,
+    val minutterLevetidFerdig: Long,
+    val oppryddingsfrekvensMinutter: Long,
+)
+
+data class DpProxyConfig(
+    val url: URL,
+    val scope: String,
+)
+
+data class HttpClientConfig(
+    val retries: Int,
+    val host: URL,
+)

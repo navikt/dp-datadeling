@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import no.nav.dagpenger.datadeling.RessursConfig
 import no.nav.dagpenger.datadeling.teknisk.LeaderElector
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse

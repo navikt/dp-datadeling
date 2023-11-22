@@ -19,6 +19,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
+import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
@@ -28,19 +29,17 @@ import java.util.concurrent.TimeUnit
 
 fun AuthenticationConfig.maskinporten(
     name: String,
-    scope: String,
-    jwksUri: String,
-    issuer: String,
+    maskinportenConfig: MaskinportenConfig,
 ) {
-    val maskinportenJwkProvider: JwkProvider = JwkProviderBuilder(URL(jwksUri))
+    val maskinportenJwkProvider: JwkProvider = JwkProviderBuilder(maskinportenConfig.jwks_uri)
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)
         .build()
 
     jwt(name) {
-        verifier(maskinportenJwkProvider, issuer)
+        verifier(maskinportenJwkProvider, maskinportenConfig.issuer)
         validate { cred ->
-            if (cred.getClaim("scope", String::class) != scope) {
+            if (cred.getClaim("scope", String::class) != maskinportenConfig.scope) {
                 defaultLogger.warn("Wrong scope in claim")
                 return@validate null
             }

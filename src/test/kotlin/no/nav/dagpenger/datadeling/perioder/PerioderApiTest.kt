@@ -12,6 +12,7 @@ import no.nav.dagpenger.datadeling.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.testutil.loadConfig
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -74,7 +75,7 @@ class PerioderApiTest : AbstractApiTest() {
     private fun testPerioderEndpoint(block: suspend ApplicationTestBuilder.() -> Unit) {
         testApplication {
             testModule(server.config) {
-                val appConfig = AppConfig.fra(environment!!.config)
+                val appConfig = loadConfig(environment!!.config)
                 apiRouting {
                     perioderApi(
                         appConfig,
