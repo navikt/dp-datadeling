@@ -11,12 +11,7 @@ import no.nav.dagpenger.datadeling.AppConfig
 inline fun Application.loadConfig(): AppConfig {
 
     return ConfigLoader.builder()
-        .addKtorConfig(environment.config)
-        .addEnvironmentSource()
+        .addPropertySource(MapPropertySource(environment.config.toMap()))
         .build()
         .loadConfigOrThrow()
-}
-
-fun ConfigLoaderBuilder.addKtorConfig(config: ApplicationConfig) = apply {
-    addPropertySource(MapPropertySource(config.toMap()))
 }
