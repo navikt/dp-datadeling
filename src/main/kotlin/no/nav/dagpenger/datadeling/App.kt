@@ -15,6 +15,7 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import no.nav.dagpenger.datadeling.api.internalApi
 import no.nav.dagpenger.datadeling.perioder.PerioderService
 import no.nav.dagpenger.datadeling.perioder.ProxyClient
 import no.nav.dagpenger.datadeling.perioder.perioderApi
@@ -107,7 +108,7 @@ fun Application.module(
     }
 
     routing {
-//        internalApi(appMicrometerRegistry)
+        internalApi(appMicrometerRegistry)
         perioderApi(appConfig, ressursService, perioderService)
     }
 }
