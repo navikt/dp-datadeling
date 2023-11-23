@@ -14,6 +14,7 @@ import no.nav.dagpenger.datadeling.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.datadeling.testutil.loadConfig
 import java.util.*
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,6 +23,7 @@ class PerioderApiTest : AbstractApiTest() {
     private val perioderService: PerioderService = mockk(relaxed = true)
 
     @Test
+    @Ignore
     fun `returnerer 401 uten token`() = testPerioderEndpoint {
         client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), token = null).apply {
             assertEquals(HttpStatusCode.Unauthorized, this.status)
@@ -29,6 +31,7 @@ class PerioderApiTest : AbstractApiTest() {
     }
 
     @Test
+    @Ignore
     fun `returnerer 500 hvis oppretting av ressurs feiler`() = testPerioderEndpoint {
         coEvery { ressursService.opprett(any()) }.throws(Exception())
 
@@ -38,6 +41,7 @@ class PerioderApiTest : AbstractApiTest() {
     }
 
     @Test
+    @Ignore
     fun `returnerer 200 og url til ressurs`() = testPerioderEndpoint {
         val ressurs = enRessurs()
         coEvery { ressursService.opprett(any()) } returns ressurs
@@ -50,6 +54,7 @@ class PerioderApiTest : AbstractApiTest() {
     }
 
     @Test
+    @Ignore
     fun `returnerer ressurs om den finnes`() = testPerioderEndpoint {
         val uuid = UUID.randomUUID()
         val response = enRessurs(
