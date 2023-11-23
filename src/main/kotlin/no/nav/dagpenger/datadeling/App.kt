@@ -34,8 +34,8 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 @Suppress("unused")
 fun Application.module(
-    dataSource: DataSource = configureDataSource(environment.config),
     appConfig: AppConfig = loadConfig(),
+    dataSource: DataSource = configureDataSource(appConfig.db),
     tokenProvider: CachedOauth2Client = cachedTokenProvider,
 ) {
 

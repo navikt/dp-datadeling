@@ -7,23 +7,20 @@ import io.micrometer.core.instrument.Clock
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.CollectorRegistry
+import no.nav.dagpenger.datadeling.AppConfig
+import no.nav.dagpenger.datadeling.DbConfig
 import org.flywaydb.core.Flyway
 import java.time.Duration
 import javax.sql.DataSource
 
-internal fun configureDataSource(config: ApplicationConfig): DataSource {
-    val databaseHost: String = requireNotNull(config.property("DB_HOST").getString()) { "host må settes" }
-    val databasePort: String = requireNotNull(config.property("DB_PORT").getString()) { "port må settes" }
-    val databaseName: String = requireNotNull(config.property("DB_DATABASE").getString()) { "databasenavn må settes" }
-    val databaseUsername: String = requireNotNull(config.property("DB_USERNAME").getString()) { "brukernavn må settes" }
-    val databasePassword: String = requireNotNull(config.property("DB_PASSWORD").getString()) { "passord må settes" }
+internal fun configureDataSource(config: DbConfig): DataSource {
 
-    val dbUrl = "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"
+    val dbUrl = "jdbc:postgresql://${config.host}:${config.port}/${config.name}"
 
     val hikariMigrationConfig = HikariConfig().apply {
         jdbcUrl = dbUrl
-        username = databaseUsername
-        password = databasePassword
+        username = config.username
+        password = config.password
         connectionTimeout = Duration.ofSeconds(5).toMillis()
         initializationFailTimeout = Duration.ofMinutes(1).toMillis()
         maximumPoolSize = 2
@@ -40,8 +37,8 @@ internal fun configureDataSource(config: ApplicationConfig): DataSource {
 
     val hikariConfig = HikariConfig().apply {
         jdbcUrl = dbUrl
-        username = databaseUsername
-        password = databasePassword
+        username = config.username
+        password = config.password
         maximumPoolSize = 5
         minimumIdle = 2
         idleTimeout = Duration.ofMinutes(1).toMillis()

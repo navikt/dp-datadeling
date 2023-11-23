@@ -8,6 +8,7 @@ data class AppConfig(
     val ressurs: RessursConfig,
     val dpProxy: DpProxyConfig,
     val httpClient: HttpClientConfig,
+    val db: DbConfig,
 )
 
 data class MaskinportenConfig(
@@ -31,4 +32,12 @@ data class DpProxyConfig(
 data class HttpClientConfig(
     val retries: Int,
     val host: URL,
+)
+
+data class DbConfig(
+    val host: String,
+    val port: Int,
+    val name: String,
+    val username: String,
+    val password: String,
 )
