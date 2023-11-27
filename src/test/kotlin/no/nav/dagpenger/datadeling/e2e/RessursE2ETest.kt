@@ -31,7 +31,7 @@ class RessursE2ETest : AbstractE2ETest() {
         ressursService = RessursService(
             ressursDao = RessursDao(dataSource),
             leaderElector = mockk(relaxed = true),
-            config = mockk(relaxed = true),
+            config = no.nav.dagpenger.datadeling.testutil.mockConfig.ressurs,
         )
     }
 
