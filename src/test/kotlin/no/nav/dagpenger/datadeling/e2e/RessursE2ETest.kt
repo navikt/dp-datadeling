@@ -17,7 +17,6 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
 import org.awaitility.kotlin.await
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -27,6 +26,7 @@ import kotlin.test.assertNull
 class RessursE2ETest : AbstractE2ETest() {
     private lateinit var ressursService: RessursService
 
+    @BeforeAll
     fun setup() {
         ressursService = RessursService(
             ressursDao = RessursDao(dataSource),
@@ -35,6 +35,7 @@ class RessursE2ETest : AbstractE2ETest() {
         )
     }
 
+    @Test
     fun `opprett ressurs og poll til ressurs har status FERDIG`() = runBlocking {
         val response = DatadelingResponse(
             personIdent = "123", perioder = listOf(
@@ -82,6 +83,7 @@ class RessursE2ETest : AbstractE2ETest() {
         }
     }
 
+    @Test
     fun `opprett ressurs og marker som FEILET ved error fra baksystem`() = runTest {
         val response = DatadelingResponse(
             personIdent = "123", perioder = listOf(

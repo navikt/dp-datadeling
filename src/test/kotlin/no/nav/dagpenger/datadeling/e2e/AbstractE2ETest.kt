@@ -6,12 +6,12 @@ import no.nav.dagpenger.datadeling.TestDatabase
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
-import org.junit.Ignore
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractE2ETest {
     private lateinit var testServerRuntime: TestServerRuntime
     private lateinit var testDatabase: TestDatabase
@@ -22,7 +22,7 @@ abstract class AbstractE2ETest {
     protected val client get() = testServerRuntime.restClient()
     protected val dataSource get() = testDatabase.dataSource
 
-
+    @BeforeAll
     fun setupServer() {
         mockOAuth2Server = MockOAuth2Server().also { it.start() }
         testDatabase = TestDatabase()
@@ -30,10 +30,12 @@ abstract class AbstractE2ETest {
         proxyMockServer = WireMockServer(8092).also { it.start() }
     }
 
+    @AfterAll
     fun tearDownServer() {
         testServerRuntime.close()
     }
 
+    @BeforeEach
     fun resetDatabase() {
         testDatabase.reset()
     }
