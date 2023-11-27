@@ -2,37 +2,41 @@ package no.nav.dagpenger.datadeling.e2e
 
 import io.ktor.client.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.datadeling.testModule
-import java.net.ServerSocket
 import javax.sql.DataSource
 
-class TestServer(private val dataSource: DataSource, ) {
-    fun start(): TestServerRuntime = TestServerRuntime(dataSource)
+class TestServer(private val dataSource: DataSource) {
+    fun start(config: AppConfig, port: Int): TestServerRuntime = TestServerRuntime(dataSource, config, port)
 }
 
 class TestServerRuntime(
     dataSource: DataSource,
-    private val httpPort: Int = ServerSocket(0).use { it.localPort },
+    config: AppConfig,
+    private val httpPort: Int,
 ) : AutoCloseable {
     private val server = createEmbeddedServer(
         dataSource = dataSource,
         httpPort = httpPort,
+        config = config,
     )
 
     companion object {
         private fun createEmbeddedServer(
             dataSource: DataSource,
             httpPort: Int,
+            config: AppConfig,
         ) =
             embeddedServer(CIO, applicationEngineEnvironment {
                 connector { port = httpPort }
                 module {
-                    testModule(dataSource = dataSource, port = httpPort)
+                    testModule(dataSource, config)
                 }
             })
     }
@@ -52,7 +56,7 @@ class TestServerRuntime(
                 port = httpPort
             }
             expectSuccess = false
-            install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+            install(ContentNegotiation) {
                 register(
                     ContentType.Application.Json,
                     JacksonConverter(objectMapper)

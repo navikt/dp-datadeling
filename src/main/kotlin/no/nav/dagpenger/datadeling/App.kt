@@ -2,7 +2,6 @@ package no.nav.dagpenger.datadeling
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.papsign.ktor.openapigen.OpenAPIGen
 import io.ktor.client.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -22,7 +21,6 @@ import no.nav.dagpenger.datadeling.perioder.perioderApi
 import no.nav.dagpenger.datadeling.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.teknisk.*
-import no.nav.dagpenger.datadeling.teknisk.configureDataSource
 import no.nav.dagpenger.datadeling.utils.*
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import java.time.LocalDate
@@ -44,15 +42,6 @@ fun Application.module(
 
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
-    }
-
-    install(OpenAPIGen) {
-        serveOpenApiJson = true
-        serveSwaggerUi = true
-        swaggerUiPath = "internal/swagger-ui"
-        info {
-            title = "DP datadeling API"
-        }
     }
 
     install(ContentNegotiation) {

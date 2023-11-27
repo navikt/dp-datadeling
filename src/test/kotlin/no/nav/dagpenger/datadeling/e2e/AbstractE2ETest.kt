@@ -2,7 +2,9 @@ package no.nav.dagpenger.datadeling.e2e
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.TestDatabase
+import no.nav.dagpenger.datadeling.testutil.mockConfig
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import java.net.ServerSocket
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractE2ETest {
@@ -21,12 +24,17 @@ abstract class AbstractE2ETest {
 
     protected val client get() = testServerRuntime.restClient()
     protected val dataSource get() = testDatabase.dataSource
+    protected lateinit var appConfig: AppConfig
 
     @BeforeAll
     fun setupServer() {
-        mockOAuth2Server = MockOAuth2Server().also { it.start() }
+        val serverPort = ServerSocket(0).use { it.localPort }
+        val authServerPort = 8081
+        mockOAuth2Server = MockOAuth2Server().also { it.start(authServerPort) }
+        appConfig = mockConfig(serverPort, mockOAuth2Server)
+
         testDatabase = TestDatabase()
-        testServerRuntime = TestServer(testDatabase.dataSource).start()
+        testServerRuntime = TestServer(testDatabase.dataSource).start(appConfig, serverPort)
         proxyMockServer = WireMockServer(8092).also { it.start() }
     }
 
@@ -40,7 +48,12 @@ abstract class AbstractE2ETest {
         testDatabase.reset()
     }
 
-    val token get() = mockOAuth2Server.issueToken("default", "dp-datadeling", DefaultOAuth2TokenCallback())
+    val token
+        get() = mockOAuth2Server.issueToken(
+            issuerId = "default",
+            clientId = "dp-datadeling",
+            tokenCallback = DefaultOAuth2TokenCallback(claims = mapOf("scope" to "nav:dagpenger:vedtak.read"))
+        )
 
     fun mockProxyError(delayMs: Int = 0) {
         proxyMockServer.stubFor(

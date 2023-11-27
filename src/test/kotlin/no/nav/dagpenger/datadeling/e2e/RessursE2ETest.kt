@@ -31,7 +31,7 @@ class RessursE2ETest : AbstractE2ETest() {
         ressursService = RessursService(
             ressursDao = RessursDao(dataSource),
             leaderElector = mockk(relaxed = true),
-            config = no.nav.dagpenger.datadeling.testutil.mockConfig.ressurs,
+            config = appConfig.ressurs,
         )
     }
 
@@ -60,7 +60,7 @@ class RessursE2ETest : AbstractE2ETest() {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
                 append(HttpHeaders.ContentType, ContentType.Application.Json)
-                append(HttpHeaders.Authorization, "Bearer  $token")
+                bearerAuth(token.serialize())
             }
             setBody(objectMapper.writeValueAsString(request))
         }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
@@ -108,7 +108,7 @@ class RessursE2ETest : AbstractE2ETest() {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
                 append(HttpHeaders.ContentType, ContentType.Application.Json)
-                append(HttpHeaders.Authorization, "Bearer  $token")
+                bearerAuth(token.serialize())
             }
             setBody(objectMapper.writeValueAsString(request))
         }.bodyAsText()
@@ -129,7 +129,7 @@ class RessursE2ETest : AbstractE2ETest() {
         client.get(this) {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
-                append(HttpHeaders.Authorization, "Bearer $token")
+                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
             }
         }.apply { assertEquals(HttpStatusCode.OK, this.status) }
             .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }.apply { block() }

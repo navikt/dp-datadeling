@@ -12,7 +12,7 @@ data class AppConfig(
 )
 
 data class MaskinportenConfig(
-    val discoveryurl: String,
+    val discoveryUrl: String,
     val scope: String,
     val jwks_uri: URL,
     val issuer: String,

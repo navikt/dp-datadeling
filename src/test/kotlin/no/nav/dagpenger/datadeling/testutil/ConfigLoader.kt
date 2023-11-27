@@ -1,25 +1,16 @@
 package no.nav.dagpenger.datadeling.testutil
 
-import com.sksamuel.hoplite.ConfigLoader
-import com.sksamuel.hoplite.sources.MapPropertySource
-import io.ktor.server.config.*
 import no.nav.dagpenger.datadeling.*
+import no.nav.security.mock.oauth2.MockOAuth2Server
 import java.net.URL
 
-inline fun loadConfig(config: ApplicationConfig): AppConfig {
-    return ConfigLoader.builder()
-        .addPropertySource(MapPropertySource(config.toMap()))
-        .build()
-        .loadConfigOrThrow()
-}
-
-val mockConfig = AppConfig (
+fun mockConfig(serverPort: Int = 8080, authServer: MockOAuth2Server = MockOAuth2Server()) = AppConfig(
     isLocal = true,
     maskinporten = MaskinportenConfig(
-        discoveryurl = "",
-        scope = "",
-        jwks_uri = URL("http://localhost"),
-        issuer = "",
+        discoveryUrl = authServer.wellKnownUrl("default").toString(),
+        scope = "nav:dagpenger:vedtak.read",
+        jwks_uri = authServer.jwksUrl("default").toUrl(),
+        issuer = authServer.issuerUrl("default").toString(),
     ),
     ressurs = RessursConfig(
         minutterLevetidFerdig = 1L,
@@ -27,12 +18,12 @@ val mockConfig = AppConfig (
         oppryddingsfrekvensMinutter = 1L,
     ),
     dpProxy = DpProxyConfig(
-        url = URL("http://localhost"),
+        url = URL("http://localhost:8092"),
         scope = "",
     ),
     httpClient = HttpClientConfig(
         retries = 0,
-        host = URL("http://localhost"),
+        host = URL("http://localhost:$serverPort"),
     ),
     db = DbConfig(
         host = "",

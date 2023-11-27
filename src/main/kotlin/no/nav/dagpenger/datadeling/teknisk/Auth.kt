@@ -6,25 +6,12 @@ import com.natpryce.konfig.Configuration
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.overriding
-import com.papsign.ktor.openapigen.model.Described
-import com.papsign.ktor.openapigen.model.security.HttpSecurityScheme
-import com.papsign.ktor.openapigen.model.security.SecuritySchemeModel
-import com.papsign.ktor.openapigen.model.security.SecuritySchemeType
-import com.papsign.ktor.openapigen.modules.providers.AuthProvider
-import com.papsign.ktor.openapigen.route.path.auth.OpenAPIAuthenticatedRoute
-import com.papsign.ktor.openapigen.route.path.normal.NormalOpenAPIRoute
-import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.response.*
-import io.ktor.util.pipeline.*
 import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
-import no.nav.security.token.support.v2.TokenValidationContextPrincipal
-import java.net.URL
 import java.util.concurrent.TimeUnit
 
 fun AuthenticationConfig.maskinporten(

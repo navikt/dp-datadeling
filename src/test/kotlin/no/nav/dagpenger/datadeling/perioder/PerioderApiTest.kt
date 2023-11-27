@@ -1,18 +1,16 @@
 package no.nav.dagpenger.datadeling.perioder
 
-import com.papsign.ktor.openapigen.route.apiRouting
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.datadeling.*
-import no.nav.dagpenger.datadeling.AbstractApiTest
 import no.nav.dagpenger.datadeling.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.ressurs.RessursService
 import no.nav.dagpenger.datadeling.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
-import no.nav.dagpenger.datadeling.testutil.loadConfig
+import no.nav.dagpenger.datadeling.testutil.mockConfig
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -74,15 +72,13 @@ class PerioderApiTest : AbstractApiTest() {
 
     private fun testPerioderEndpoint(block: suspend ApplicationTestBuilder.() -> Unit) {
         testApplication {
-            testModule(server.config) {
-                val appConfig = loadConfig(environment!!.config)
-                apiRouting {
-                    perioderApi(
-                        appConfig,
-                        ressursService,
-                        perioderService
-                    )
-                }
+            val appConfig = mockConfig()
+            testApiModule(appConfig) {
+                perioderApi(
+                    appConfig,
+                    ressursService,
+                    perioderService
+                )
             }
             block()
         }
