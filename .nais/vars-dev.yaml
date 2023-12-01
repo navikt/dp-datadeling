@@ -1,6 +1,6 @@
-limitsMemory: 1024Mi
-requestsMemory: 512Mi
-requestsCpu: 500m
+limitsMemory: 512Mi
+requestsMemory: 256Mi
+requestsCpu: 50m
 db_tier: "db-f1-micro"
 ingresses:
   - https://dp-datadeling.intern.dev.nav.no
