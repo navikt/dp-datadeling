@@ -6,9 +6,10 @@ import com.natpryce.konfig.Configuration
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.overriding
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import no.nav.dagpenger.datadeling.MaskinportenConfig
+import io.ktor.server.auth.AuthenticationConfig
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.jwt.jwt
+import no.nav.dagpenger.datadeling.config.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
