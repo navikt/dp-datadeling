@@ -8,7 +8,6 @@ project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 val micrometerVersion = "1.12.0"
 val ktorVersion = "2.3.6"
 val jacksonVersion = "2.16.0"
-val openApiGeneratorVersion = "0.6.1"
 val tokenValidationVersion = "3.1.8"
 val kotlinLoggerVersion = "3.0.5"
 val logbackVersion = "1.4.11"
@@ -57,6 +56,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
@@ -75,9 +75,6 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion")
-
-    // OpenAPI / Swagger UI
-    implementation("dev.forst:ktor-openapi-generator:$openApiGeneratorVersion")
 
     // Security
     implementation("no.nav.security:token-validation-ktor-v2:$tokenValidationVersion")

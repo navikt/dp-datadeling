@@ -1,34 +1,29 @@
 package no.nav.dagpenger.datadeling.api.perioder
 
-import com.papsign.ktor.openapigen.annotations.parameters.PathParam
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
+import io.ktor.server.request.ContentTransformationException
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.config.AppConfig
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
-import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadType
-import java.lang.IllegalArgumentException
-import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 fun Route.perioderApi(
     appConfig: AppConfig,
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
-
 
     authenticate("afpPrivat") {
         route("/maskinporten-test/") {
@@ -77,7 +72,6 @@ fun Route.perioderApi(
                     } else {
                         call.respond(HttpStatusCode.OK, response)
                     }
-
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest)
                 } catch (e: Exception) {
@@ -90,26 +84,3 @@ fun Route.perioderApi(
     }
 }
 
-data class RessursId(@PathParam("Id for ressurs") val uuid: UUID)
-
-private val requestExample = DatadelingRequest(
-    personIdent = "01020312345",
-    fraOgMedDato = LocalDate.now(),
-    tilOgMedDato = LocalDate.now()
-)
-
-private val responseExample = Ressurs(
-    uuid = UUID.randomUUID(),
-    status = RessursStatus.FERDIG,
-    response = DatadelingResponse(
-        personIdent = "01020312345",
-        perioder = listOf(
-            Periode(
-                fraOgMedDato = LocalDate.now(),
-                tilOgMedDato = LocalDate.now(),
-                ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                gjenståendeDager = 0
-            )
-        )
-    )
-)
