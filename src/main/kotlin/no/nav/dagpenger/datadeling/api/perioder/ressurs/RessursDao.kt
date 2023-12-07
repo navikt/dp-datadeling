@@ -2,13 +2,14 @@ package no.nav.dagpenger.datadeling.api.perioder.ressurs
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotliquery.Row
+import kotliquery.queryOf
 import kotliquery.sessionOf
-import no.nav.dagpenger.datadeling.teknisk.asQuery
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import org.intellij.lang.annotations.Language
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 import javax.sql.DataSource
 
 class RessursDao(private val dataSource: DataSource) {
@@ -59,6 +60,10 @@ class RessursDao(private val dataSource: DataSource) {
         )
     }
 }
+
+fun asQuery(@Language("SQL") sql: String, argMap: Map<String, Any?> = emptyMap()) = queryOf(sql, argMap)
+
+fun asQuery(@Language("SQL") sql: String, vararg params: Any?) = queryOf(sql, *params)
 
 private fun mapRessurs(row: Row): Ressurs = Ressurs(
     uuid = row.uuid("uuid"),

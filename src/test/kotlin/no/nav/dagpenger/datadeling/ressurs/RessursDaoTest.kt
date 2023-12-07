@@ -2,11 +2,11 @@ package no.nav.dagpenger.datadeling.ressurs
 
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.AbstractDatabaseTest
-import no.nav.dagpenger.datadeling.enDatadelingRequest
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.teknisk.asQuery
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.asQuery
+import no.nav.dagpenger.datadeling.enDatadelingRequest
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -34,7 +34,6 @@ class RessursDaoTest : AbstractDatabaseTest() {
             assertEquals(3, ressurser.size)
             assertTrue { ressurser.all { it.status == RessursStatus.OPPRETTET } }
         }
-
     }
 
     @Test
@@ -126,7 +125,7 @@ class RessursDaoTest : AbstractDatabaseTest() {
         status: RessursStatus = RessursStatus.OPPRETTET,
         request: DatadelingRequest = enDatadelingRequest(),
         response: DatadelingResponse? = null,
-        opprettet: LocalDateTime = LocalDateTime.now()
+        opprettet: LocalDateTime = LocalDateTime.now(),
     ) =
         sessionOf(database.dataSource).use { session ->
             session.run(
