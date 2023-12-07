@@ -46,24 +46,6 @@ fun Application.module(
 
     install(ContentNegotiation) {
         jackson {
-            val javaTimeModule = JavaTimeModule()
-            javaTimeModule.addSerializer(
-                LocalDate::class.java,
-                LocalDateSerializer()
-            )
-            javaTimeModule.addDeserializer(
-                LocalDate::class.java,
-                LocalDateDeserializer()
-            )
-            javaTimeModule.addSerializer(
-                LocalDateTime::class.java,
-                LocalDateTimeSerializer()
-            )
-            javaTimeModule.addDeserializer(
-                LocalDateTime::class.java,
-                LocalDateTimeDeserializer()
-            )
-
             registerModule(javaTimeModule)
         }
     }

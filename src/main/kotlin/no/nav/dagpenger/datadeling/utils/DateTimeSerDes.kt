@@ -7,12 +7,18 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import java.io.IOException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
+val javaTimeModule = JavaTimeModule()
+    .addSerializer(LocalDate::class.java, LocalDateSerializer())
+    .addDeserializer(LocalDate::class.java, LocalDateDeserializer())
+    .addSerializer(LocalDateTime::class.java, LocalDateTimeSerializer())
+    .addDeserializer(LocalDateTime::class.java, LocalDateTimeDeserializer())
 
 class LocalDateSerializer : StdSerializer<LocalDate>(LocalDate::class.java) {
 
