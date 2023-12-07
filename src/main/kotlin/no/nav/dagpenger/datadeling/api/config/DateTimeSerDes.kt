@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.utils
+package no.nav.dagpenger.datadeling.api.config
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser

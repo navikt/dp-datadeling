@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import org.intellij.lang.annotations.Language

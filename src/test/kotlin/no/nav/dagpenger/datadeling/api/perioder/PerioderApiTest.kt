@@ -7,17 +7,15 @@ import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.datadeling.AbstractApiTest
-import no.nav.dagpenger.datadeling.api.perioder.PerioderService
-import no.nav.dagpenger.datadeling.api.perioder.perioderApi
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.enDatadelingRequest
-import no.nav.dagpenger.datadeling.enDatadelingResponse
-import no.nav.dagpenger.datadeling.enPeriode
-import no.nav.dagpenger.datadeling.enRessurs
-import no.nav.dagpenger.datadeling.januar
-import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
+import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
+import no.nav.dagpenger.datadeling.testutil.enPeriode
+import no.nav.dagpenger.datadeling.testutil.enRessurs
+import no.nav.dagpenger.datadeling.testutil.januar
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testApiModule
 import no.nav.dagpenger.datadeling.testGet
 import no.nav.dagpenger.datadeling.testPost
@@ -85,7 +83,7 @@ class PerioderApiTest : AbstractApiTest() {
         testApplication {
             val appConfig = mockConfig()
             testApiModule(appConfig) {
-                perioderApi(
+                perioderRoutes(
                     appConfig,
                     ressursService,
                     perioderService

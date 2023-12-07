@@ -7,7 +7,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.micrometer.prometheus.PrometheusMeterRegistry
 
-fun Route.internalApi(prometheusMeterRegistry: PrometheusMeterRegistry) {
+fun Route.livenessRoutes(prometheusMeterRegistry: PrometheusMeterRegistry) {
     route("/internal/liveness") {
         get {
             call.respond("Alive")

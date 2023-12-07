@@ -1,6 +1,16 @@
-package no.nav.dagpenger.datadeling.config
+package no.nav.dagpenger.datadeling
 
+import com.sksamuel.hoplite.ConfigLoader
+import com.sksamuel.hoplite.sources.MapPropertySource
+import io.ktor.server.application.Application
 import java.net.URL
+
+fun Application.loadConfig(): AppConfig {
+    return ConfigLoader.builder()
+        .addPropertySource(MapPropertySource(environment.config.toMap()))
+        .build()
+        .loadConfigOrThrow()
+}
 
 data class AppConfig(
     val isLocal: Boolean = false,

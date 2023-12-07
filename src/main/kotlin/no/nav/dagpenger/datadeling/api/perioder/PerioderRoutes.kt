@@ -14,12 +14,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
-import no.nav.dagpenger.datadeling.config.AppConfig
+import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import java.util.UUID
 
-fun Route.perioderApi(
+fun Route.perioderRoutes(
     appConfig: AppConfig,
     ressursService: RessursService,
     perioderService: PerioderService,

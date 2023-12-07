@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.config
+package no.nav.dagpenger.datadeling
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

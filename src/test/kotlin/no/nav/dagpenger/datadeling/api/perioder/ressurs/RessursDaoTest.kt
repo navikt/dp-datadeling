@@ -2,8 +2,12 @@ package no.nav.dagpenger.datadeling.api.perioder.ressurs
 
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.TestDatabase
-import no.nav.dagpenger.datadeling.enDatadelingRequest
-import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.asQuery
+import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import org.junit.jupiter.api.BeforeEach

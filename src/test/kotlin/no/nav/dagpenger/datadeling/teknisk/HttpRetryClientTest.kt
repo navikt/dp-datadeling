@@ -12,6 +12,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import no.nav.dagpenger.datadeling.AbstractApiTest
+import no.nav.dagpenger.datadeling.api.installRetryClient
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

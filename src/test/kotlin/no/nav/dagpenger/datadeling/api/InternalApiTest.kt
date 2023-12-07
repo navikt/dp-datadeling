@@ -40,7 +40,7 @@ class InternalApiTest : AbstractApiTest() {
     private fun testInternalApi(block: suspend ApplicationTestBuilder.() -> Unit) {
         testApplication {
             testApiModule(mockConfig()) {
-                internalApi(mockk<PrometheusMeterRegistry>(relaxed = true))
+                livenessRoutes(mockk<PrometheusMeterRegistry>(relaxed = true))
             }
             block()
         }

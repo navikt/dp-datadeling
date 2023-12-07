@@ -8,13 +8,15 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testModule
 import javax.sql.DataSource
 
 class TestServer(private val dataSource: DataSource) {
     fun start(config: AppConfig, port: Int): TestServerRuntime = TestServerRuntime(dataSource, config, port)
 }
+
+const val SERVER_PORT = 9080
 
 class TestServerRuntime(
     dataSource: DataSource,
@@ -23,7 +25,7 @@ class TestServerRuntime(
 ) : AutoCloseable {
     private val server = createEmbeddedServer(
         dataSource = dataSource,
-        httpPort = httpPort,
+        httpPort = SERVER_PORT,
         config = config,
     )
 

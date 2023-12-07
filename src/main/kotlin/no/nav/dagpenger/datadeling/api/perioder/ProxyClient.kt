@@ -6,7 +6,8 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
-import no.nav.dagpenger.datadeling.config.DpProxyConfig
+import no.nav.dagpenger.datadeling.DpProxyConfig
+import no.nav.dagpenger.datadeling.api.perioder.PerioderClient
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.oauth2.CachedOauth2Client

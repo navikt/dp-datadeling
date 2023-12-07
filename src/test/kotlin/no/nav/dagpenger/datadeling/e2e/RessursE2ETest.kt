@@ -6,12 +6,12 @@ import io.ktor.http.*
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import no.nav.dagpenger.datadeling.januar
+import no.nav.dagpenger.datadeling.testutil.januar
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode

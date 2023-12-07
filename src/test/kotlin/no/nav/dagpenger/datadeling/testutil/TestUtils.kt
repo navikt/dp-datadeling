@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling
+package no.nav.dagpenger.datadeling.testutil
 
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
