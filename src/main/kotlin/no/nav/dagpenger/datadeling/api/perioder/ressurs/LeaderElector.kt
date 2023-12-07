@@ -1,10 +1,11 @@
-package no.nav.dagpenger.datadeling.teknisk
+package no.nav.dagpenger.datadeling.api.perioder.ressurs
 
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.request
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.datadeling.AppConfig
+import no.nav.dagpenger.datadeling.config.AppConfig
+import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import java.net.InetAddress.getLocalHost
 
 class LeaderElector(private val httpClient: HttpClient, private val appConfig: AppConfig) {
