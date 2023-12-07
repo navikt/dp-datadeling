@@ -1,17 +1,28 @@
 package no.nav.dagpenger.datadeling.perioder
 
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
-import no.nav.dagpenger.datadeling.*
-import no.nav.dagpenger.datadeling.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.ressurs.RessursService
-import no.nav.dagpenger.datadeling.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.AbstractApiTest
+import no.nav.dagpenger.datadeling.api.perioder.PerioderService
+import no.nav.dagpenger.datadeling.api.perioder.perioderApi
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.enDatadelingRequest
+import no.nav.dagpenger.datadeling.enDatadelingResponse
+import no.nav.dagpenger.datadeling.enPeriode
+import no.nav.dagpenger.datadeling.enRessurs
+import no.nav.dagpenger.datadeling.januar
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
+import no.nav.dagpenger.datadeling.testApiModule
+import no.nav.dagpenger.datadeling.testGet
+import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testutil.mockConfig
-import java.util.*
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
