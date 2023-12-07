@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.ressurs
+package no.nav.dagpenger.datadeling.api.perioder.ressurs
 
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.AbstractDatabaseTest

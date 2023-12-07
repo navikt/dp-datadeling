@@ -1,9 +1,14 @@
 package no.nav.dagpenger.datadeling
 
 import com.nimbusds.jwt.SignedJWT
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.append
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
