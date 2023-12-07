@@ -5,6 +5,8 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.*
+import no.nav.dagpenger.datadeling.api.perioder.PerioderService
+import no.nav.dagpenger.datadeling.api.perioder.ProxyClient
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
 import org.junit.jupiter.api.AfterEach

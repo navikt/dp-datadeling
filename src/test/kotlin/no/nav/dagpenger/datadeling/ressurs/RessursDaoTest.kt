@@ -3,9 +3,9 @@ package no.nav.dagpenger.datadeling.ressurs
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.AbstractDatabaseTest
 import no.nav.dagpenger.datadeling.enDatadelingRequest
-import no.nav.dagpenger.datadeling.perioder.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.perioder.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.perioder.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.teknisk.asQuery
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.perioder
+package no.nav.dagpenger.datadeling.api.perioder
 
 import com.papsign.ktor.openapigen.annotations.parameters.PathParam
 import io.ktor.http.*
@@ -10,11 +10,11 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import no.nav.dagpenger.datadeling.AppConfig
+import no.nav.dagpenger.datadeling.config.AppConfig
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.datadeling.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.ressurs.RessursService
-import no.nav.dagpenger.datadeling.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
@@ -28,6 +28,8 @@ fun Route.perioderApi(
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
+
+
     authenticate("afpPrivat") {
         route("/maskinporten-test/") {
             get {
