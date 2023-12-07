@@ -1,15 +1,12 @@
 package no.nav.dagpenger.datadeling.api.perioder.ressurs
 
 import kotliquery.sessionOf
-import no.nav.dagpenger.datadeling.AbstractDatabaseTest
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.asQuery
+import no.nav.dagpenger.datadeling.TestDatabase
 import no.nav.dagpenger.datadeling.enDatadelingRequest
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
@@ -21,8 +18,14 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RessursDaoTest : AbstractDatabaseTest() {
+class RessursDaoTest {
+    private val database = TestDatabase()
     private val ressursDao = RessursDao(database.dataSource)
+
+    @BeforeEach
+    fun resetDatabase() {
+        database.reset()
+    }
 
     @Test
     fun `opprett ressurs`() {
