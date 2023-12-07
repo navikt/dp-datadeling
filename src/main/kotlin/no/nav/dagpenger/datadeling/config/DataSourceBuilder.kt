@@ -1,14 +1,11 @@
-package no.nav.dagpenger.datadeling.teknisk
+package no.nav.dagpenger.datadeling.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.server.config.*
 import io.micrometer.core.instrument.Clock
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.CollectorRegistry
-import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.DbConfig
 import org.flywaydb.core.Flyway
 import java.time.Duration
 import javax.sql.DataSource
