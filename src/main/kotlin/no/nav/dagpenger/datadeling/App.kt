@@ -3,13 +3,17 @@ package no.nav.dagpenger.datadeling
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.netty.EngineMain
+import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.path
 import io.ktor.server.routing.routing
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
@@ -26,10 +30,10 @@ import no.nav.dagpenger.datadeling.config.AppConfig
 import no.nav.dagpenger.datadeling.config.configureDataSource
 import no.nav.dagpenger.datadeling.config.loadConfig
 import no.nav.dagpenger.datadeling.teknisk.cachedTokenProvider
-import no.nav.dagpenger.datadeling.teknisk.installRetryClient
 import no.nav.dagpenger.datadeling.teknisk.maskinporten
-import no.nav.dagpenger.datadeling.utils.javaTimeModule
+import no.nav.dagpenger.datadeling.teknisk.javaTimeModule
 import no.nav.dagpenger.oauth2.CachedOauth2Client
+import org.slf4j.event.Level
 import javax.sql.DataSource
 
 val defaultLogger = KotlinLogging.logger {}
@@ -67,6 +71,14 @@ fun Application.module(
         }
     }
 
+    install(CallLogging) {
+        disableDefaultColors()
+        filter {
+            it.request.path() !in setOf("/metrics", "/isalive", "/isready")
+        }
+        level = Level.INFO
+    }
+
     install(Authentication) {
         maskinporten(name = "afpPrivat", maskinportenConfig = appConfig.maskinporten)
     }
@@ -84,4 +96,15 @@ private fun httpClient(appConfig: AppConfig) = HttpClient {
         }
     }
     installRetryClient(maksRetries = appConfig.httpClient.retries)
+}
+
+fun HttpClientConfig<*>.installRetryClient(
+    maksRetries: Int = 5,
+    delayFunc: suspend (Long) -> Unit = { kotlinx.coroutines.delay(it) }, // Brukes for å mocke ut delay i enhetstester,
+) {
+    install(HttpRequestRetry) {
+        delay { delayFunc(it) }
+        retryOnServerErrors(maxRetries = maksRetries)
+        exponentialDelay()
+    }
 }
