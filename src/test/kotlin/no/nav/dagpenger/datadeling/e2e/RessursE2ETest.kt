@@ -7,10 +7,10 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.januar
-import no.nav.dagpenger.datadeling.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.ressurs.RessursService
-import no.nav.dagpenger.datadeling.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.perioder.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.perioder.ressurs.RessursDao
+import no.nav.dagpenger.datadeling.perioder.ressurs.RessursService
+import no.nav.dagpenger.datadeling.perioder.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.teknisk.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse

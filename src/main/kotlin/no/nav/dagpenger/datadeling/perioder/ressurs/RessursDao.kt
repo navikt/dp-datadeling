@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.ressurs
+package no.nav.dagpenger.datadeling.perioder.ressurs
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotliquery.Row
@@ -22,7 +22,7 @@ class RessursDao(private val dataSource: DataSource) {
         )
     }
 
-    fun hent(uuid: UUID) = sessionOf(dataSource).use { session ->
+    fun hent(uuid: UUID): Ressurs? = sessionOf(dataSource).use { session ->
         session.run(
             asQuery("select * from ressurs where uuid = ?", uuid).map(::mapRessurs).asSingle
         )
