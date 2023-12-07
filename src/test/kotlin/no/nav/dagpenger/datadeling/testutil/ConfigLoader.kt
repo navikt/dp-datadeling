@@ -1,6 +1,11 @@
 package no.nav.dagpenger.datadeling.testutil
 
-import no.nav.dagpenger.datadeling.*
+import no.nav.dagpenger.datadeling.config.AppConfig
+import no.nav.dagpenger.datadeling.config.DbConfig
+import no.nav.dagpenger.datadeling.config.DpProxyConfig
+import no.nav.dagpenger.datadeling.config.HttpClientConfig
+import no.nav.dagpenger.datadeling.config.MaskinportenConfig
+import no.nav.dagpenger.datadeling.config.RessursConfig
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import java.net.URL
 
