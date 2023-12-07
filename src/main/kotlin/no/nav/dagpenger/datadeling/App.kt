@@ -30,15 +30,12 @@ import no.nav.dagpenger.datadeling.teknisk.installRetryClient
 import no.nav.dagpenger.datadeling.teknisk.maskinporten
 import no.nav.dagpenger.datadeling.utils.javaTimeModule
 import no.nav.dagpenger.oauth2.CachedOauth2Client
-import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.sql.DataSource
 
 val defaultLogger = KotlinLogging.logger {}
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-@Suppress("unused")
 fun Application.module(
     appConfig: AppConfig = loadConfig(),
     dataSource: DataSource = configureDataSource(appConfig.db),
@@ -46,6 +43,19 @@ fun Application.module(
 ) {
 
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+    val httpClient = httpClient(appConfig)
+
+    val proxyClient = ProxyClient(appConfig.dpProxy, httpClient, tokenProvider)
+    val perioderService = PerioderService(proxyClient = proxyClient)
+
+    val leaderElector = LeaderElector(httpClient, appConfig)
+    val ressursDao = RessursDao(dataSource)
+    val ressursService = RessursService(ressursDao, leaderElector, appConfig.ressurs)
+
+    routing {
+        internalApi(appMicrometerRegistry)
+        perioderApi(appConfig, ressursService, perioderService)
+    }
 
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
@@ -58,35 +68,20 @@ fun Application.module(
     }
 
     install(Authentication) {
-        maskinporten(
-            "afpPrivat",
-            appConfig.maskinporten
-        )
+        maskinporten(name = "afpPrivat", maskinportenConfig = appConfig.maskinporten)
     }
-
-    val client = HttpClient {
-        install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-            jackson {
-                registerModule(JavaTimeModule())
-                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            }
-        }
-        installRetryClient(maksRetries = appConfig.httpClient.retries)
-    }
-
-    val ressursDao = RessursDao(dataSource)
-
-    val perioderService = PerioderService(proxyClient = ProxyClient(appConfig.dpProxy, client, tokenProvider))
-
-    val leaderElector = LeaderElector(client, appConfig)
-    val ressursService = RessursService(ressursDao, leaderElector, appConfig.ressurs)
 
     launch {
         ressursService.scheduleRessursCleanup()
     }
+}
 
-    routing {
-        internalApi(appMicrometerRegistry)
-        perioderApi(appConfig, ressursService, perioderService)
+private fun httpClient(appConfig: AppConfig) = HttpClient {
+    install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+        jackson {
+            registerModule(JavaTimeModule())
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        }
     }
+    installRetryClient(maksRetries = appConfig.httpClient.retries)
 }
