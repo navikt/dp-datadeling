@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling
+package no.nav.dagpenger.datadeling.config
 
 import java.net.URL
 
