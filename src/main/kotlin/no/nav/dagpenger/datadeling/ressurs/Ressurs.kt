@@ -1,7 +1,7 @@
 package no.nav.dagpenger.datadeling.ressurs
 
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
-import java.util.*
+import java.util.UUID
 
 enum class RessursStatus {
     OPPRETTET,
