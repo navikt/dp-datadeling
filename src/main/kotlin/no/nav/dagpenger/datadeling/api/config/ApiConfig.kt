@@ -8,11 +8,15 @@ import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
+import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.dagpenger.datadeling.AppConfig
 import org.slf4j.event.Level.INFO
 
-fun Application.konfigurerApi(appMicrometerRegistry: PrometheusMeterRegistry, appConfig: AppConfig) {
+fun Application.konfigurerApi(
+    appMicrometerRegistry: PrometheusMeterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+    appConfig: AppConfig
+) {
     install(Authentication) {
         maskinporten(name = "afpPrivat", maskinportenConfig = appConfig.maskinporten)
     }

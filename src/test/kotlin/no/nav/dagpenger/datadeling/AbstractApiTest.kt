@@ -37,28 +37,29 @@ abstract class AbstractApiTest {
 suspend fun HttpClient.testPost(
     path: String,
     body: Any?,
-    token: SignedJWT?,
+    token: String?,
 ) =
     post(path) {
         headers {
             append(HttpHeaders.Accept, ContentType.Application.Json)
             append(HttpHeaders.ContentType, ContentType.Application.Json)
-            if (token != null) {
-                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
+            token?.let {
+                append(HttpHeaders.Authorization, "Bearer $token")
             }
         }
-        if (body != null) {
+        body?.let {
             setBody(objectMapper.writeValueAsString(body))
+
         }
     }
 
-suspend fun HttpClient.testGet(path: String, token: SignedJWT?) =
+suspend fun HttpClient.testGet(path: String, token: String?) =
     get(path) {
         headers {
             append(HttpHeaders.Accept, ContentType.Application.Json)
             append(HttpHeaders.ContentType, ContentType.Application.Json)
-            if (token != null) {
-                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
+            token?.let {
+                append(HttpHeaders.Authorization, "Bearer $token")
             }
         }
     }

@@ -15,7 +15,6 @@ import no.nav.security.mock.oauth2.MockOAuth2Server
 
 object TestApplication {
     private const val MASKINPORTEN_ISSUER_ID = "maskinporten"
-    private const val CLIENT_ID = "dp-soknad"
 
     private val mockOAuth2Server: MockOAuth2Server by lazy {
         MockOAuth2Server().also { server ->
@@ -23,13 +22,11 @@ object TestApplication {
         }
     }
 
-    internal fun testAzureAdToken(ADGrupper: List<String>): String {
+    internal fun issueMaskinportenToken(): String {
         return mockOAuth2Server.issueToken(
             issuerId = MASKINPORTEN_ISSUER_ID,
-            audience = CLIENT_ID,
             claims = mapOf(
-                "NAVident" to "123",
-                "groups" to ADGrupper,
+                "scope" to Config.appConfig.maskinporten.scope,
             ),
         ).serialize()
     }
@@ -40,7 +37,7 @@ object TestApplication {
     ) {
         System.setProperty("MASKINPORTEN_JWKS_URI", mockOAuth2Server.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
         System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", "${mockOAuth2Server.wellKnownUrl(MASKINPORTEN_ISSUER_ID)}")
-        System.setProperty("MASKINPORTEN_ISSUER", MASKINPORTEN_ISSUER_ID)
+        System.setProperty("MASKINPORTEN_ISSUER", mockOAuth2Server.issuerUrl(MASKINPORTEN_ISSUER_ID).toString())
 
         return testApplication {
             application(moduleFunction)

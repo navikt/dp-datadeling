@@ -67,11 +67,12 @@ class RessursDaoTest {
     @Test
     fun `marker gamle ressurser som feilet`() = withMigratedDb {
         val ressursDao = RessursDao(Config.datasource)
-        val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+        val today = LocalDate.now()
+        val ressurs = ressursDao.opprett(DatadelingRequest("123", today, today))
         requireNotNull(ressurs)
         assertEquals(OPPRETTET, ressurs.status)
 
-        ressursDao.markerSomFeilet(LocalDateTime.now())
+        ressursDao.markerSomFeilet(today.plusDays(1).atStartOfDay())
         assertEquals(FEILET, ressursDao.hent(ressurs.uuid)!!.status)
     }
 

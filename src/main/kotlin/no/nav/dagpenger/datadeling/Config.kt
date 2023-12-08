@@ -19,6 +19,7 @@ internal object Config {
 
     private val defaultProperties = ConfigurationMap(
         mapOf(
+            "DP_DATADELING_URL" to "http://localhost:8080",
             //"DP_PROXY_URL" to "",
             //"DP_PROXY_SCOPE" to ""
         ),

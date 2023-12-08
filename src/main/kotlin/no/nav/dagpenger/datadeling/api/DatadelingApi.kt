@@ -41,6 +41,7 @@ fun Application.datadelingApi(
         ressursService.scheduleRessursCleanup()
     }
 }
+
 fun HttpClientConfig<*>.installRetryClient(
     maksRetries: Int = 5,
     delayFunc: suspend (Long) -> Unit = { kotlinx.coroutines.delay(it) }, // Brukes for å mocke ut delay i enhetstester,
