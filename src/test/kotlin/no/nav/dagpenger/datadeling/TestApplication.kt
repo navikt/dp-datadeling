@@ -14,7 +14,7 @@ import io.ktor.server.testing.testApplication
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
 object TestApplication {
-    private const val AZUREAD_ISSUER_ID = "azureAd"
+    private const val MASKINPORTEN_ISSUER_ID = "maskinporten"
     private const val CLIENT_ID = "dp-soknad"
 
     private val mockOAuth2Server: MockOAuth2Server by lazy {
@@ -25,7 +25,7 @@ object TestApplication {
 
     internal fun testAzureAdToken(ADGrupper: List<String>): String {
         return mockOAuth2Server.issueToken(
-            issuerId = AZUREAD_ISSUER_ID,
+            issuerId = MASKINPORTEN_ISSUER_ID,
             audience = CLIENT_ID,
             claims = mapOf(
                 "NAVident" to "123",
@@ -38,8 +38,9 @@ object TestApplication {
         moduleFunction: Application.() -> Unit,
         test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
-        System.setProperty("azure-app.client-id", CLIENT_ID)
-        System.setProperty("azure-app.well-known-url", "${mockOAuth2Server.wellKnownUrl(AZUREAD_ISSUER_ID)}")
+        System.setProperty("MASKINPORTEN_JWKS_URI", mockOAuth2Server.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
+        System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", "${mockOAuth2Server.wellKnownUrl(MASKINPORTEN_ISSUER_ID)}")
+        System.setProperty("MASKINPORTEN_ISSUER", MASKINPORTEN_ISSUER_ID)
 
         return testApplication {
             application(moduleFunction)
