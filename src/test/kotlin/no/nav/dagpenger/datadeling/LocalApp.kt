@@ -2,7 +2,6 @@ package no.nav.dagpenger.datadeling
 
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
-import io.mockk.mockk
 import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.testutil.mockConfig
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -15,8 +14,7 @@ fun Application.testModule(
     appConfig: AppConfig = mockConfig(8080, MockOAuth2Server()),
 ) {
     datadelingApi(
-        dataSource = dataSource,
-        appConfig = appConfig,
-        tokenProvider = mockk(relaxed = true)
+        config = appConfig,
+        dataSource = dataSource
     )
 }

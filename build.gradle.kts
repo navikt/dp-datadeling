@@ -60,9 +60,11 @@ dependencies {
     implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
+    implementation("io.ktor:ktor-server-cio:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
     implementation("com.sksamuel.hoplite:hoplite-hocon:$hopliteVersion")
     implementation("com.sksamuel.hoplite:hoplite-core:$hopliteVersion")
+
 
     // Ktor Client
     implementation("io.ktor:ktor-client-core:$ktorVersion")

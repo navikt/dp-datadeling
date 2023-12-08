@@ -13,7 +13,7 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.api.config.cachedTokenProvider
+import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.api.perioder.PerioderService
 import no.nav.dagpenger.datadeling.api.perioder.ProxyClient
@@ -23,31 +23,27 @@ import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.configureDataSource
 import no.nav.dagpenger.datadeling.loadConfig
-import no.nav.dagpenger.oauth2.CachedOauth2Client
 import javax.sql.DataSource
 
-@Suppress("Unused")
 fun Application.datadelingApi(
-    appConfig: AppConfig = loadConfig(),
-    dataSource: DataSource = configureDataSource(appConfig.db),
-    tokenProvider: CachedOauth2Client = cachedTokenProvider,
+    config: AppConfig = Config.config,
 ) {
 
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-    konfigurerApi(appMicrometerRegistry, appConfig)
+    konfigurerApi(appMicrometerRegistry, config)
 
-    val httpClient = httpClient(appConfig)
+    val httpClient = httpClient(config)
 
-    val proxyClient = ProxyClient(appConfig.dpProxy, httpClient, tokenProvider)
+    val proxyClient = ProxyClient(Config.dpProxyUrl, Config.dpProxyTokenProvider)
     val perioderService = PerioderService(proxyClient)
 
-    val leaderElector = LeaderElector(httpClient, appConfig)
-    val ressursDao = RessursDao(dataSource)
-    val ressursService = RessursService(ressursDao, leaderElector, appConfig.ressurs)
+    val leaderElector = LeaderElector(httpClient, config)
+    val ressursDao = RessursDao()
+    val ressursService = RessursService(ressursDao, leaderElector, config.ressurs)
 
     routing {
         livenessRoutes(appMicrometerRegistry)
-        perioderRoutes(appConfig, ressursService, perioderService)
+        perioderRoutes(config, ressursService, perioderService)
     }
 
     launch {

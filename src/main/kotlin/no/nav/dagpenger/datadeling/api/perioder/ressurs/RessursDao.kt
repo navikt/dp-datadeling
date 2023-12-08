@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
+import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
@@ -12,7 +13,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
 
-class RessursDao(private val dataSource: DataSource) {
+class RessursDao(private val dataSource: DataSource = Config.datasource) {
     fun opprett(request: DatadelingRequest) = sessionOf(dataSource).use { session ->
         session.run(
             asQuery(
