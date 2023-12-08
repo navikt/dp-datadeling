@@ -1,6 +1,6 @@
-limitsMemory: 4096Mi
-requestsMemory: 1Gi
-requestsCpu: 500m
+limitsMemory: 1024Mi
+requestsMemory: 512Mi
+requestsCpu: 50m
 db_tier: "db-custom-4-8192"
 ingresses:
   - https://dp-datadeling.intern.nav.no
