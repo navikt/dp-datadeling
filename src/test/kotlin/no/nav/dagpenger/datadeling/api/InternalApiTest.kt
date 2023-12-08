@@ -1,21 +1,18 @@
 package no.nav.dagpenger.datadeling.api
 
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
-import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.testApplication
 import io.mockk.mockk
-import no.nav.dagpenger.datadeling.AbstractApiTest
-import no.nav.dagpenger.datadeling.testApiModule
-import no.nav.dagpenger.datadeling.testutil.mockConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class InternalApiTest : AbstractApiTest() {
+class InternalApiTest {
 
     @Test
-    fun shouldGetAliveWithoutToken() = testInternalApi {
+    fun shouldGetAliveWithoutToken() = testApplication {
+        routing { livenessRoutes(mockk()) }
         val response = client.get("/internal/liveness")
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -23,7 +20,8 @@ class InternalApiTest : AbstractApiTest() {
     }
 
     @Test
-    fun shouldGetReadyWithoutToken() = testInternalApi {
+    fun shouldGetReadyWithoutToken() = testApplication {
+        routing { livenessRoutes(mockk()) }
         val response = client.get("/internal/readyness")
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -31,18 +29,10 @@ class InternalApiTest : AbstractApiTest() {
     }
 
     @Test
-    fun shouldGetMetricsWithoutToken() = testInternalApi {
+    fun shouldGetMetricsWithoutToken() = testApplication {
+        routing { livenessRoutes(mockk(relaxed = true)) }
         val response = client.get("/internal/prometheus")
 
         assertEquals(HttpStatusCode.OK, response.status)
-    }
-
-    private fun testInternalApi(block: suspend ApplicationTestBuilder.() -> Unit) {
-        testApplication {
-            testApiModule(mockConfig()) {
-                livenessRoutes(mockk<PrometheusMeterRegistry>(relaxed = true))
-            }
-            block()
-        }
     }
 }
