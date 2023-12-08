@@ -22,19 +22,4 @@ fun mockConfig(serverPort: Int = 8080, authServer: MockOAuth2Server = MockOAuth2
         minutterLevetidOpprettet = 1L,
         oppryddingsfrekvensMinutter = 1L,
     ),
-    dpProxy = DpProxyConfig(
-        url = URL("http://localhost:8092"),
-        scope = "",
-    ),
-    httpClient = HttpClientConfig(
-        retries = 0,
-        host = URL("http://localhost:$serverPort"),
-    ),
-    db = DbConfig(
-        host = "",
-        port = 5432,
-        name = "",
-        username = "",
-        password = "",
-    ),
 )

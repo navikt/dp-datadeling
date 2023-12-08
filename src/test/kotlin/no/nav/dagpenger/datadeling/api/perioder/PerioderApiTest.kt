@@ -84,7 +84,6 @@ class PerioderApiTest : AbstractApiTest() {
             val appConfig = mockConfig()
             testApiModule(appConfig) {
                 perioderRoutes(
-                    appConfig,
                     ressursService,
                     perioderService
                 )

@@ -3,27 +3,24 @@ package no.nav.dagpenger.datadeling.e2e
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.TestDatabase
+import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.testutil.mockConfig
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import java.net.ServerSocket
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractE2ETest {
     private lateinit var testServerRuntime: TestServerRuntime
-    private lateinit var testDatabase: TestDatabase
 
     private lateinit var proxyMockServer: WireMockServer
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
     protected val client get() = testServerRuntime.restClient()
-    protected val dataSource get() = testDatabase.dataSource
     protected lateinit var appConfig: AppConfig
 
     @BeforeAll
@@ -33,19 +30,13 @@ abstract class AbstractE2ETest {
         mockOAuth2Server = MockOAuth2Server().also { it.start(authServerPort) }
         appConfig = mockConfig(serverPort, mockOAuth2Server)
 
-        testDatabase = TestDatabase()
-        testServerRuntime = TestServer(testDatabase.dataSource).start(appConfig, serverPort)
+        testServerRuntime = TestServer(Config.datasource).start(appConfig, serverPort)
         proxyMockServer = WireMockServer(8092).also { it.start() }
     }
 
     @AfterAll
     fun tearDownServer() {
         testServerRuntime.close()
-    }
-
-    @BeforeEach
-    fun resetDatabase() {
-        testDatabase.reset()
     }
 
     val token

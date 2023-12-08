@@ -8,8 +8,8 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import no.nav.dagpenger.datadeling.AppConfig
+import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.datadeling.testModule
 import javax.sql.DataSource
 
 class TestServer(private val dataSource: DataSource) {
@@ -38,7 +38,7 @@ class TestServerRuntime(
             embeddedServer(CIO, applicationEngineEnvironment {
                 connector { port = httpPort }
                 module {
-                    testModule(dataSource, config)
+                    datadelingApi()
                 }
             })
     }

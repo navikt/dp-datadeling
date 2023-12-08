@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.testutil.januar
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
@@ -29,7 +30,7 @@ class RessursE2ETest : AbstractE2ETest() {
     @BeforeAll
     fun setup() {
         ressursService = RessursService(
-            ressursDao = RessursDao(dataSource),
+            ressursDao = RessursDao(Config.datasource),
             leaderElector = mockk(relaxed = true),
             config = appConfig.ressurs,
         )
