@@ -16,9 +16,6 @@ data class AppConfig(
     val isLocal: Boolean = false,
     val maskinporten: MaskinportenConfig,
     val ressurs: RessursConfig,
-    val dpProxy: DpProxyConfig,
-    val httpClient: HttpClientConfig,
-    val db: DbConfig,
 )
 
 data class MaskinportenConfig(

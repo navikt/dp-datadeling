@@ -41,14 +41,7 @@ java {
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven {
-        name = "github"
-        url = uri("https://maven.pkg.github.com/navikt/dp-kontrakter")
-        credentials {
-            username = project.findProperty("githubUser") as String? ?: System.getenv("GITHUB_USERNAME")
-            password = project.findProperty("githubPassword") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 dependencies {

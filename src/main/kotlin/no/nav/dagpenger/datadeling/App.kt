@@ -11,7 +11,6 @@ val defaultLogger = KotlinLogging.logger {}
 fun main() {
     val datadelingApi: Application.() -> Unit = {
         datadelingApi(
-            dataSource = Config.datasource,
         )
     }
     embeddedServer(port = 8080, module = datadelingApi, factory = CIO).start(wait = true)

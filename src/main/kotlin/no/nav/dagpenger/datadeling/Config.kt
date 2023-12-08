@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
+import java.net.URL
 import javax.sql.DataSource
 
 internal object Config {
@@ -32,9 +33,21 @@ internal object Config {
         AppConfig(
             isLocal = false,
             maskinporten = MaskinportenConfig(
-                discoveryUrl =
-            )
+                discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
+                scope = "nav:dagpenger:afpprivat.read",
+                jwks_uri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)]
+            ),
+            ressurs = RessursConfig(
+                minutterLevetidOpprettet = 120,
+                minutterLevetidFerdig = 1440,
+                oppryddingsfrekvensMinutter = 60
+            ),
         )
+    }
+
+    val dpDatadelingUrl: String by lazy {
+        properties[Key("DP_DATADELING_URL", stringType)]
     }
 
     val dpProxyUrl by lazy {

@@ -13,14 +13,13 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
-import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import java.util.UUID
 
 fun Route.perioderRoutes(
-    appConfig: AppConfig,
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
@@ -41,7 +40,7 @@ fun Route.perioderRoutes(
                     try {
                         val request = call.receive<DatadelingRequest>()
                         val ressurs = requireNotNull(ressursService.opprett(request))
-                        val ressursUrl = "${appConfig.httpClient.host}/dagpenger/v1/periode/${ressurs.uuid}"
+                        val ressursUrl = "${Config.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
 
                         launch {
                             try {
