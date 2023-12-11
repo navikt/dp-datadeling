@@ -62,6 +62,7 @@ dependencies {
     // Ktor Client
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
 
     // Jackson
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
@@ -90,6 +91,7 @@ dependencies {
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
     implementation("com.github.navikt.dp-biblioteker:oauth2-klient:$bibliotekerVersion")
+    implementation("io.ktor:ktor-client-logging-jvm:2.3.6")
 
     // Test
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")

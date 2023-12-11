@@ -1,15 +1,11 @@
 package no.nav.dagpenger.datadeling.testutil
 
 import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.DbConfig
-import no.nav.dagpenger.datadeling.DpProxyConfig
-import no.nav.dagpenger.datadeling.HttpClientConfig
 import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.RessursConfig
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import java.net.URL
 
-fun mockConfig(serverPort: Int = 8080, authServer: MockOAuth2Server = MockOAuth2Server()) = AppConfig(
+fun mockConfig(authServer: MockOAuth2Server = MockOAuth2Server()) = AppConfig(
     isLocal = true,
     maskinporten = MaskinportenConfig(
         discoveryUrl = authServer.wellKnownUrl("default").toString(),

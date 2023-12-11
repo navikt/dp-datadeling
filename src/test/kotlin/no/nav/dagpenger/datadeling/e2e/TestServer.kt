@@ -1,47 +1,25 @@
 package no.nav.dagpenger.datadeling.e2e
 
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.http.*
-import io.ktor.serialization.jackson.*
-import io.ktor.server.cio.*
-import io.ktor.server.engine.*
-import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.api.datadelingApi
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType
+import io.ktor.serialization.jackson.JacksonConverter
+import no.nav.dagpenger.datadeling.createDatadelingServer
 import no.nav.dagpenger.datadeling.objectMapper
-import javax.sql.DataSource
 
-class TestServer(private val dataSource: DataSource) {
-    fun start(config: AppConfig, port: Int): TestServerRuntime = TestServerRuntime(dataSource, config, port)
+class TestServer {
+    fun start(): TestServerRuntime = TestServerRuntime()
 }
 
-const val SERVER_PORT = 9080
+const val SERVER_PORT = 8080
 
-class TestServerRuntime(
-    dataSource: DataSource,
-    config: AppConfig,
-    private val httpPort: Int,
-) : AutoCloseable {
-    private val server = createEmbeddedServer(
-        dataSource = dataSource,
-        httpPort = SERVER_PORT,
-        config = config,
-    )
-
-    companion object {
-        private fun createEmbeddedServer(
-            dataSource: DataSource,
-            httpPort: Int,
-            config: AppConfig,
-        ) =
-            embeddedServer(CIO, applicationEngineEnvironment {
-                connector { port = httpPort }
-                module {
-                    datadelingApi()
-                }
-            })
-    }
+class TestServerRuntime : AutoCloseable {
+    private val server = createDatadelingServer(port = SERVER_PORT)
 
     init {
         server.start(wait = false)
@@ -55,7 +33,7 @@ class TestServerRuntime(
         return HttpClient {
             defaultRequest {
                 host = "localhost"
-                port = httpPort
+                port = SERVER_PORT
             }
             expectSuccess = false
             install(ContentNegotiation) {

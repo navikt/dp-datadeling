@@ -32,7 +32,7 @@ class RessursE2ETest : AbstractE2ETest() {
         ressursService = RessursService(
             ressursDao = RessursDao(Config.datasource),
             leaderElector = mockk(relaxed = true),
-            config = appConfig.ressurs,
+            config = Config.appConfig.ressurs,
         )
     }
 
@@ -135,6 +135,5 @@ class RessursE2ETest : AbstractE2ETest() {
         }.apply { assertEquals(HttpStatusCode.OK, this.status) }
             .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }.apply { block() }
     }
-
 }
 

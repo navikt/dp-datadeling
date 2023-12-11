@@ -2,36 +2,44 @@ package no.nav.dagpenger.datadeling.e2e
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.Config
-import no.nav.dagpenger.datadeling.testutil.mockConfig
+import no.nav.dagpenger.datadeling.Postgres
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
-import java.net.ServerSocket
+
+private const val MASKINPORTEN_ISSUER_ID = "maskinporten"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractE2ETest {
+
     private lateinit var testServerRuntime: TestServerRuntime
 
     private lateinit var proxyMockServer: WireMockServer
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
     protected val client get() = testServerRuntime.restClient()
-    protected lateinit var appConfig: AppConfig
 
     @BeforeAll
     fun setupServer() {
-        val serverPort = ServerSocket(0).use { it.localPort }
+        //sette opp alle properties som brukes
         val authServerPort = 8081
-        mockOAuth2Server = MockOAuth2Server().also { it.start(authServerPort) }
-        appConfig = mockConfig(serverPort, mockOAuth2Server)
 
-        testServerRuntime = TestServer(Config.datasource).start(appConfig, serverPort)
-        proxyMockServer = WireMockServer(8092).also { it.start() }
+        mockOAuth2Server = MockOAuth2Server().also {
+            it.start(authServerPort)
+            System.setProperty("MASKINPORTEN_JWKS_URI", it.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
+            System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", "${it.wellKnownUrl(MASKINPORTEN_ISSUER_ID)}")
+            System.setProperty("MASKINPORTEN_ISSUER", it.issuerUrl(MASKINPORTEN_ISSUER_ID).toString())
+        }
+        proxyMockServer = WireMockServer(8092).also {
+            it.start()
+            System.setProperty("DP_PROXY_URL", it.url("/"))
+            System.setProperty("DP_PROXY_SCOPE", "nav:dagpenger:afpprivat.read")
+        }
+        Postgres.withMigratedDb()
+        testServerRuntime = TestServer().start()
     }
 
     @AfterAll
@@ -41,9 +49,9 @@ abstract class AbstractE2ETest {
 
     val token
         get() = mockOAuth2Server.issueToken(
-            issuerId = "default",
+            issuerId = MASKINPORTEN_ISSUER_ID,
             clientId = "dp-datadeling",
-            tokenCallback = DefaultOAuth2TokenCallback(claims = mapOf("scope" to "nav:dagpenger:vedtak.read"))
+            tokenCallback = DefaultOAuth2TokenCallback(claims = mapOf("scope" to "nav:dagpenger:afpprivat.read"))
         )
 
     fun mockProxyError(delayMs: Int = 0) {
