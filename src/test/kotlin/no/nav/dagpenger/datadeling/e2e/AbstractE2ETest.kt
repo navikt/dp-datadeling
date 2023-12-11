@@ -1,5 +1,6 @@
 package no.nav.dagpenger.datadeling.e2e
 
+import com.ctc.wstx.shaded.msv_core.datatype.xsd.IntType
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.dagpenger.datadeling.Postgres
@@ -8,6 +9,7 @@ import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 
 private const val MASKINPORTEN_ISSUER_ID = "maskinporten"
@@ -26,6 +28,7 @@ abstract class AbstractE2ETest {
     fun setupServer() {
         //sette opp alle properties som brukes
         val authServerPort = 8081
+        System.setProperty("DP_PROXY_CLIENT_MAX_RETRIES", "1")
 
         mockOAuth2Server = MockOAuth2Server().also {
             it.start(authServerPort)
@@ -46,9 +49,22 @@ abstract class AbstractE2ETest {
         testServerRuntime = TestServer().start()
     }
 
+    @BeforeEach
+    fun beforeEach() {
+        proxyMockServer.resetAll()
+    }
+
     @AfterAll
     fun tearDownServer() {
         testServerRuntime.close()
+        System.clearProperty("DP_PROXY_CLIENT_MAX_RETRIES")
+        System.clearProperty("MASKINPORTEN_JWKS_URI")
+        System.clearProperty("MASKINPORTEN_WELL_KNOWN_URL")
+        System.clearProperty("MASKINPORTEN_ISSUER")
+        System.clearProperty("AZURE_APP_CLIENT_ID")
+        System.clearProperty("AZURE_APP_CLIENT_SECRET")
+        System.clearProperty("DP_PROXY_URL")
+        System.clearProperty("DP_PROXY_SCOPE")
     }
 
     val token

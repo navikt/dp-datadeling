@@ -42,6 +42,9 @@ object TestApplication {
         return testApplication {
             application(moduleFunction)
             test()
+            System.clearProperty("MASKINPORTEN_JWKS_URI")
+            System.clearProperty("MASKINPORTEN_WELL_KNOWN_URL")
+            System.clearProperty("MASKINPORTEN_ISSUER")
         }
     }
 

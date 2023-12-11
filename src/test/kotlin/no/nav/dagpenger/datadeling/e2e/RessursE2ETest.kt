@@ -18,9 +18,12 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
 import org.awaitility.kotlin.await
+import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.*
 import kotlin.test.assertNull
 
@@ -116,8 +119,9 @@ class RessursE2ETest : AbstractE2ETest() {
 
         val uuid = UUID.fromString(ressursUrl.split("/").last())
         runBlocking {
-            await.until {
+            await.atMost(Duration.ofSeconds(5)).until {
                 ressursService.hent(uuid)?.status == RessursStatus.FEILET
+
             }
         }
 

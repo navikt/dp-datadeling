@@ -15,6 +15,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
+import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.Config.dpProxyTokenProvider
 import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.datadeling.defaultLogger
@@ -30,27 +31,30 @@ class ProxyClient(
 
     override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
         val urlString = "$dpProxyBaseUrl" + "proxy/v1/arena/dagpengerperioder"
-        val token = try {
+
+        val invoke = try {
             tokenProvider.invoke()
         } catch (e: Exception) {
-            defaultLogger.error(e) {"Kunne ikke hente token: " + e.stackTraceToString()}
-            throw e
+            defaultLogger.error(e) { "Kunne ikke hente token " }
         }
 
         val result = runCatching {
             client.post(urlString) {
                 headers {
                     append(HttpHeaders.Accept, "application/json")
-                    append(HttpHeaders.Authorization, "Bearer $token")
+                    append(HttpHeaders.Authorization, "Bearer $invoke")
                     append(HttpHeaders.ContentType, "application/json")
                 }
                 setBody(request)
             }.body<DatadelingResponse>()
         }
-        return result.fold(onSuccess = { it }, onFailure = {
-            defaultLogger.error(it) { "Kunne ikke hente dagpengeperioder fra url: $urlString for request $request" }
-            throw it
-        })
+        return result.fold(
+            onSuccess = { it },
+            onFailure = {
+                defaultLogger.error(it) { "Kunne ikke hente dagpengeperioder fra url: $urlString for request $request" }
+                throw it
+            }
+        )
     }
 
     private val client = HttpClient {
@@ -60,7 +64,9 @@ class ProxyClient(
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
         }
-        installRetryClient()
+        installRetryClient(
+            maksRetries = Config.dpProxyClientMaxRetries
+        )
         install(Logging) {
             logger = Logger.SIMPLE
             level = LogLevel.ALL

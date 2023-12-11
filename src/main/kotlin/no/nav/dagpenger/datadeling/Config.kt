@@ -1,9 +1,11 @@
 package no.nav.dagpenger.datadeling
 
+import com.ctc.wstx.shaded.msv_core.datatype.xsd.IntType
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
+import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import kotlinx.coroutines.runBlocking
@@ -20,6 +22,7 @@ internal object Config {
     private val defaultProperties = ConfigurationMap(
         mapOf(
             "DP_DATADELING_URL" to "http://localhost:8080",
+            "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
             //"DP_PROXY_URL" to "",
             //"DP_PROXY_SCOPE" to ""
         ),
@@ -53,6 +56,9 @@ internal object Config {
 
     val dpProxyUrl by lazy {
         properties[Key("DP_PROXY_URL", stringType)]
+    }
+    val dpProxyClientMaxRetries: Int by lazy {
+        properties[Key("DP_PROXY_CLIENT_MAX_RETRIES", intType)]
     }
 
     val dpProxyTokenProvider by lazy {
