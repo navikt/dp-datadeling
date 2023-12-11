@@ -13,12 +13,15 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
-import io.ktor.http.headers
 import io.ktor.serialization.jackson.jackson
+import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config.dpProxyTokenProvider
 import no.nav.dagpenger.datadeling.api.installRetryClient
+import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 class ProxyClient(
     private val dpProxyBaseUrl: String,
@@ -26,17 +29,28 @@ class ProxyClient(
 ) : PerioderClient {
 
     override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
+        val urlString = "$dpProxyBaseUrl" + "proxy/v1/arena/dagpengerperioder"
+        val token = try {
+            tokenProvider.invoke()
+        } catch (e: Exception) {
+            defaultLogger.error(e) {"Kunne ikke hente token: " + e.stackTraceToString()}
+            throw e
+        }
+
         val result = runCatching {
-            client.post("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder") {
+            client.post(urlString) {
                 headers {
                     append(HttpHeaders.Accept, "application/json")
-                    append(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                    append(HttpHeaders.Authorization, "Bearer $token")
                     append(HttpHeaders.ContentType, "application/json")
                 }
                 setBody(request)
             }.body<DatadelingResponse>()
         }
-        return result.getOrThrow()
+        return result.fold(onSuccess = { it }, onFailure = {
+            defaultLogger.error(it) { "Kunne ikke hente dagpengeperioder fra url: $urlString for request $request" }
+            throw it
+        })
     }
 
     private val client = HttpClient {

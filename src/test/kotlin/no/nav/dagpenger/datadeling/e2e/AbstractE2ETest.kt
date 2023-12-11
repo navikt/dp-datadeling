@@ -32,6 +32,10 @@ abstract class AbstractE2ETest {
             System.setProperty("MASKINPORTEN_JWKS_URI", it.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
             System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", "${it.wellKnownUrl(MASKINPORTEN_ISSUER_ID)}")
             System.setProperty("MASKINPORTEN_ISSUER", it.issuerUrl(MASKINPORTEN_ISSUER_ID).toString())
+
+            System.setProperty("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT", "${it.tokenEndpointUrl("azureAd")}")
+            System.setProperty("AZURE_APP_CLIENT_ID", "test")
+            System.setProperty("AZURE_APP_CLIENT_SECRET", "tull")
         }
         proxyMockServer = WireMockServer(8092).also {
             it.start()
