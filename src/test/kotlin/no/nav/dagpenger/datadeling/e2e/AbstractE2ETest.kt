@@ -4,6 +4,7 @@ import com.ctc.wstx.shaded.msv_core.datatype.xsd.IntType
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.dagpenger.datadeling.Postgres
+import no.nav.dagpenger.datadeling.TestApplication
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
@@ -18,10 +19,7 @@ private const val MASKINPORTEN_ISSUER_ID = "maskinporten"
 abstract class AbstractE2ETest {
 
     private lateinit var testServerRuntime: TestServerRuntime
-
     private lateinit var proxyMockServer: WireMockServer
-    private lateinit var mockOAuth2Server: MockOAuth2Server
-
     protected val client get() = testServerRuntime.restClient()
 
     @BeforeAll
@@ -29,17 +27,8 @@ abstract class AbstractE2ETest {
         //sette opp alle properties som brukes
         val authServerPort = 8081
         System.setProperty("DP_PROXY_CLIENT_MAX_RETRIES", "1")
+        TestApplication.setup()
 
-        mockOAuth2Server = MockOAuth2Server().also {
-            it.start(authServerPort)
-            System.setProperty("MASKINPORTEN_JWKS_URI", it.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
-            System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", "${it.wellKnownUrl(MASKINPORTEN_ISSUER_ID)}")
-            System.setProperty("MASKINPORTEN_ISSUER", it.issuerUrl(MASKINPORTEN_ISSUER_ID).toString())
-
-            System.setProperty("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT", "${it.tokenEndpointUrl("azureAd")}")
-            System.setProperty("AZURE_APP_CLIENT_ID", "test")
-            System.setProperty("AZURE_APP_CLIENT_SECRET", "tull")
-        }
         proxyMockServer = WireMockServer(8092).also {
             it.start()
             System.setProperty("DP_PROXY_URL", it.url("/"))
@@ -57,22 +46,12 @@ abstract class AbstractE2ETest {
     @AfterAll
     fun tearDownServer() {
         testServerRuntime.close()
+        proxyMockServer.shutdownServer()
+        TestApplication.teardown()
         System.clearProperty("DP_PROXY_CLIENT_MAX_RETRIES")
-        System.clearProperty("MASKINPORTEN_JWKS_URI")
-        System.clearProperty("MASKINPORTEN_WELL_KNOWN_URL")
-        System.clearProperty("MASKINPORTEN_ISSUER")
-        System.clearProperty("AZURE_APP_CLIENT_ID")
-        System.clearProperty("AZURE_APP_CLIENT_SECRET")
         System.clearProperty("DP_PROXY_URL")
         System.clearProperty("DP_PROXY_SCOPE")
     }
-
-    val token
-        get() = mockOAuth2Server.issueToken(
-            issuerId = MASKINPORTEN_ISSUER_ID,
-            clientId = "dp-datadeling",
-            tokenCallback = DefaultOAuth2TokenCallback(claims = mapOf("scope" to "nav:dagpenger:afpprivat.read"))
-        )
 
     fun mockProxyError(delayMs: Int = 0) {
         proxyMockServer.stubFor(

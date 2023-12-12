@@ -7,6 +7,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.Config
+import no.nav.dagpenger.datadeling.TestApplication
 import no.nav.dagpenger.datadeling.testutil.januar
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
@@ -64,7 +65,7 @@ class RessursE2ETest : AbstractE2ETest() {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
                 append(HttpHeaders.ContentType, ContentType.Application.Json)
-                bearerAuth(token.serialize())
+                bearerAuth(TestApplication.issueMaskinportenToken())
             }
             setBody(objectMapper.writeValueAsString(request))
         }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
@@ -112,12 +113,19 @@ class RessursE2ETest : AbstractE2ETest() {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
                 append(HttpHeaders.ContentType, ContentType.Application.Json)
-                bearerAuth(token.serialize())
+                bearerAuth(TestApplication.issueMaskinportenToken())
             }
             setBody(objectMapper.writeValueAsString(request))
         }.bodyAsText()
 
-        val uuid = UUID.fromString(ressursUrl.split("/").last())
+        val uuid = ressursUrl.let {
+            try {
+                UUID.fromString(ressursUrl.split("/").last())
+            } catch (e: Exception) {
+                throw RuntimeException("Kunne ikke hente uuid fra ressursUrl: $ressursUrl")
+            }
+        }
+
         runBlocking {
             await.atMost(Duration.ofSeconds(5)).until {
                 ressursService.hent(uuid)?.status == RessursStatus.FEILET
@@ -134,7 +142,7 @@ class RessursE2ETest : AbstractE2ETest() {
         client.get(this) {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
-                append(HttpHeaders.Authorization, "Bearer ${token.serialize()}")
+                append(HttpHeaders.Authorization, "Bearer ${TestApplication.issueMaskinportenToken()}")
             }
         }.apply { assertEquals(HttpStatusCode.OK, this.status) }
             .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }.apply { block() }
