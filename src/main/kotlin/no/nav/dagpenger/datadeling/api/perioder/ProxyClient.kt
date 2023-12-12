@@ -28,7 +28,7 @@ class ProxyClient(
 ) : PerioderClient {
 
     override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
-        val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//", "/")
+        val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
 
         val invoke = try {
             tokenProvider.invoke()
