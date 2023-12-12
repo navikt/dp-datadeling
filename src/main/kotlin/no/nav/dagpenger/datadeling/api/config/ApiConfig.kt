@@ -1,5 +1,7 @@
 package no.nav.dagpenger.datadeling.api.config
 
+import io.ktor.http.ContentType
+import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -11,11 +13,12 @@ import io.ktor.server.request.path
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.dagpenger.datadeling.AppConfig
+import no.nav.dagpenger.datadeling.objectMapper
 import org.slf4j.event.Level.INFO
 
 fun Application.konfigurerApi(
     appMicrometerRegistry: PrometheusMeterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-    appConfig: AppConfig
+    appConfig: AppConfig,
 ) {
     install(Authentication) {
         maskinporten(name = "afpPrivat", maskinportenConfig = appConfig.maskinporten)
@@ -27,7 +30,7 @@ fun Application.konfigurerApi(
 
     install(ContentNegotiation) {
         jackson {
-            registerModule(javaTimeModule)
+            register(ContentType.Application.Json, JacksonConverter(objectMapper))
         }
     }
 
