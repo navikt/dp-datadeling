@@ -24,7 +24,7 @@ import no.nav.dagpenger.datadeling.testutil.januar
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadType
+import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -52,8 +52,7 @@ class RessursE2ETest : AbstractE2ETest() {
                 Periode(
                     fraOgMedDato = 10.januar(),
                     tilOgMedDato = 25.januar(),
-                    ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                    gjenståendeDager = 100,
+                    ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
                 )
             )
         )
@@ -100,8 +99,7 @@ class RessursE2ETest : AbstractE2ETest() {
                 Periode(
                     fraOgMedDato = 10.januar(),
                     tilOgMedDato = 25.januar(),
-                    ytelseType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                    gjenståendeDager = 100,
+                    ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
                 )
             )
         )

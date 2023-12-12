@@ -6,9 +6,9 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadType
+import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
 import java.time.LocalDate
 import java.util.UUID
-
 
 internal const val FNR = "01020312342"
 
@@ -22,7 +22,7 @@ internal fun enDatadelingRequest(periode: ClosedRange<LocalDate>, fnr: String = 
 internal fun enDatadelingRequest(
     fraOgMed: LocalDate = 1.januar(),
     tilOgMed: LocalDate? = null,
-    fnr: String = FNR
+    fnr: String = FNR,
 ) =
     DatadelingRequest(
         personIdent = fnr,
@@ -51,25 +51,21 @@ internal fun emptyResponse() = DatadelingResponse(FNR, emptyList())
 
 internal fun enPeriode(
     periode: ClosedRange<LocalDate>,
-    ytelseType: StønadType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-    gjenståendeDager: Int = 100,
+    ytelseType: StønadType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
 ) = enPeriode(
     fraOgMed = periode.start,
     tilOgMed = periode.endInclusive,
     ytelseType = ytelseType,
-    gjenståendeDager = gjenståendeDager,
 )
 
 internal fun enPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
-    ytelseType: StønadType = StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-    gjenståendeDager: Int = 100,
+    ytelseType: StønadType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
 ) = Periode(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
-    ytelseType = ytelseType,
-    gjenståendeDager = gjenståendeDager,
+    ytelseType = ytelseType
 )
 
 internal fun Int.januar(year: Int = 2023) = LocalDate.of(year, 1, this)

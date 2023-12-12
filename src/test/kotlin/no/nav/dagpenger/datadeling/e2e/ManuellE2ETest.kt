@@ -16,7 +16,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import org.junit.Ignore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -35,7 +34,7 @@ class ManuellE2ETest {
         val access_token: String
     )
 
-    fun tokentProvider(): String {
+    fun tokenProvider(): String {
         return runBlocking {
             client.get("https://dp-maskinporten-client.intern.dev.nav.no/token").bodyAsText().let {
                 objectMapper.readValue(it, Token::class.java).access_token
@@ -51,7 +50,7 @@ class ManuellE2ETest {
                 personIdent = "02929898071",
                 fraOgMedDato = LocalDate.of(2023, 10, 1),
             )
-            val token = tokentProvider()
+            val token = tokenProvider()
             val ressursUrl = client.post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
                 headers {
                     append(HttpHeaders.Accept, ContentType.Application.Json)

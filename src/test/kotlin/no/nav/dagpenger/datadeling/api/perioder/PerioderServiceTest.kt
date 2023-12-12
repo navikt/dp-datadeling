@@ -10,7 +10,8 @@ import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enPeriode
 import no.nav.dagpenger.datadeling.testutil.januar
 import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadType
+import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
+import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_PERMITTERING_ORDINAER
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -85,8 +86,8 @@ class PerioderServiceTest {
         val request = enDatadelingRequest(1.januar()..11.januar())
 
         val response = enDatadelingResponse(
-            enPeriode(1.januar()..6.januar(), StønadType.DAGPENGER_PERMITTERING_ORDINAER),
-            enPeriode(7.januar()..11.januar(), StønadType.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+            enPeriode(1.januar()..6.januar(), DAGPENGER_PERMITTERING_ORDINAER),
+            enPeriode(7.januar()..11.januar(), DAGPENGER_ARBEIDSSOKER_ORDINAER),
         )
 
         coEvery { proxyClient.hentDagpengeperioder(request) } returns response

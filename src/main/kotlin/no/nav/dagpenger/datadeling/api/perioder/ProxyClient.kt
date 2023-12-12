@@ -33,7 +33,7 @@ class ProxyClient(
         val invoke = try {
             tokenProvider.invoke()
         } catch (e: Exception) {
-            defaultLogger.error(e) { "Kunne ikke hente token " }
+            defaultLogger.error(e) { "Kunne ikke hente token" }
         }
 
         val result = runCatching {
