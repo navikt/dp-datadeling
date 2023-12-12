@@ -22,8 +22,6 @@ import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 
-private val sikkerlogg = KotlinLogging.logger("tjenestekall")
-
 class ProxyClient(
     private val dpProxyBaseUrl: String,
     private val tokenProvider: () -> String = dpProxyTokenProvider,
@@ -68,8 +66,7 @@ class ProxyClient(
             maksRetries = Config.dpProxyClientMaxRetries
         )
         install(Logging) {
-            logger = Logger.SIMPLE
-            level = LogLevel.ALL
+            level = LogLevel.INFO
         }
     }
 }
