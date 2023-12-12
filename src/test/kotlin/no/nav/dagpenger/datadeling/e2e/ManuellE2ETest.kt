@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -43,7 +44,7 @@ class ManuellE2ETest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     fun bubba() {
         runBlocking {
             val request = DatadelingRequest(
