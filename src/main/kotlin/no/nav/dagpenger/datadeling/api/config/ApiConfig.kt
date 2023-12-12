@@ -34,7 +34,7 @@ fun Application.konfigurerApi(
     install(CallLogging) {
         disableDefaultColors()
         filter {
-            it.request.path() !in setOf("/metrics", "/isalive", "/isready")
+            it.request.path() !in setOf("/internal/prometheus", "/internal/liveness", "/internal/readyness")
         }
         level = INFO
     }
