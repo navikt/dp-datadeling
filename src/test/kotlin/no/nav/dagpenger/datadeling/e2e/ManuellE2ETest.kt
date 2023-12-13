@@ -34,9 +34,10 @@ class ManuellE2ETest {
         val access_token: String
     )
 
+
     fun tokenProvider(): String {
         return runBlocking {
-            client.get("https://dp-maskinporten-client.intern.dev.nav.no/token").bodyAsText().let {
+            client.get("https://dp-maskinporten-client.ekstern.dev.nav.no/token").bodyAsText().let {
                 objectMapper.readValue(it, Token::class.java).access_token
             }
         }
@@ -51,7 +52,7 @@ class ManuellE2ETest {
                 fraOgMedDato = LocalDate.of(2023, 10, 1),
             )
             val token = tokenProvider()
-            val ressursUrl = client.post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
+            val ressursUrl = client.post("https://dp-datadeling.ekstern.nav.no/dagpenger/v1/periode") {
                 headers {
                     append(HttpHeaders.Accept, ContentType.Application.Json)
                     append(HttpHeaders.ContentType, ContentType.Application.Json)
@@ -62,14 +63,13 @@ class ManuellE2ETest {
                 println("Ressurs url: $it")
             }
 
-            repeat((1..5).count()) { time ->
-                val hubba = ressursUrl.replace("intern", "ekstern")
-                println("Henter ressurs: $hubba")
-                client.get(hubba) {
+            repeat((1..5).count()) { i ->
+                println("Henter ressurs: $ressursUrl")
+                client.get(ressursUrl) {
                     bearerAuth(token)
                 }.let { response ->
-                    println("Statuss: " + response.status)
-                    response.bodyAsText().also { println("Resultat $time: $it") }
+                    println("Status: " + response.status)
+                    response.bodyAsText().also { println("Resultat $i: $it") }
                 }
                 delay(1000)
             }
