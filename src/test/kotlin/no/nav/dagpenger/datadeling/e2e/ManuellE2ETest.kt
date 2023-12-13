@@ -37,7 +37,7 @@ class ManuellE2ETest {
 
     fun tokenProvider(): String {
         return runBlocking {
-            client.get("https://dp-maskinporten-client.ekstern.dev.nav.no/token").bodyAsText().let {
+            client.get("https://dp-maskinporten-client.intern.dev.nav.no/token").bodyAsText().let {
                 objectMapper.readValue(it, Token::class.java).access_token
             }
         }
@@ -52,7 +52,7 @@ class ManuellE2ETest {
                 fraOgMedDato = LocalDate.of(2023, 10, 1),
             )
             val token = tokenProvider()
-            val ressursUrl = client.post("https://dp-datadeling.ekstern.nav.no/dagpenger/v1/periode") {
+            val ressursUrl = client.post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
                 headers {
                     append(HttpHeaders.Accept, ContentType.Application.Json)
                     append(HttpHeaders.ContentType, ContentType.Application.Json)
