@@ -44,10 +44,6 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlinGradle {
         ktlint()
     }
-    // Workaround for <https://github.com/diffplug/spotless/issues/1644>
-    // using idea found at
-    // <https://github.com/diffplug/spotless/issues/1527#issuecomment-1409142798>.
-    lineEndings = LineEnding.PLATFORM_NATIVE // or any other except GIT_ATTRIBUTES
 }
 
 tasks.withType<KotlinCompile>().configureEach {
