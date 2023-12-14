@@ -1,22 +1,10 @@
 project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
-val micrometerVersion = "1.12.0"
-val ktorVersion = "2.3.6"
-val jacksonVersion = "2.16.0"
 val tokenValidationVersion = "3.1.8"
-val kotlinLoggerVersion = "3.0.5"
-val logbackVersion = "1.4.11"
-val logstashVersion = "7.4"
-val postgresVersion = "42.6.0"
-val hikariVersion = "5.1.0"
-val flywayVersion = "9.22.3"
 val kontrakterVersion = "2.0_20231212155248_db8495c"
-val bibliotekerVersion = "2023.10.30-15.22.df63af45787f"
 val mockOauth2Version = "2.0.0"
-val jupiterVersion = "5.10.1"
 val wiremockVersion = "3.0.1"
 val testcontainersVersion = "1.19.2"
-val mockkVersion = "1.13.8"
 
 plugins {
     id("common")
@@ -31,63 +19,41 @@ repositories {
 
 dependencies {
     // Ktor Server
-    implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
-    implementation("io.ktor:ktor-server-cio:$ktorVersion")
-    implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
+    implementation(libs.bundles.ktor.server)
+    implementation("io.ktor:ktor-server-cio:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-metrics-micrometer:${libs.versions.ktor.get()}")
+    implementation(libs.micrometer.registry.prometheus)
 
     // Ktor Client
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    implementation(libs.bundles.ktor.client)
 
     // Jackson
-    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion")
+    implementation(libs.bundles.jackson)
+    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:${libs.versions.jackson.get()}")
 
     // Security
     implementation("no.nav.security:token-validation-ktor-v2:$tokenValidationVersion")
-    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
 
     // Log
-    implementation("io.github.microutils:kotlin-logging:$kotlinLoggerVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
+    implementation(libs.kotlin.logging)
 
     // DB
-    implementation("org.postgresql:postgresql:$postgresVersion")
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("com.github.seratch:kotliquery:1.9.0")
+    implementation(libs.bundles.postgres)
 
     // Nav
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
-    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:$bibliotekerVersion")
-    implementation("io.ktor:ktor-client-logging-jvm:2.3.6")
+    implementation(libs.dp.biblioteker.oauth2.klient)
 
     // Test
-    testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
+    testImplementation(libs.ktor.server.test.host)
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+    testImplementation(libs.testcontainer.postgresql)
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
-    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation(libs.mockk)
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
-    testImplementation("ch.qos.logback:logback-classic:$logbackVersion")
-    testImplementation("io.ktor:ktor-server-cio:$ktorVersion")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter:$jupiterVersion")
 }
 
 application {
