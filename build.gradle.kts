@@ -44,13 +44,15 @@ dependencies {
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
     implementation(libs.dp.biblioteker.oauth2.klient)
-
+    implementation(libs.rapids.and.rivers)
+    implementation("no.nav.dagpenger:aktivitetslogg:20231003.21.027341")
     // Test
     testImplementation(libs.ktor.server.test.host)
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation(libs.testcontainer.postgresql)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotest.assertions.core)
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
 }
