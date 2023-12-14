@@ -1,0 +1,76 @@
+name: Build and deploy
+
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+
+jobs:
+  build:
+    name: Build and publish Docker image
+    runs-on: ubuntu-latest
+    permissions: # Sjekk https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+      contents: "read"
+      checks: "write"
+      pull-requests: "write"
+      id-token: "write"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - uses: gradle/gradle-build-action@v2
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          gradle-version: wrapper
+          arguments: --configuration-cache build installDist
+
+      - name: docker-build-push
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: teamdagpenger
+          push_image: true # optional, default true
+          tag: ${{ github.sha }}
+          dockerfile: mediator/Dockerfile # optional, default Dockerfile
+          docker_context: mediator # optional, default .
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+
+  deploy-dev:
+    name: Deploy to dev
+    needs: [ build ]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: dev-gcp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/nais.yaml
+          VAR: image=${{ needs.build.outputs.image }}
+          VARS: .nais/vars-dev.yaml
+          PRINT_PAYLOAD: true
+
+#  deploy-prod:
+#    name: Deploy to Production
+#    needs: [ build, deploy-dev ]
+#    if: github.ref == 'refs/heads/main'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: nais/deploy/actions/deploy@v1
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: prod-gcp
+#          RESOURCE: .nais/nais.yaml
+#          VARS: .nais/vars-prod.yaml
+#          PRINT_PAYLOAD: true
