@@ -14,7 +14,7 @@ fun AuthenticationConfig.maskinporten(
     maskinportenConfig: MaskinportenConfig,
 ) {
     val maskinportenJwkProvider: JwkProvider =
-        JwkProviderBuilder(maskinportenConfig.jwks_uri)
+        JwkProviderBuilder(maskinportenConfig.jwksUri)
             .cached(10, 24, TimeUnit.HOURS)
             .rateLimited(10, 1, TimeUnit.MINUTES)
             .build()

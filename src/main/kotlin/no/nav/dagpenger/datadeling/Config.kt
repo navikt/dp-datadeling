@@ -35,7 +35,7 @@ internal object Config {
                 MaskinportenConfig(
                     discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
                     scope = "nav:dagpenger:afpprivat.read",
-                    jwks_uri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                    jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
                     issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
                 ),
             ressurs =
