@@ -50,7 +50,6 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation(libs.testcontainer.postgresql)
-    testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
     testImplementation(libs.mockk)
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
