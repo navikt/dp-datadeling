@@ -2,17 +2,11 @@ package no.nav.dagpenger.datadeling.api.config
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
-import com.natpryce.konfig.Configuration
-import com.natpryce.konfig.ConfigurationProperties
-import com.natpryce.konfig.EnvironmentVariables
-import com.natpryce.konfig.overriding
 import io.ktor.server.auth.AuthenticationConfig
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.oauth2.CachedOauth2Client
-import no.nav.dagpenger.oauth2.OAuth2Config
 import java.util.concurrent.TimeUnit
 
 fun AuthenticationConfig.maskinporten(
@@ -36,15 +30,4 @@ fun AuthenticationConfig.maskinporten(
             JWTPrincipal(cred.payload)
         }
     }
-}
-
-private val properties: Configuration by lazy {
-    ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
-}
-val cachedTokenProvider by lazy {
-    val azureAd = OAuth2Config.AzureAd(properties)
-    CachedOauth2Client(
-        tokenEndpointUrl = azureAd.tokenEndpointUrl,
-        authType = azureAd.clientSecret(),
-    )
 }

@@ -15,15 +15,11 @@ import java.net.URL
 import javax.sql.DataSource
 
 internal object Config {
-    const val APP_NAME = "dp-datadeling"
-
     private val defaultProperties =
         ConfigurationMap(
             mapOf(
                 "DP_DATADELING_URL" to "http://localhost:8080",
                 "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
-                // "DP_PROXY_URL" to "",
-                // "DP_PROXY_SCOPE" to ""
             ),
         )
 
