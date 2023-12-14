@@ -11,12 +11,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
-import no.nav.dagpenger.datadeling.AbstractApiTest
 import no.nav.dagpenger.datadeling.api.installRetryClient
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class HttpRetryClientTest : AbstractApiTest() {
+const val PATH = "/"
+
+class HttpRetryClientTest {
     @Test
     fun `http-klienten prøver ikke retry om den får en 2xx-respons`() =
         testApplication {
@@ -77,9 +78,5 @@ class HttpRetryClientTest : AbstractApiTest() {
                 call.respond(statusCode)
             }
         }
-    }
-
-    private companion object {
-        const val PATH = "/"
     }
 }
