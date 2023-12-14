@@ -25,7 +25,10 @@ class RessursService(
 
     fun hent(uuid: UUID) = ressursDao.hent(uuid)
 
-    fun ferdigstill(uuid: UUID, response: DatadelingResponse) = ressursDao.ferdigstill(uuid, response)
+    fun ferdigstill(
+        uuid: UUID,
+        response: DatadelingResponse,
+    ) = ressursDao.ferdigstill(uuid, response)
 
     fun markerSomFeilet(uuid: UUID) = ressursDao.markerSomFeilet(uuid)
 
@@ -48,14 +51,18 @@ class RessursService(
         }
     }
 
-    private suspend fun schedule(delayDuration: Duration, action: () -> Unit) {
+    private suspend fun schedule(
+        delayDuration: Duration,
+        action: () -> Unit,
+    ) {
         withContext(Dispatchers.IO) {
-            val scheduledEventFlow = flow {
-                while (true) {
-                    emit(Unit)
-                    delay(delayDuration.toMillis())
+            val scheduledEventFlow =
+                flow {
+                    while (true) {
+                        emit(Unit)
+                        delay(delayDuration.toMillis())
+                    }
                 }
-            }
 
             scheduledEventFlow.onEach { action() }.launchIn(this)
         }

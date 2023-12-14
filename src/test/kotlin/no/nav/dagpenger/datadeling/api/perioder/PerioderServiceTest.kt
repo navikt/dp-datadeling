@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class PerioderServiceTest {
-
     private val proxyClient = mockk<ProxyClient>()
     private val perioderService = PerioderService(proxyClient)
 
@@ -27,102 +26,112 @@ class PerioderServiceTest {
     }
 
     @Test
-    fun `ingen perioder`() = runTest {
-        coEvery { proxyClient.hentDagpengeperioder(any()) } returns emptyResponse()
+    fun `ingen perioder`() =
+        runTest {
+            coEvery { proxyClient.hentDagpengeperioder(any()) } returns emptyResponse()
 
-        val request = enDatadelingRequest(1.januar()..10.januar())
-        val response = perioderService.hentDagpengeperioder(request)
+            val request = enDatadelingRequest(1.januar()..10.januar())
+            val response = perioderService.hentDagpengeperioder(request)
 
-        assertEquals(emptyList<Periode>(), response.perioder)
-    }
-
-    @Test
-    fun `én periode`() = runTest {
-        val request = enDatadelingRequest(1.januar()..6.januar())
-        val response = enDatadelingResponse(enPeriode(1.januar()..6.januar()))
-
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-
-        assertEquals(response.perioder, perioderService.hentDagpengeperioder(request).perioder)
-    }
-
-    @Test
-    fun `slår sammen perioder uten gap`() = runTest {
-        val request = enDatadelingRequest(1.januar()..11.januar())
-
-        val response = enDatadelingResponse(
-            enPeriode(1.januar()..6.januar()),
-            enPeriode(7.januar()..11.januar()),
-        )
-
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            assertEquals(emptyList<Periode>(), response.perioder)
         }
-    }
 
     @Test
-    fun `slår ikke sammen perioder med gap`() = runTest {
-        val request = enDatadelingRequest(1.januar()..11.januar())
+    fun `én periode`() =
+        runTest {
+            val request = enDatadelingRequest(1.januar()..6.januar())
+            val response = enDatadelingResponse(enPeriode(1.januar()..6.januar()))
 
-        val response = enDatadelingResponse(
-            enPeriode(1.januar()..5.januar()),
-            enPeriode(7.januar()..11.januar()),
-        )
+            coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(2, it.perioder.size)
-            assertEquals(response.perioder, it.perioder)
+            assertEquals(response.perioder, perioderService.hentDagpengeperioder(request).perioder)
         }
-    }
 
     @Test
-    fun `slår ikke sammen perioder med forskjellige ytelsestyper`() = runTest {
-        val request = enDatadelingRequest(1.januar()..11.januar())
+    fun `slår sammen perioder uten gap`() =
+        runTest {
+            val request = enDatadelingRequest(1.januar()..11.januar())
 
-        val response = enDatadelingResponse(
-            enPeriode(1.januar()..6.januar(), DAGPENGER_PERMITTERING_ORDINAER),
-            enPeriode(7.januar()..11.januar(), DAGPENGER_ARBEIDSSOKER_ORDINAER),
-        )
+            val response =
+                enDatadelingResponse(
+                    enPeriode(1.januar()..6.januar()),
+                    enPeriode(7.januar()..11.januar()),
+                )
 
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { proxyClient.hentDagpengeperioder(request) } returns response
 
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(2, it.perioder.size)
-            assertEquals(response.perioder, it.perioder)
+            perioderService.hentDagpengeperioder(request).let {
+                assertEquals(1, it.perioder.size)
+                assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
+                assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            }
         }
-    }
 
     @Test
-    fun `avkorter perioden mot forespørsel`() = runTest {
-        val request = enDatadelingRequest(3.januar()..8.januar())
-        val response = enDatadelingResponse(enPeriode(1.januar()..11.januar()))
+    fun `slår ikke sammen perioder med gap`() =
+        runTest {
+            val request = enDatadelingRequest(1.januar()..11.januar())
 
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            val response =
+                enDatadelingResponse(
+                    enPeriode(1.januar()..5.januar()),
+                    enPeriode(7.januar()..11.januar()),
+                )
 
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+
+            perioderService.hentDagpengeperioder(request).let {
+                assertEquals(2, it.perioder.size)
+                assertEquals(response.perioder, it.perioder)
+            }
         }
-    }
 
     @Test
-    fun `avkorter perioder uten avsluttet ytelse`() = runTest {
-        val request = enDatadelingRequest(3.januar()..8.januar())
-        val response = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null))
+    fun `slår ikke sammen perioder med forskjellige ytelsestyper`() =
+        runTest {
+            val request = enDatadelingRequest(1.januar()..11.januar())
 
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            val response =
+                enDatadelingResponse(
+                    enPeriode(1.januar()..6.januar(), DAGPENGER_PERMITTERING_ORDINAER),
+                    enPeriode(7.januar()..11.januar(), DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                )
 
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+
+            perioderService.hentDagpengeperioder(request).let {
+                assertEquals(2, it.perioder.size)
+                assertEquals(response.perioder, it.perioder)
+            }
         }
-    }
+
+    @Test
+    fun `avkorter perioden mot forespørsel`() =
+        runTest {
+            val request = enDatadelingRequest(3.januar()..8.januar())
+            val response = enDatadelingResponse(enPeriode(1.januar()..11.januar()))
+
+            coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+
+            perioderService.hentDagpengeperioder(request).let {
+                assertEquals(1, it.perioder.size)
+                assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
+                assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            }
+        }
+
+    @Test
+    fun `avkorter perioder uten avsluttet ytelse`() =
+        runTest {
+            val request = enDatadelingRequest(3.januar()..8.januar())
+            val response = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null))
+
+            coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+
+            perioderService.hentDagpengeperioder(request).let {
+                assertEquals(1, it.perioder.size)
+                assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
+                assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            }
+        }
 }

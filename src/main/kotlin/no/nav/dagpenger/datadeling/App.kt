@@ -11,5 +11,4 @@ fun main() {
     createDatadelingServer().start(wait = true)
 }
 
-fun createDatadelingServer(port: Int = 8080) =
-    embeddedServer(port = port, module = { datadelingApi() }, factory = CIO)
+fun createDatadelingServer(port: Int = 8080) = embeddedServer(port = port, module = { datadelingApi() }, factory = CIO)

@@ -21,19 +21,19 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class ManuellE2ETest {
-    val client = HttpClient {
-        install(ContentNegotiation) {
-            register(
-                ContentType.Application.Json,
-                JacksonConverter(objectMapper)
-            )
+    val client =
+        HttpClient {
+            install(ContentNegotiation) {
+                register(
+                    ContentType.Application.Json,
+                    JacksonConverter(objectMapper),
+                )
+            }
         }
-    }
 
     data class Token(
-        val access_token: String
+        val access_token: String,
     )
-
 
     fun tokenProvider(): String {
         return runBlocking {
@@ -47,21 +47,23 @@ class ManuellE2ETest {
     @Disabled
     fun bubba() {
         runBlocking {
-            val request = DatadelingRequest(
-                personIdent = "02929898071",
-                fraOgMedDato = LocalDate.of(2023, 10, 1),
-            )
+            val request =
+                DatadelingRequest(
+                    personIdent = "02929898071",
+                    fraOgMedDato = LocalDate.of(2023, 10, 1),
+                )
             val token = tokenProvider()
-            val ressursUrl = client.post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
-                headers {
-                    append(HttpHeaders.Accept, ContentType.Application.Json)
-                    append(HttpHeaders.ContentType, ContentType.Application.Json)
-                    bearerAuth(token)
+            val ressursUrl =
+                client.post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
+                    headers {
+                        append(HttpHeaders.Accept, ContentType.Application.Json)
+                        append(HttpHeaders.ContentType, ContentType.Application.Json)
+                        bearerAuth(token)
+                    }
+                    setBody(objectMapper.writeValueAsString(request))
+                }.bodyAsText().also {
+                    println("Ressurs url: $it")
                 }
-                setBody(objectMapper.writeValueAsString(request))
-            }.bodyAsText().also {
-                println("Ressurs url: $it")
-            }
 
             repeat((1..5).count()) { i ->
                 println("Henter ressurs: $ressursUrl")
@@ -73,8 +75,6 @@ class ManuellE2ETest {
                 }
                 delay(1000)
             }
-
         }
     }
-
 }

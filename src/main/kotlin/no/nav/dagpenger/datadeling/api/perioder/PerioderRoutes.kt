@@ -23,7 +23,6 @@ fun Route.perioderRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
-
     authenticate("afpPrivat") {
         route("/maskinporten-test/") {
             get {
@@ -79,7 +78,5 @@ fun Route.perioderRoutes(
                 }
             }
         }
-
     }
 }
-

@@ -17,13 +17,9 @@ import no.nav.dagpenger.datadeling.api.perioder.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 
-fun Application.datadelingApi(
-    config: AppConfig = Config.appConfig,
-) {
-
+fun Application.datadelingApi(config: AppConfig = Config.appConfig) {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     konfigurerApi(appMicrometerRegistry, config)
-
 
     val proxyClient = ProxyClient(Config.dpProxyUrl, Config.dpProxyTokenProvider)
     val perioderService = PerioderService(proxyClient)
@@ -44,7 +40,7 @@ fun Application.datadelingApi(
 
 fun HttpClientConfig<*>.installRetryClient(
     maksRetries: Int = 5,
-    delayFunc: suspend (Long) -> Unit = { kotlinx.coroutines.delay(it) }, // Brukes for å mocke ut delay i enhetstester,
+    delayFunc: suspend (Long) -> Unit = { kotlinx.coroutines.delay(it) },
 ) {
     install(HttpRequestRetry) {
         delay { delayFunc(it) }

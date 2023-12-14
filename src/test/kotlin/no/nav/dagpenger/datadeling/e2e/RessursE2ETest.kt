@@ -38,108 +38,121 @@ class RessursE2ETest : AbstractE2ETest() {
 
     @BeforeAll
     fun setup() {
-        ressursService = RessursService(
-            ressursDao = RessursDao(Config.datasource),
-            leaderElector = mockk(relaxed = true),
-            config = Config.appConfig.ressurs,
-        )
+        ressursService =
+            RessursService(
+                ressursDao = RessursDao(Config.datasource),
+                leaderElector = mockk(relaxed = true),
+                config = Config.appConfig.ressurs,
+            )
     }
 
     @Test
-    fun `opprett ressurs og poll til ressurs har status FERDIG`() = runBlocking {
-        val response = DatadelingResponse(
-            personIdent = "123", perioder = listOf(
-                Periode(
-                    fraOgMedDato = 10.januar(),
-                    tilOgMedDato = 25.januar(),
-                    ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                )
-            )
-        )
-
-        mockProxyResponse(response, delayMs = 200)
-
-        val request = DatadelingRequest(
-            personIdent = response.personIdent,
-            fraOgMedDato = 1.januar(),
-            tilOgMedDato = 31.januar(),
-        )
-
-        val ressursUrl = client.post("/dagpenger/v1/periode") {
-            headers {
-                append(HttpHeaders.Accept, ContentType.Application.Json)
-                append(HttpHeaders.ContentType, ContentType.Application.Json)
-                bearerAuth(TestApplication.issueMaskinportenToken())
-            }
-            setBody(objectMapper.writeValueAsString(request))
-        }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
-
-        ressursUrl.fetchRessursResponse {
-            assertEquals(RessursStatus.OPPRETTET, this.status)
-            assertNull(this.response)
-        }
-
-        val uuid = UUID.fromString(ressursUrl.split("/").last())
+    fun `opprett ressurs og poll til ressurs har status FERDIG`() =
         runBlocking {
-            await.until {
-                ressursService.hent(uuid)?.status == RessursStatus.FERDIG
+            val response =
+                DatadelingResponse(
+                    personIdent = "123",
+                    perioder =
+                        listOf(
+                            Periode(
+                                fraOgMedDato = 10.januar(),
+                                tilOgMedDato = 25.januar(),
+                                ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                            ),
+                        ),
+                )
+
+            mockProxyResponse(response, delayMs = 200)
+
+            val request =
+                DatadelingRequest(
+                    personIdent = response.personIdent,
+                    fraOgMedDato = 1.januar(),
+                    tilOgMedDato = 31.januar(),
+                )
+
+            val ressursUrl =
+                client.post("/dagpenger/v1/periode") {
+                    headers {
+                        append(HttpHeaders.Accept, ContentType.Application.Json)
+                        append(HttpHeaders.ContentType, ContentType.Application.Json)
+                        bearerAuth(TestApplication.issueMaskinportenToken())
+                    }
+                    setBody(objectMapper.writeValueAsString(request))
+                }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
+
+            ressursUrl.fetchRessursResponse {
+                assertEquals(RessursStatus.OPPRETTET, this.status)
+                assertNull(this.response)
+            }
+
+            val uuid = UUID.fromString(ressursUrl.split("/").last())
+            runBlocking {
+                await.until {
+                    ressursService.hent(uuid)?.status == RessursStatus.FERDIG
+                }
+            }
+
+            ressursUrl.fetchRessursResponse {
+                assertEquals(RessursStatus.FERDIG, this.status)
+                assertEquals(response, this.response)
             }
         }
-
-        ressursUrl.fetchRessursResponse {
-            assertEquals(RessursStatus.FERDIG, this.status)
-            assertEquals(response, this.response)
-        }
-    }
 
     @Test
-    fun `opprett ressurs og marker som FEILET ved error fra baksystem`() = runTest {
-        val response = DatadelingResponse(
-            personIdent = "123", perioder = listOf(
-                Periode(
-                    fraOgMedDato = 10.januar(),
-                    tilOgMedDato = 25.januar(),
-                    ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
+    fun `opprett ressurs og marker som FEILET ved error fra baksystem`() =
+        runTest {
+            val response =
+                DatadelingResponse(
+                    personIdent = "123",
+                    perioder =
+                        listOf(
+                            Periode(
+                                fraOgMedDato = 10.januar(),
+                                tilOgMedDato = 25.januar(),
+                                ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                            ),
+                        ),
                 )
-            )
-        )
 
-        mockProxyError()
+            mockProxyError()
 
-        val request = DatadelingRequest(
-            personIdent = response.personIdent,
-            fraOgMedDato = 1.januar(),
-            tilOgMedDato = 31.januar(),
-        )
+            val request =
+                DatadelingRequest(
+                    personIdent = response.personIdent,
+                    fraOgMedDato = 1.januar(),
+                    tilOgMedDato = 31.januar(),
+                )
 
-        val ressursUrl = client.post("/dagpenger/v1/periode") {
-            headers {
-                append(HttpHeaders.Accept, ContentType.Application.Json)
-                append(HttpHeaders.ContentType, ContentType.Application.Json)
-                bearerAuth(TestApplication.issueMaskinportenToken())
+            val ressursUrl =
+                client.post("/dagpenger/v1/periode") {
+                    headers {
+                        append(HttpHeaders.Accept, ContentType.Application.Json)
+                        append(HttpHeaders.ContentType, ContentType.Application.Json)
+                        bearerAuth(TestApplication.issueMaskinportenToken())
+                    }
+                    setBody(objectMapper.writeValueAsString(request))
+                }.bodyAsText()
+
+            val uuid =
+                ressursUrl.let {
+                    try {
+                        UUID.fromString(ressursUrl.split("/").last())
+                    } catch (e: Exception) {
+                        throw RuntimeException("Kunne ikke hente uuid fra ressursUrl: $ressursUrl")
+                    }
+                }
+
+            runBlocking {
+                await.atMost(Duration.ofSeconds(5)).until {
+                    ressursService.hent(uuid)?.status == RessursStatus.FEILET
+                }
             }
-            setBody(objectMapper.writeValueAsString(request))
-        }.bodyAsText()
 
-        val uuid = ressursUrl.let {
-            try {
-                UUID.fromString(ressursUrl.split("/").last())
-            } catch (e: Exception) {
-                throw RuntimeException("Kunne ikke hente uuid fra ressursUrl: $ressursUrl")
+            ressursUrl.fetchRessursResponse {
+                assertEquals(RessursStatus.FEILET, this.status)
             }
         }
-
-        runBlocking {
-            await.atMost(Duration.ofSeconds(5)).until {
-                ressursService.hent(uuid)?.status == RessursStatus.FEILET
-
-            }
-        }
-
-        ressursUrl.fetchRessursResponse {
-            assertEquals(RessursStatus.FEILET, this.status)
-        }
-    }
 
     private suspend fun String.fetchRessursResponse(block: Ressurs.() -> Unit) {
         client.get(this) {
@@ -151,4 +164,3 @@ class RessursE2ETest : AbstractE2ETest() {
             .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }.apply { block() }
     }
 }
-

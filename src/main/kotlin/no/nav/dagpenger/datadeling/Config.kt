@@ -1,6 +1,5 @@
 package no.nav.dagpenger.datadeling
 
-import com.ctc.wstx.shaded.msv_core.datatype.xsd.IntType
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
@@ -16,17 +15,17 @@ import java.net.URL
 import javax.sql.DataSource
 
 internal object Config {
+    const val APP_NAME = "dp-datadeling"
 
-    const val appName = "dp-datadeling"
-
-    private val defaultProperties = ConfigurationMap(
-        mapOf(
-            "DP_DATADELING_URL" to "http://localhost:8080",
-            "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
-            //"DP_PROXY_URL" to "",
-            //"DP_PROXY_SCOPE" to ""
-        ),
-    )
+    private val defaultProperties =
+        ConfigurationMap(
+            mapOf(
+                "DP_DATADELING_URL" to "http://localhost:8080",
+                "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
+                // "DP_PROXY_URL" to "",
+                // "DP_PROXY_SCOPE" to ""
+            ),
+        )
 
     val datasource: DataSource by lazy { dataSource }
 
@@ -36,17 +35,19 @@ internal object Config {
     val appConfig: AppConfig by lazy {
         AppConfig(
             isLocal = false,
-            maskinporten = MaskinportenConfig(
-                discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
-                scope = "nav:dagpenger:afpprivat.read",
-                jwks_uri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
-                issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)]
-            ),
-            ressurs = RessursConfig(
-                minutterLevetidOpprettet = 120,
-                minutterLevetidFerdig = 1440,
-                oppryddingsfrekvensMinutter = 60
-            ),
+            maskinporten =
+                MaskinportenConfig(
+                    discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
+                    scope = "nav:dagpenger:afpprivat.read",
+                    jwks_uri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                    issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
+                ),
+            ressurs =
+                RessursConfig(
+                    minutterLevetidOpprettet = 120,
+                    minutterLevetidFerdig = 1440,
+                    oppryddingsfrekvensMinutter = 60,
+                ),
         )
     }
 
@@ -69,11 +70,12 @@ internal object Config {
         val azureAdConfig = OAuth2Config.AzureAd(properties)
         CachedOauth2Client(
             tokenEndpointUrl = azureAdConfig.tokenEndpointUrl,
-            authType = azureAdConfig.clientSecret()
+            authType = azureAdConfig.clientSecret(),
         )
     }
 
-    private fun azureAdTokenSupplier(scope: String): () -> String = {
-        runBlocking { azureAdClient.clientCredentials(scope).accessToken }
-    }
+    private fun azureAdTokenSupplier(scope: String): () -> String =
+        {
+            runBlocking { azureAdClient.clientCredentials(scope).accessToken }
+        }
 }

@@ -25,9 +25,10 @@ object TestApplication {
     internal fun issueMaskinportenToken(): String {
         return mockOAuth2Server.issueToken(
             issuerId = MASKINPORTEN_ISSUER_ID,
-            claims = mapOf(
-                "scope" to Config.appConfig.maskinporten.scope,
-            ),
+            claims =
+                mapOf(
+                    "scope" to Config.appConfig.maskinporten.scope,
+                ),
         ).serialize()
     }
 

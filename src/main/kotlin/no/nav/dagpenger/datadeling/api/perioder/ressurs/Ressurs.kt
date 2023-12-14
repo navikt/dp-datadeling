@@ -12,5 +12,5 @@ enum class RessursStatus {
 data class Ressurs(
     val uuid: UUID,
     val status: RessursStatus,
-    val response: DatadelingResponse?
+    val response: DatadelingResponse?,
 )

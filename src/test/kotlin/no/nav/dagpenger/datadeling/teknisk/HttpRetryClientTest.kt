@@ -17,46 +17,48 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class HttpRetryClientTest : AbstractApiTest() {
+    @Test
+    fun `http-klienten prøver ikke retry om den får en 2xx-respons`() =
+        testApplication {
+            respondWith(HttpStatusCode.OK)
+
+            var numberOfRequests = 0
+
+            createRetryClient()
+                .usingInterceptor { numberOfRequests += 1 }
+                .get(PATH)
+
+            assertEquals(1, numberOfRequests)
+        }
 
     @Test
-    fun `http-klienten prøver ikke retry om den får en 2xx-respons`() = testApplication {
-        respondWith(HttpStatusCode.OK)
+    fun `http-klienten prøver ikke retry om den får en 4xx-respons`() =
+        testApplication {
+            respondWith(HttpStatusCode.NotFound)
 
-        var numberOfRequests = 0
+            var numberOfRequests = 0
 
-        createRetryClient()
-            .usingInterceptor { numberOfRequests += 1 }
-            .get(PATH)
+            createRetryClient()
+                .usingInterceptor { numberOfRequests += 1 }
+                .get(PATH)
 
-        assertEquals(1, numberOfRequests)
-    }
-
-    @Test
-    fun `http-klienten prøver ikke retry om den får en 4xx-respons`() = testApplication {
-        respondWith(HttpStatusCode.NotFound)
-
-        var numberOfRequests = 0
-
-        createRetryClient()
-            .usingInterceptor { numberOfRequests += 1 }
-            .get(PATH)
-
-        assertEquals(1, numberOfRequests)
-    }
+            assertEquals(1, numberOfRequests)
+        }
 
     @Test
-    fun `http-klienten prøver å nå ressurs på nytt dersom den får en 5xx-respons`() = testApplication {
-        respondWith(HttpStatusCode.InternalServerError)
+    fun `http-klienten prøver å nå ressurs på nytt dersom den får en 5xx-respons`() =
+        testApplication {
+            respondWith(HttpStatusCode.InternalServerError)
 
-        val maxRetries = 5
-        var numberOfRequests = 0
+            val maxRetries = 5
+            var numberOfRequests = 0
 
-        createRetryClient(maxRetries)
-            .usingInterceptor { numberOfRequests += 1 }
-            .get(PATH)
+            createRetryClient(maxRetries)
+                .usingInterceptor { numberOfRequests += 1 }
+                .get(PATH)
 
-        assertEquals(maxRetries + 1, numberOfRequests)
-    }
+            assertEquals(maxRetries + 1, numberOfRequests)
+        }
 
     private fun ApplicationTestBuilder.createRetryClient(maxRetries: Int = 5) =
         createClient { installRetryClient(maksRetries = maxRetries, delayFunc = {}) }

@@ -29,7 +29,6 @@ plugins {
     application
 }
 
-
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
@@ -49,7 +48,6 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
     implementation("com.sksamuel.hoplite:hoplite-hocon:$hopliteVersion")
     implementation("com.sksamuel.hoplite:hoplite-core:$hopliteVersion")
-
 
     // Ktor Client
     implementation("io.ktor:ktor-client-core:$ktorVersion")

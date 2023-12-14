@@ -21,19 +21,22 @@ class TestApiServer {
         private lateinit var mockOAuth2Server: MockOAuth2Server
 
         val serverConfig
-            get() = MapApplicationConfig(
-                "port" to "9080",
-                "ENV" to "LOCAL",
-                "DP_PROXY_URL" to "http://0.0.0.0:8092/api",
-                "DP_PROXY_SCOPE" to "scope",
-                "DP_DATADELING_URL" to "http://localhost:8080",
-                "AZURE_APP_WELL_KNOWN_URL" to "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration\"",
-                "AZURE_APP_CLIENT_ID" to "test",
-                "no.nav.security.jwt.issuers.0.issuer_name" to ISSUER,
-                "no.nav.security.jwt.issuers.0.discoveryurl" to mockOAuth2Server.wellKnownUrl(ISSUER).toString(),
-                "no.nav.security.jwt.issuers.0.accepted_audience" to "default",
-                "httpClient.retries" to "0"
-            )
+            get() =
+                MapApplicationConfig(
+                    "port" to "9080",
+                    "ENV" to "LOCAL",
+                    "DP_PROXY_URL" to "http://0.0.0.0:8092/api",
+                    "DP_PROXY_SCOPE" to "scope",
+                    "DP_DATADELING_URL" to "http://localhost:8080",
+                    @Suppress("standard:max-line-length")
+                    "AZURE_APP_WELL_KNOWN_URL"
+                        to "https://login.microsoftonline.com/77678b69-1daf-47b6-9072-771d270ac800/v2.0/.well-known/openid-configuration\"",
+                    "AZURE_APP_CLIENT_ID" to "test",
+                    "no.nav.security.jwt.issuers.0.issuer_name" to ISSUER,
+                    "no.nav.security.jwt.issuers.0.discoveryurl" to mockOAuth2Server.wellKnownUrl(ISSUER).toString(),
+                    "no.nav.security.jwt.issuers.0.accepted_audience" to "default",
+                    "httpClient.retries" to "0",
+                )
     }
 
     fun start() {
@@ -49,11 +52,14 @@ class TestApiServer {
         mockOAuth2Server.issueToken(
             issuerId = "default",
             clientId = "dp-datadeling",
-            tokenCallback = DefaultOAuth2TokenCallback(claims = mapOf("scope" to "nav:dagpenger:vedtak.read"))
+            tokenCallback = DefaultOAuth2TokenCallback(claims = mapOf("scope" to "nav:dagpenger:vedtak.read")),
         )
 }
 
-fun ApplicationTestBuilder.testApiModule(appConfig: AppConfig, block: Routing.() -> Unit) {
+fun ApplicationTestBuilder.testApiModule(
+    appConfig: AppConfig,
+    block: Routing.() -> Unit,
+) {
     install(ContentNegotiation) {
         jackson {
             registerModule(JavaTimeModule())

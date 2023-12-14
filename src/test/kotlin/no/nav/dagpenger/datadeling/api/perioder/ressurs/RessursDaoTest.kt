@@ -19,76 +19,82 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class RessursDaoTest {
+    @Test
+    fun `opprett og hent ressurs`() =
+        withMigratedDb {
+            val ressursDao = RessursDao(Config.datasource)
+            val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+            assertEquals(OPPRETTET, ressurs!!.status)
+            assertEquals(ressurs, ressursDao.hent(ressurs.uuid))
+        }
 
     @Test
-    fun `opprett og hent ressurs`() = withMigratedDb {
-        val ressursDao = RessursDao(Config.datasource)
-        val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
-        assertEquals(OPPRETTET, ressurs!!.status)
-        assertEquals(ressurs, ressursDao.hent(ressurs.uuid))
-    }
+    fun `returnerer null om ressurs ikke finnes`() =
+        withMigratedDb {
+            val ressursDao = RessursDao(Config.datasource)
+            assertNull(ressursDao.hent(UUID.randomUUID()))
+        }
 
     @Test
-    fun `returnerer null om ressurs ikke finnes`() = withMigratedDb {
-        val ressursDao = RessursDao(Config.datasource)
-        assertNull(ressursDao.hent(UUID.randomUUID()))
-    }
+    fun `ferdigstill ressurs`() =
+        withMigratedDb {
+            val ressursDao = RessursDao(Config.datasource)
+            val opprettet = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+            assertNotNull(opprettet)
+            assertEquals(OPPRETTET, opprettet!!.status)
+
+            val response =
+                DatadelingResponse(
+                    personIdent = "EN-IDENT",
+                    perioder = emptyList(),
+                )
+            ressursDao.ferdigstill(opprettet.uuid, response)
+            val ferdigstilt = ressursDao.hent(opprettet.uuid)
+
+            requireNotNull(ferdigstilt)
+            assertEquals(FERDIG, ferdigstilt.status)
+            assertEquals(response.personIdent, ferdigstilt.response!!.personIdent)
+        }
 
     @Test
-    fun `ferdigstill ressurs`() = withMigratedDb {
-        val ressursDao = RessursDao(Config.datasource)
-        val opprettet = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
-        assertNotNull(opprettet)
-        assertEquals(OPPRETTET, opprettet!!.status)
+    fun `marker ressurs som feilet`() =
+        withMigratedDb {
+            val ressursDao = RessursDao(Config.datasource)
+            val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+            requireNotNull(ressurs)
+            assertEquals(OPPRETTET, ressurs.status)
 
-        val response = DatadelingResponse(
-            personIdent = "EN-IDENT",
-            perioder = emptyList(),
-        )
-        ressursDao.ferdigstill(opprettet.uuid, response)
-        val ferdigstilt = ressursDao.hent(opprettet.uuid)
-
-        requireNotNull(ferdigstilt)
-        assertEquals(FERDIG, ferdigstilt.status)
-        assertEquals(response.personIdent, ferdigstilt.response!!.personIdent)
-    }
+            ressursDao.markerSomFeilet(ressurs.uuid)
+            assertEquals(FEILET, ressursDao.hent(ressurs.uuid)!!.status)
+        }
 
     @Test
-    fun `marker ressurs som feilet`() = withMigratedDb {
-        val ressursDao = RessursDao(Config.datasource)
-        val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
-        requireNotNull(ressurs)
-        assertEquals(OPPRETTET, ressurs.status)
+    fun `marker gamle ressurser som feilet`() =
+        withMigratedDb {
+            val ressursDao = RessursDao(Config.datasource)
+            val today = LocalDate.now()
+            val ressurs = ressursDao.opprett(DatadelingRequest("123", today, today))
+            requireNotNull(ressurs)
+            assertEquals(OPPRETTET, ressurs.status)
 
-        ressursDao.markerSomFeilet(ressurs.uuid)
-        assertEquals(FEILET, ressursDao.hent(ressurs.uuid)!!.status)
-    }
-
-    @Test
-    fun `marker gamle ressurser som feilet`() = withMigratedDb {
-        val ressursDao = RessursDao(Config.datasource)
-        val today = LocalDate.now()
-        val ressurs = ressursDao.opprett(DatadelingRequest("123", today, today))
-        requireNotNull(ressurs)
-        assertEquals(OPPRETTET, ressurs.status)
-
-        ressursDao.markerSomFeilet(today.plusDays(1).atStartOfDay())
-        assertEquals(FEILET, ressursDao.hent(ressurs.uuid)!!.status)
-    }
+            ressursDao.markerSomFeilet(today.plusDays(1).atStartOfDay())
+            assertEquals(FEILET, ressursDao.hent(ressurs.uuid)!!.status)
+        }
 
     @Test
-    fun `sletter ferdige ressurser`() = withMigratedDb {
-        val ressursDao = RessursDao(Config.datasource)
-        val now = LocalDateTime.now()
-        insertRessurs(OPPRETTET, opprettet = now.minusMinutes(10))
-        insertRessurs(FERDIG, opprettet = now.minusMinutes(10))
-        insertRessurs(FERDIG, opprettet = now)
-        insertRessurs(FEILET, opprettet = now)
+    fun `sletter ferdige ressurser`() =
+        withMigratedDb {
+            val ressursDao = RessursDao(Config.datasource)
+            val now = LocalDateTime.now()
+            insertRessurs(OPPRETTET, opprettet = now.minusMinutes(10))
+            insertRessurs(FERDIG, opprettet = now.minusMinutes(10))
+            insertRessurs(FERDIG, opprettet = now)
+            insertRessurs(FEILET, opprettet = now)
 
-        val antallSlettet = ressursDao.slettFerdigeRessurser(eldreEnn = now.minusMinutes(5))
-        assertEquals(1, antallSlettet)
-        assertEquals(3, alleRessurser().size)
-    }
+            val antallSlettet = ressursDao.slettFerdigeRessurser(eldreEnn = now.minusMinutes(5))
+            assertEquals(1, antallSlettet)
+            assertEquals(3, alleRessurser().size)
+        }
 
     private fun insertRessurs(
         status: RessursStatus = OPPRETTET,
@@ -99,31 +105,33 @@ class RessursDaoTest {
         session.run(
             asQuery(
                 """
-                        insert into ressurs(uuid, status, response, request, opprettet)
-                        values(?, CAST(? as ressurs_status), CAST(? as json), CAST(? as json), ?)
-                        returning uuid
-                    """.trimIndent(),
+                insert into ressurs(uuid, status, response, request, opprettet)
+                values(?, CAST(? as ressurs_status), CAST(? as json), CAST(? as json), ?)
+                returning uuid
+                """.trimIndent(),
                 UUID.randomUUID(),
                 status.name.lowercase(),
                 if (response != null) objectMapper.writeValueAsString(response) else null,
                 objectMapper.writeValueAsString(request),
-                opprettet
+                opprettet,
             ).map {
                 it.uuid("uuid")
-            }.asSingle
+            }.asSingle,
         )
     }
 
-    private fun alleRessurser() = sessionOf(Config.datasource).use { session ->
-        session.run(
-            asQuery("select * from ressurs").map { row ->
-                Ressurs(
-                    uuid = row.uuid("uuid"),
-                    status = RessursStatus.valueOf(row.string("status").uppercase()),
-                    response = row.stringOrNull("response")
-                        ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) }
-                )
-            }.asList
-        )
-    }
+    private fun alleRessurser() =
+        sessionOf(Config.datasource).use { session ->
+            session.run(
+                asQuery("select * from ressurs").map { row ->
+                    Ressurs(
+                        uuid = row.uuid("uuid"),
+                        status = RessursStatus.valueOf(row.string("status").uppercase()),
+                        response =
+                            row.stringOrNull("response")
+                                ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) },
+                    )
+                }.asList,
+            )
+        }
 }
