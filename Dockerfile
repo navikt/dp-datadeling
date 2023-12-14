@@ -21,5 +21,5 @@ COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY build/install/* /
 
 USER nobody
-CMD ["mediator"]
+CMD ["dp-datadeling"]
 EXPOSE 8080
