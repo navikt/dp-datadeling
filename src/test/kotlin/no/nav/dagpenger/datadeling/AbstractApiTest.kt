@@ -8,6 +8,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.append
+import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -15,22 +16,23 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 abstract class AbstractApiTest {
     companion object {
-        private val testServer = TestApiServer()
+        private lateinit var mockOAuth2Server: MockOAuth2Server
 
         @JvmStatic
         @BeforeAll
         fun setup() {
-            testServer.start()
+            mockOAuth2Server = MockOAuth2Server()
+            mockOAuth2Server.start(8091)
         }
 
         @JvmStatic
         @AfterAll
         fun cleanup() {
-            testServer.shutdown()
+            mockOAuth2Server.shutdown()
         }
     }
 
-    protected val server get() = testServer
+    protected val server get() = mockOAuth2Server
 }
 
 suspend fun HttpClient.testPost(
