@@ -53,6 +53,8 @@ spec:
   azure:
     application:
       enabled: true
+  kafka:
+    pool: {{ kafka_pool }}
   maskinporten:
     enabled: true
     scopes:

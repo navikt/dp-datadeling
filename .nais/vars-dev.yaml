@@ -7,3 +7,4 @@ ingresses:
 dpProxyHost: dp-proxy.dev-fss-pub.nais.io
 dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
+kafka_pool: nav-dev
