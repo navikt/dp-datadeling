@@ -25,18 +25,10 @@ val mockkVersion = "1.13.8"
 val hopliteVersion = "2.7.5"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.9.20"
-    id("io.ktor.plugin") version "2.3.6"
-
-    // Apply the application plugin to add support for building a CLI application in Java.
+    id("common")
     application
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
 
 repositories {
     mavenCentral()
