@@ -11,6 +11,8 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
+import no.nav.helse.rapids_rivers.KafkaConfig
+import no.nav.helse.rapids_rivers.KafkaRapid
 import java.net.URL
 import javax.sql.DataSource
 
@@ -60,6 +62,20 @@ internal object Config {
 
     val dpProxyTokenProvider by lazy {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
+    }
+
+    val rapidsConnection by lazy {
+        KafkaRapid.create(
+            KafkaConfig(
+                bootstrapServers = properties[Key("KAFKA_BROKERS", stringType)],
+                consumerGroupId = "dp-datadeling-v1",
+                clientId = "dp-datadeling",
+                truststorePassword = properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
+                autoOffsetResetConfig = "latest",
+            ),
+            topic = "",
+            extraTopics = listOf(),
+        )
     }
 
     private val azureAdClient: CachedOauth2Client by lazy {
