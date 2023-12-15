@@ -1,6 +1,6 @@
 # dp-datadeling
 
-Rest-API for deling av dagpengerelaterte data til interne og eksterne aktører
+Rest-API for deling av dagpengerelaterte data til interne og eksterne aktører.
 
 ## Bygging
 
@@ -13,15 +13,11 @@ githubUser=x-access-token
 githubPassword=%YOUR_GITHUB_TOKEN%
 ```
 
-Bygg ved å kjøre `./gradlew clean build`. Dette vil også kjøre testene.
+Bygg ved å kjøre `./gradlew build`
 
-## Kjør appen lokalt
+## Dokumentasjon
 
-Start appen ved å kjøre main-funksjonen tli `LocalApp`
-
-## Swagger
-
-Swagger UI: http://localhost:8080/internal/swagger-ui/index.html
+Swaggerdoc blir publisert til: https://navikt.github.io/dp-datadeling/openapi.html
 
 ## Henvendelser
 
@@ -29,4 +25,4 @@ Spørsmål knyttet til koden eller prosjektet kan stilles ved å opprette et iss
 
 ### For NAV-ansatte
 
-Interne henvendelser kan sendes via Slack i kanalen #team-dagpenger-dev.
+Interne henvendelser kan sendes via Slack i kanalen #po-arbeid-dev.
