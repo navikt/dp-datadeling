@@ -2,9 +2,35 @@ openapi: 3.0.0
 info:
   title: Datadeling API
   version: 1.0.0
-  description: Todo
-  contact:
-    name: '#team-dagpenger'
+
+  description: |
+    * Ordinær dagpengerettighet for arbeidsledige
+    * Dagpenger under permittering
+    * Dagpenger under permittering fra fiskeindustrien
+    
+    Undervarianter av disse rettighetene vil også inkluderes:
+    * Personer som har dagpenger på bakgrunn av vernepliktregelen (verneplikt 3 av de siste 12 måneder)
+    * Personer som har dagpenger på bakgrunn av lærlingeregelverket under koronapandemien
+    
+    Tjenesten vil IKKE hente vedtak med informasjon om
+    * Rett til forskutterte lønnsgarantimidler utbetalt som dagpenger
+    * Rett til å ta med dagpengene til utlandet
+    * Sanksjonsvedtak (forlenget ventetid eller tidsbegrenset bortfall – medfører at personen ikke får utbetaling i en periode)
+    * Annullering av sanksjon (opphever sanksjonen)
+    
+    Tjenesten vil hente perioder der personen har hatt vedtak om rett til dagpenger, selv om personen ikke har fått 
+    utbetaling i hele/deler av perioden grunnet sanksjonsvedtak.
+    
+    Tjenesten vil hente perioder der personen har hatt vedtak om rett til dagpenger, selv om personen har hatt 
+    enkeltdager eller meldeperioder uten rett til utbetaling, for eksempel grunnet arbeid over terskel for tapt 
+    arbeidstid eller enkeltdager med fravær eller sykdom.
+    
+    Det er en utfordring med datakvaliteten, ved at endringer med tilbakevirkende kraft ikke reflekteres. Dataene som 
+    utleveres tar ikke hensyn til eventuelle feilutbetalingssaker. Der en feilutbetalingssak har resultert i omgjøring 
+    av vedtaksperioden, blir ikke dette reflektert i dataene som utleveres. Dette gjelder både for ferdig behandlede 
+    feilutbetalingssaker og eventuelle etterfølgende feilutbetalingssaker. Vedtaksperiodene er dermed ikke nødvendigvis 
+    korrekte. Det er imidlertid sjeldent at en feilutbetalingssak får betydning for vedtaksperiode, og det vil berøre 
+    et lite antall saker.
 
 servers:
   - url: https://dp-datadeling.ekstern.dev.nav.no
@@ -52,6 +78,25 @@ paths:
 components:
   schemas:
     # TODO: Bruke openapi genererte objekter. Objektene kommer fra dp-kontrakter, ikke autogenerert som vi burde
+
+    DatadelingRequest:
+      type: object
+      required:
+        - personIdent
+        - fraOgMedDato
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        fraOgMedDato:
+          type: string
+          format: date
+          description: Tidligste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Vedtak som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
+        tilOgMedDato:
+          type: string
+          format: date
+          description: Seneste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Vedtak med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
+
     Ressurs:
       type: object
       required:
@@ -65,8 +110,6 @@ components:
           $ref: '#/components/schemas/RessursStatus'
         response:
           $ref: '#/components/schemas/DatadelingResponse'
-
-
 
     RessursStatus:
       type: string
@@ -99,37 +142,19 @@ components:
         fraOgMedDato:
           type: string
           format: date
-          description: todo
+          description: Første dato ytelsen gjelder.
         tilOgMedDato:
           type: string
           format: date
-          description: todo
-        #TODO: Dette er rart. ytelsetype og stønadstype er ikke det samme.
+          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv.
         ytelseType:
-          $ref: '#/components/schemas/StønadType'
+          $ref: '#/components/schemas/YtelseType'
 
-    StønadType:
+
+    YtelseType:
       type: string
+      description: Type ytelse som gjelder i perioden.
       enum:
         - DAGPENGER_ARBEIDSSOKER_ORDINAER
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
-
-    DatadelingRequest:
-      type: object
-      required:
-        - personIdent
-        - fraOgMedDato
-      properties:
-        personIdent:
-          type: string
-          description: Personens fødselsnummer eller D-nummer
-        fraOgMedDato:
-          type: string
-          format: date
-          description: Tidligste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Vedtak som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
-        tilOgMedDato:
-          type: string
-          format: date
-          description: Seneste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Vedtak med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
-
