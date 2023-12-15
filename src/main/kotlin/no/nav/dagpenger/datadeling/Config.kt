@@ -97,9 +97,7 @@ internal object Config {
             ),
             topic = "teamdagpenger.rapid.v1",
             extraTopics = listOf(),
-        ).also {
-            it.start()
-        }
+        )
     }
 
     val isLocalEnvironment: Boolean by lazy {
