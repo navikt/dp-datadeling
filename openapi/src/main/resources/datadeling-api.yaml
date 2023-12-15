@@ -15,4 +15,4 @@ paths:
         200:
           description: OK
       summary: Oppsummering
-      description: Beskrivelse
+      description: Mer beskrivelse
