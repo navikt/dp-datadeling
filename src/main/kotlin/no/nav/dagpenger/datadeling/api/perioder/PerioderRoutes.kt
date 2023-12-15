@@ -3,6 +3,7 @@ package no.nav.dagpenger.datadeling.api.perioder
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
+import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -17,12 +18,15 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
 
 fun Route.perioderRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
 ) {
+    swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
+
     authenticate("afpPrivat") {
         route("/maskinporten-test/") {
             get {
@@ -43,7 +47,7 @@ fun Route.perioderRoutes(
 
                         launch {
                             try {
-                                val perioder = perioderService.hentDagpengeperioder(request)
+                                val perioder: DatadelingResponse = perioderService.hentDagpengeperioder(request)
                                 ressursService.ferdigstill(ressurs.uuid, perioder)
                             } catch (e: Exception) {
                                 ressursService.markerSomFeilet(ressurs.uuid)
