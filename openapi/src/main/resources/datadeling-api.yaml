@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: Datadeling API
+  version: 1.0.0
+  description: Todo
+  contact:
+    name: '#team-dagpenger'
+servers:
+  - url: https://dp-datadeling.ekstern.dev.nav.no
+    description: dev
+paths:
+  /perioder:
+    post:
+      responses:
+        200:
+          description: OK
+      summary: Oppsummering
+      description: Beskrivelse

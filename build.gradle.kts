@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(path = ":openapi"))
     // Ktor Server
     implementation(libs.bundles.ktor.server)
     implementation("io.ktor:ktor-server-cio:${libs.versions.ktor.get()}")
