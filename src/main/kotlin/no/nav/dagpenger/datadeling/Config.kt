@@ -91,3 +91,22 @@ internal object Config {
             runBlocking { azureAdClient.clientCredentials(scope).accessToken }
         }
 }
+
+data class AppConfig(
+    val isLocal: Boolean = false,
+    val maskinporten: MaskinportenConfig,
+    val ressurs: RessursConfig,
+)
+
+data class MaskinportenConfig(
+    val discoveryUrl: String,
+    val scope: String,
+    val jwksUri: URL,
+    val issuer: String,
+)
+
+data class RessursConfig(
+    val minutterLevetidOpprettet: Long,
+    val minutterLevetidFerdig: Long,
+    val oppryddingsfrekvensMinutter: Long,
+)
