@@ -29,12 +29,92 @@ paths:
               schema:
                 type: string
                 description: En url man kaller for å få svar på hvilke perioder en person har hatt retten til dagpenger
+    get:
+      parameters:
+        - in: path
+          name: ressursUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      description: Beskrivelse
+      summary: Oppsummering
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ressurs'
+
 
 
 components:
   schemas:
-    # TODO: Bruke openapi generert objekt
-    # Dette er en beskrivelse av DatadelingRequest objektet fra dp-kontrakter, ikke autogenerer
+    # TODO: Bruke openapi genererte objekter. Objektene kommer fra dp-kontrakter, ikke autogenerert som vi burde
+    Ressurs:
+      type: object
+      required:
+        - uuid
+        - status
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/RessursStatus'
+        response:
+          $ref: '#/components/schemas/DatadelingResponse'
+
+
+
+    RessursStatus:
+      type: string
+      enum:
+        - OPPRETTET
+        - FERDIG
+        - FEILET
+
+    DatadelingResponse:
+      type: object
+      required:
+        - personIdent
+        - perioder
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        perioder:
+          type: array
+          description: Liste med perioder bruker har hatt retten til dagpenger. Kan være en tom liste.
+          items:
+            $ref: '#/components/schemas/Periode'
+
+    Periode:
+      type: object
+      required:
+        - fraOgMedDato
+        - ytelseType
+      properties:
+        fraOgMedDato:
+          type: string
+          format: date
+          description: todo
+        tilOgMedDato:
+          type: string
+          format: date
+          description: todo
+        #TODO: Dette er rart. ytelsetype og stønadstype er ikke det samme.
+        ytelseType:
+          $ref: '#/components/schemas/StønadType'
+
+    StønadType:
+      type: string
+      enum:
+        - DAGPENGER_ARBEIDSSOKER_ORDINAER
+        - DAGPENGER_PERMITTERING_ORDINAER
+        - DAGPENGER_PERMITTERING_FISKEINDUSTRI
+
     DatadelingRequest:
       type: object
       required:
