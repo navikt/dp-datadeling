@@ -39,18 +39,18 @@ internal object Config {
         AppConfig(
             isLocal = false,
             maskinporten =
-                MaskinportenConfig(
-                    discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
-                    scope = "nav:dagpenger:afpprivat.read",
-                    jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
-                    issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
-                ),
+            MaskinportenConfig(
+                discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
+                scope = "nav:dagpenger:afpprivat.read",
+                jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
+            ),
             ressurs =
-                RessursConfig(
-                    minutterLevetidOpprettet = 120,
-                    minutterLevetidFerdig = 1440,
-                    oppryddingsfrekvensMinutter = 60,
-                ),
+            RessursConfig(
+                minutterLevetidOpprettet = 120,
+                minutterLevetidFerdig = 1440,
+                oppryddingsfrekvensMinutter = 60,
+            ),
         )
     }
 
@@ -89,12 +89,17 @@ internal object Config {
                 bootstrapServers = properties[Key("KAFKA_BROKERS", stringType)],
                 consumerGroupId = "dp-datadeling-v1",
                 clientId = "dp-datadeling",
+                truststore = properties.getOrNull(Key("KAFKA_TRUSTSTORE_PATH", stringType)),
                 truststorePassword = properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
+                keystoreLocation = properties[Key("KAFKA_KEYSTORE_PATH", stringType)],
+                keystorePassword = properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
                 autoOffsetResetConfig = "latest",
             ),
             topic = "teamdagpenger.rapid.v1",
             extraTopics = listOf(),
-        )
+        ).also {
+            it.start()
+        }
     }
 
     val isLocalEnvironment: Boolean by lazy {
