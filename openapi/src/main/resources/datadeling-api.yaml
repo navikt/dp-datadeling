@@ -5,14 +5,51 @@ info:
   description: Todo
   contact:
     name: '#team-dagpenger'
+
 servers:
   - url: https://dp-datadeling.ekstern.dev.nav.no
     description: dev
+
 paths:
-  /perioder:
+  /dagpenger/v1/periode:
     post:
-      responses:
-        200:
-          description: OK
-      summary: Oppsummering
       description: Mer beskrivelse
+      summary: Oppsummering
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        201:
+          description: Created
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: En url man kaller for å få svar på hvilke perioder en person har hatt retten til dagpenger
+
+
+components:
+  schemas:
+    # TODO: Bruke openapi generert objekt
+    # Dette er en beskrivelse av DatadelingRequest objektet fra dp-kontrakter, ikke autogenerer
+    DatadelingRequest:
+      type: object
+      required:
+        - personIdent
+        - fraOgMedDato
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        fraOgMedDato:
+          type: string
+          format: date
+          description: Tidligste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Vedtak som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
+        tilOgMedDato:
+          type: string
+          format: date
+          description: Seneste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Vedtak med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
+
