@@ -4,19 +4,20 @@ info:
   version: 1.0.0
 
   description: |
+    Tjenesten vil hente perioder personen har hatt dagpengerettighet av følgende varianter:
     * Ordinær dagpengerettighet for arbeidsledige
     * Dagpenger under permittering
     * Dagpenger under permittering fra fiskeindustrien
     
     Undervarianter av disse rettighetene vil også inkluderes:
-    * Personer som har dagpenger på bakgrunn av vernepliktregelen (verneplikt 3 av de siste 12 måneder)
+    * Personer som har dagpenger på bakgrunn av vernepliktregelen (verneplikt tre av de siste tolv måneder)
     * Personer som har dagpenger på bakgrunn av lærlingeregelverket under koronapandemien
     
-    Tjenesten vil IKKE hente vedtak med informasjon om
+    Tjenesten vil ikke hente vedtak med informasjon om
     * Rett til forskutterte lønnsgarantimidler utbetalt som dagpenger
     * Rett til å ta med dagpengene til utlandet
     * Sanksjonsvedtak (forlenget ventetid eller tidsbegrenset bortfall – medfører at personen ikke får utbetaling i en periode)
-    * Annullering av sanksjon (opphever sanksjonen)
+    * Annullering av sanksjon
     
     Tjenesten vil hente perioder der personen har hatt vedtak om rett til dagpenger, selv om personen ikke har fått 
     utbetaling i hele/deler av perioden grunnet sanksjonsvedtak.
