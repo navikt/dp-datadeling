@@ -9,6 +9,7 @@ import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.PostgresDataSourceBuilder.dataSource
+import no.nav.dagpenger.datadeling.sporing.AuditLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 import no.nav.helse.rapids_rivers.KafkaConfig
@@ -34,18 +35,18 @@ internal object Config {
         AppConfig(
             isLocal = false,
             maskinporten =
-                MaskinportenConfig(
-                    discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
-                    scope = "nav:dagpenger:afpprivat.read",
-                    jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
-                    issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
-                ),
+            MaskinportenConfig(
+                discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
+                scope = "nav:dagpenger:afpprivat.read",
+                jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
+            ),
             ressurs =
-                RessursConfig(
-                    minutterLevetidOpprettet = 120,
-                    minutterLevetidFerdig = 1440,
-                    oppryddingsfrekvensMinutter = 60,
-                ),
+            RessursConfig(
+                minutterLevetidOpprettet = 120,
+                minutterLevetidFerdig = 1440,
+                oppryddingsfrekvensMinutter = 60,
+            ),
         )
     }
 
