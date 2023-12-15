@@ -14,12 +14,17 @@ object TestApplication {
         }
     }
 
-    internal fun issueMaskinportenToken(): String {
+    internal fun issueMaskinportenToken(orgNummer: String = "orgNummer"): String {
         return mockOAuth2Server.issueToken(
             issuerId = MASKINPORTEN_ISSUER_ID,
             claims =
                 mapOf(
                     "scope" to Config.appConfig.maskinporten.scope,
+                    "consumer" to
+                        mapOf(
+                            "authority" to "NO",
+                            "ID" to orgNummer,
+                        ),
                 ),
         ).serialize()
     }

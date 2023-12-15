@@ -1,5 +1,7 @@
 package no.nav.dagpenger.datadeling.api.perioder
 
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
@@ -13,8 +15,13 @@ import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.datadeling.sporing.AuditHendelse
+import no.nav.dagpenger.datadeling.sporing.AuditLogger
+import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
+import no.nav.dagpenger.datadeling.sporing.NoopAuditLogger
 import no.nav.dagpenger.datadeling.testGet
 import no.nav.dagpenger.datadeling.testPost
+import no.nav.dagpenger.datadeling.testutil.FNR
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enPeriode
@@ -87,11 +94,44 @@ class PerioderApiTest {
                 }
         }
 
-    private fun testPerioderEndpoint(block: suspend ApplicationTestBuilder.() -> Unit) {
+    @Test
+    fun `Audit logger ved opprettelse av ressurs`() {
+        val auditLogger =
+            object : AuditLogger {
+                val hendelser = mutableListOf<AuditHendelse>()
+
+                override fun log(hendelse: AuditHendelse) {
+                    hendelser.add(hendelse)
+                }
+            }
+        testPerioderEndpoint(auditLogger) {
+            val ressurs = enRessurs()
+            coEvery { ressursService.opprett(any()) } returns ressurs
+            coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
+
+            client.testPost(
+                "/dagpenger/v1/periode",
+                enDatadelingRequest(),
+                issueMaskinportenToken(orgNummer = "Z123456"),
+            )
+
+            auditLogger.hendelser.size shouldBe 1
+            auditLogger.hendelser.first().let {
+                it.shouldBeInstanceOf<DagpengerPeriodeSpørringHendelse>()
+                it.ident() shouldBe FNR
+                // todo test orgnummer
+            }
+        }
+    }
+
+    private fun testPerioderEndpoint(
+        auditLogger: AuditLogger = NoopAuditLogger,
+        block: suspend ApplicationTestBuilder.() -> Unit,
+    ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
             konfigurerApi(appConfig = Config.appConfig)
         }) {
-            routing { perioderRoutes(ressursService, perioderService) }
+            routing { perioderRoutes(ressursService, perioderService, auditLogger) }
             block()
         }
     }

@@ -15,8 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.datadeling.Config
+import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.sporing.AuditLogger
+import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
@@ -24,6 +27,7 @@ import java.util.UUID
 fun Route.perioderRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
+    auditLogger: AuditLogger = Config.auditLogger,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 
@@ -44,6 +48,12 @@ fun Route.perioderRoutes(
                         val request = call.receive<DatadelingRequest>()
                         val ressurs = requireNotNull(ressursService.opprett(request))
                         val ressursUrl = "${Config.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
+                        auditLogger.log(
+                            DagpengerPeriodeSpørringHendelse(
+                                ident = request.personIdent,
+                                saksbehandlerNavIdent = call.orgNummer(),
+                            ),
+                        )
 
                         launch {
                             try {

@@ -8,14 +8,18 @@ import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.PostgresDataSourceBuilder.dataSource
-import no.nav.dagpenger.datadeling.sporing.AuditLogger
+import no.nav.dagpenger.datadeling.sporing.KafkaAuditLogger
+import no.nav.dagpenger.datadeling.sporing.NoopAuditLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 import no.nav.helse.rapids_rivers.KafkaConfig
 import no.nav.helse.rapids_rivers.KafkaRapid
 import java.net.URL
 import javax.sql.DataSource
+
+private val logger = KotlinLogging.logger {}
 
 internal object Config {
     private val defaultProperties =
@@ -35,18 +39,18 @@ internal object Config {
         AppConfig(
             isLocal = false,
             maskinporten =
-            MaskinportenConfig(
-                discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
-                scope = "nav:dagpenger:afpprivat.read",
-                jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
-                issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
-            ),
+                MaskinportenConfig(
+                    discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
+                    scope = "nav:dagpenger:afpprivat.read",
+                    jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                    issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
+                ),
             ressurs =
-            RessursConfig(
-                minutterLevetidOpprettet = 120,
-                minutterLevetidFerdig = 1440,
-                oppryddingsfrekvensMinutter = 60,
-            ),
+                RessursConfig(
+                    minutterLevetidOpprettet = 120,
+                    minutterLevetidFerdig = 1440,
+                    oppryddingsfrekvensMinutter = 60,
+                ),
         )
     }
 
@@ -65,7 +69,21 @@ internal object Config {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
     }
 
-    val rapidsConnection by lazy {
+    val auditLogger by lazy {
+        when (isLocalEnvironment) {
+            true -> {
+                logger.info("Using no-op audit logger")
+                NoopAuditLogger
+            }
+
+            else -> {
+                logger.info("Using Kafka audit logger")
+                KafkaAuditLogger(rapidsConnection)
+            }
+        }
+    }
+
+    private val rapidsConnection by lazy {
         KafkaRapid.create(
             KafkaConfig(
                 bootstrapServers = properties[Key("KAFKA_BROKERS", stringType)],
@@ -74,9 +92,13 @@ internal object Config {
                 truststorePassword = properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
                 autoOffsetResetConfig = "latest",
             ),
-            topic = "",
+            topic = "teamdagpenger.rapid.v1",
             extraTopics = listOf(),
         )
+    }
+
+    val isLocalEnvironment: Boolean by lazy {
+        properties.getOrNull(Key("NAIS_CLUSTER_NAME", stringType)) == null
     }
 
     private val azureAdClient: CachedOauth2Client by lazy {

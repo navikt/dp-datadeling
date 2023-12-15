@@ -55,5 +55,10 @@ class DagpengerPeriodeSpørringHendelse(
 }
 
 interface AuditLogger {
-    fun log(hendelse: AuditHendelse) {}
+    fun log(hendelse: AuditHendelse)
+}
+
+object NoopAuditLogger : AuditLogger {
+    override fun log(hendelse: AuditHendelse) {
+    }
 }

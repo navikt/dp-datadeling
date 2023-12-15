@@ -2,12 +2,25 @@ package no.nav.dagpenger.datadeling.api.config
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.AuthenticationConfig
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.auth.principal
 import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import java.util.concurrent.TimeUnit
+
+private data class Consumer(
+    val authority: String,
+    val ID: String,
+)
+
+fun ApplicationCall.orgNummer(): String {
+    return principal<JWTPrincipal>()?.payload?.claims?.get("consumer")?.asMap()?.get("ID")?.let {
+        it as String
+    } ?: throw IllegalArgumentException("Fant ikke orgnummer i jwt")
+}
 
 fun AuthenticationConfig.maskinporten(
     name: String,
