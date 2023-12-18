@@ -39,18 +39,18 @@ internal object Config {
         AppConfig(
             isLocal = false,
             maskinporten =
-            MaskinportenConfig(
-                discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
-                scope = "nav:dagpenger:afpprivat.read",
-                jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
-                issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
-            ),
+                MaskinportenConfig(
+                    discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
+                    scope = "nav:dagpenger:afpprivat.read",
+                    jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                    issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
+                ),
             ressurs =
-            RessursConfig(
-                minutterLevetidOpprettet = 120,
-                minutterLevetidFerdig = 1440,
-                oppryddingsfrekvensMinutter = 60,
-            ),
+                RessursConfig(
+                    minutterLevetidOpprettet = 120,
+                    minutterLevetidFerdig = 1440,
+                    oppryddingsfrekvensMinutter = 60,
+                ),
         )
     }
 
