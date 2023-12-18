@@ -15,7 +15,7 @@ githubPassword=%YOUR_GITHUB_TOKEN%
 
 Bygg ved å kjøre `./gradlew build`
 
-## Dokumentasjon
+## Dokumentasjon 
 
 Swaggerdoc blir publisert til: https://navikt.github.io/dp-datadeling/openapi.html
 
