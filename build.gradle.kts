@@ -1,7 +1,7 @@
 project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
 val tokenValidationVersion = "3.2.0"
-val kontrakterVersion = "2.0_20231212155248_db8495c"
+val kontrakterVersion = "2.0_20231215122123_6aa93da"
 val mockOauth2Version = "2.1.0"
 val wiremockVersion = "3.0.1"
 val testcontainersVersion = "1.19.2"
