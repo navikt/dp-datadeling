@@ -32,15 +32,6 @@ fun Route.perioderRoutes(
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 
     authenticate("afpPrivat") {
-        route("/maskinporten-test/") {
-            get {
-                defaultLogger.info("heipaadu")
-                call.respond("Seherja")
-            }
-        }
-    }
-
-    authenticate("afpPrivat") {
         route("/dagpenger/v1/periode") {
             post {
                 withContext(Dispatchers.IO) {
