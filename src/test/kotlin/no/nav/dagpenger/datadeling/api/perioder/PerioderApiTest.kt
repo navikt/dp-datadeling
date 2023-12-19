@@ -72,14 +72,14 @@ class PerioderApiTest {
     fun `returnerer ressurs om den finnes`() =
         testPerioderEndpoint {
             val uuid = UUID.randomUUID()
-            val response =
+            val ressurs =
                 enRessurs(
                     uuid = uuid,
                     status = RessursStatus.FERDIG,
                     data = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null)),
                 )
 
-            coEvery { ressursService.hent(uuid) } returns response
+            coEvery { ressursService.hent(uuid) } returns ressurs
 
             client.testGet("/dagpenger/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
                 response.status shouldBe HttpStatusCode.OK

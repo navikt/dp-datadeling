@@ -15,6 +15,7 @@ class RessursSerDerTest {
     fun serialize() {
         objectMapper.writeValueAsString(
             enRessurs(
+                request = enDatadelingRequest(),
                 uuid = UUID.fromString("db5338cd-fbf6-44b7-bca8-0312868c2b32"),
                 data = enDatadelingResponse(),
             ),
