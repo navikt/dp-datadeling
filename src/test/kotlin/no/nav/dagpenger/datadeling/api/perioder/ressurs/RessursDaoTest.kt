@@ -127,6 +127,9 @@ class RessursDaoTest {
                     Ressurs(
                         uuid = row.uuid("uuid"),
                         status = RessursStatus.valueOf(row.string("status").uppercase()),
+                        request =
+                            row.string("request")
+                                .let { objectMapper.readValue(it, DatadelingRequest::class.java) },
                         response =
                             row.stringOrNull("response")
                                 ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) },

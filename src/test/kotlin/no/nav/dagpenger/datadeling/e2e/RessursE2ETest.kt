@@ -1,5 +1,8 @@
 package no.nav.dagpenger.datadeling.e2e
 
+import com.fasterxml.jackson.databind.node.ObjectNode
+import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.matchers.shouldBe
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -15,7 +18,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.TestApplication
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
@@ -31,7 +33,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.UUID
-import kotlin.test.assertNull
 
 class RessursE2ETest : AbstractE2ETest() {
     private lateinit var ressursService: RessursService
@@ -82,8 +83,8 @@ class RessursE2ETest : AbstractE2ETest() {
                 }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
 
             ressursUrl.fetchRessursResponse {
-                assertEquals(RessursStatus.OPPRETTET, this.status)
-                assertNull(this.response)
+                this["status"].asText() shouldBe RessursStatus.OPPRETTET.name
+                this["response"] shouldBe null
             }
 
             val uuid = UUID.fromString(ressursUrl.split("/").last())
@@ -94,8 +95,24 @@ class RessursE2ETest : AbstractE2ETest() {
             }
 
             ressursUrl.fetchRessursResponse {
-                assertEquals(RessursStatus.FERDIG, this.status)
-                assertEquals(response, this.response)
+                this["status"].asText() shouldBe RessursStatus.FERDIG.name
+                this.toString() shouldEqualJson
+                    """
+                    {
+                      "uuid": "$uuid",
+                      "status": "FERDIG",
+                      "response": {
+                        "personIdent": "123",
+                        "perioder": [
+                          {
+                            "fraOgMedDato": "2023-01-10",
+                            "tilOgMedDato": "2023-01-25",
+                            "ytelseType": "DAGPENGER_ARBEIDSSOKER_ORDINAER"
+                          }
+                        ]
+                      }
+                    }
+                    """.trimIndent()
             }
         }
 
@@ -150,17 +167,17 @@ class RessursE2ETest : AbstractE2ETest() {
             }
 
             ressursUrl.fetchRessursResponse {
-                assertEquals(RessursStatus.FEILET, this.status)
+                this["status"].asText() shouldBe RessursStatus.FEILET.name
             }
         }
 
-    private suspend fun String.fetchRessursResponse(block: Ressurs.() -> Unit) {
+    private suspend fun String.fetchRessursResponse(block: ObjectNode.() -> Unit) {
         client.get(this) {
             headers {
                 append(HttpHeaders.Accept, ContentType.Application.Json)
                 append(HttpHeaders.Authorization, "Bearer ${TestApplication.issueMaskinportenToken()}")
             }
         }.apply { assertEquals(HttpStatusCode.OK, this.status) }
-            .let { objectMapper.readValue(it.bodyAsText(), Ressurs::class.java) }.apply { block() }
+            .let { objectMapper.readValue(it.bodyAsText(), ObjectNode::class.java) }.apply { block() }
     }
 }

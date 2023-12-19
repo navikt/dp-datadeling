@@ -1,5 +1,6 @@
 package no.nav.dagpenger.datadeling.api.perioder
 
+import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
@@ -11,10 +12,8 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.TestApplication.issueMaskinportenToken
 import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestApplication
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.AuditLogger
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
@@ -82,16 +81,27 @@ class PerioderApiTest {
 
             coEvery { ressursService.hent(uuid) } returns response
 
-            client.testGet("/dagpenger/v1/periode/$uuid", token = issueMaskinportenToken())
-                .apply { assertEquals(HttpStatusCode.OK, this.status) }
-                .let {
-                    objectMapper.readValue(it.bodyAsText(), Ressurs::class.java)
-                }
-                .apply {
-                    assertEquals(uuid, this.uuid)
-                    assertEquals(RessursStatus.FERDIG, this.status)
-                    assertEquals(response.response, this.response)
-                }
+            client.testGet("/dagpenger/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
+                response.status shouldBe HttpStatusCode.OK
+                //language=JSON
+                response.bodyAsText() shouldEqualJson
+                    """
+                    {
+                      "uuid": "$uuid",
+                      "status": "FERDIG",
+                      "response": {
+                        "personIdent": "01020312342",
+                        "perioder": [
+                          {
+                            "fraOgMedDato": "2023-01-01",
+                            "ytelseType": "DAGPENGER_ARBEIDSSOKER_ORDINAER"
+                          }
+                        ]
+                      }
+                    }
+                                                                                                                                      
+                    """.trimIndent()
+            }
         }
 
     @Test

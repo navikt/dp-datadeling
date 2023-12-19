@@ -84,6 +84,7 @@ private fun mapRessurs(row: Row): Ressurs =
     Ressurs(
         uuid = row.uuid("uuid"),
         status = row.string("status").tilRessursStatus(),
+        request = row.string("request").let { objectMapper.readValue<DatadelingRequest>(it) },
         response = row.stringOrNull("response")?.let { objectMapper.readValue<DatadelingResponse>(it) },
     )
 

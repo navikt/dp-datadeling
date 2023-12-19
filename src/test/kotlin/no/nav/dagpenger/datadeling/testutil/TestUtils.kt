@@ -34,10 +34,12 @@ internal fun enDatadelingRequest(
 internal fun enRessurs(
     uuid: UUID = UUID.randomUUID(),
     status: RessursStatus = RessursStatus.OPPRETTET,
+    request: DatadelingRequest = enDatadelingRequest(),
     data: DatadelingResponse? = null,
 ) = Ressurs(
     uuid = uuid,
     status = status,
+    request = request,
     response = data,
 )
 
