@@ -41,8 +41,8 @@ spec:
       external:
         - host: {{ dpProxyHost }}
   leaderElection: true
-  # envFrom:
-  #  - secret: dp-datadeling
+  secureLogs:
+    enabled: true
   env:
     - name: DP_PROXY_URL
       value: https://{{ dpProxyHost }}
