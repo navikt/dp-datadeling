@@ -12,12 +12,14 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.jackson.jackson
+import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.Config.dpProxyTokenProvider
 import no.nav.dagpenger.datadeling.api.installRetryClient
-import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+
+private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 class ProxyClient(
     private val dpProxyBaseUrl: String,
@@ -26,11 +28,11 @@ class ProxyClient(
     override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
 
-        val invoke =
+        val token =
             try {
                 tokenProvider.invoke()
             } catch (e: Exception) {
-                defaultLogger.error(e) { "Kunne ikke hente token" }
+                sikkerlogger.error(e) { "Kunne ikke hente token" }
             }
 
         val result =
@@ -38,7 +40,7 @@ class ProxyClient(
                 client.post(urlString) {
                     headers {
                         append(HttpHeaders.Accept, "application/json")
-                        append(HttpHeaders.Authorization, "Bearer $invoke")
+                        append(HttpHeaders.Authorization, "Bearer $token")
                         append(HttpHeaders.ContentType, "application/json")
                     }
                     setBody(request)
@@ -47,7 +49,7 @@ class ProxyClient(
         return result.fold(
             onSuccess = { it },
             onFailure = {
-                defaultLogger.error(it) { "Kunne ikke hente dagpengeperioder fra url: $urlString for request $request" }
+                sikkerlogger.error(it) { "Kunne ikke hente dagpengeperioder fra url: $urlString for request $request" }
                 throw it
             },
         )

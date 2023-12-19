@@ -14,6 +14,7 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
@@ -23,6 +24,8 @@ import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
+
+private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 fun Route.perioderRoutes(
     ressursService: RessursService,
@@ -59,7 +62,8 @@ fun Route.perioderRoutes(
                     } catch (e: ContentTransformationException) {
                         call.respond(HttpStatusCode.BadRequest, "Kan ikke lese innholdet i forespørselen")
                     } catch (e: Exception) {
-                        defaultLogger.error { e }
+                        defaultLogger.error("Kunne ikke opprette ressurs. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke opprette ressurs. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke opprette ressurs")
                     }
                 }
@@ -78,7 +82,8 @@ fun Route.perioderRoutes(
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest)
                 } catch (e: Exception) {
-                    defaultLogger.error { e }
+                    defaultLogger.error("Kunne ikke hente ressurs. Se sikkerlogg for detaljer")
+                    sikkerlogger.error(e) { "Kunne ikke hente ressurs. Detaljer:" }
                     call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente ressurs")
                 }
             }
