@@ -91,7 +91,7 @@ internal object Config {
     val sporTopic: String by lazy {
         properties.getOrElse(Key("KAFKA_SPOR_TOPIC", stringType)) { "public-sporingslogg-loggmeldingmottatt" }
     }
-    val auditTopic: String = "rapid.v1"
+    val auditTopic: String = "teamdagpenger.rapid.v1"
 
     val aivenKafkaConfig by lazy {
         producerConfig(
