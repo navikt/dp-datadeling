@@ -18,9 +18,6 @@ internal class Sporing(
         val leverteDataBase64Encoded =
             Base64.getEncoder()
                 .encodeToString(objectMapper.writeValueAsString(this.leverteData).encodeToByteArray())
-        val dataForespørselBase64Encoded =
-            Base64.getEncoder()
-                .encodeToString(objectMapper.writeValueAsString(this.dataForespørsel).encodeToByteArray())
 
         return """
             {
@@ -29,7 +26,7 @@ internal class Sporing(
               "tema": "${this.tema}",
               "behandlingsGrunnlag": "${this.behandlingsgrunnlag}",
               "uthentingsTidspunkt": "${this.tidspunkt}",
-              "dataForespoersel": "$dataForespørselBase64Encoded",
+              "dataForespoersel": ${this.dataForespørsel},
               "leverteData": "$leverteDataBase64Encoded"
             }
             """.trimIndent()

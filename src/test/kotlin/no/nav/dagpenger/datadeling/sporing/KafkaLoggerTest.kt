@@ -80,7 +80,7 @@ class KafkaLoggerTest {
                               "mottaker": "999888777",
                               "tema": "DAG",
                               "behandlingsGrunnlag": "GDPR Art. 6(1)e. AFP-tilskottsloven §17 første ledd, §29 andre ledd, første punktum. GDPR Art. 9(2)b",
-                              "dataForespoersel":  "IntcbiAgXCJwZXJzb25JZGVudFwiIDogXCIwMTAyMDMxMjM0MlwiLFxuICBcImZyYU9nTWVkRGF0b1wiIDogXCIyMDIzLTAxLTAxXCJcbn0i",
+                              "dataForespoersel": {"personIdent": "01020312342","fraOgMedDato": "2023-01-01"},
                               "leverteData": "IntcbiAgXCJwZXJzb25JZGVudFwiIDogXCIwMTAyMDMxMjM0MlwiLFxuICBcInBlcmlvZGVyXCIgOiBbIHtcbiAgICBcImZyYU9nTWVkRGF0b1wiIDogXCIyMDIxLTAxLTAxXCIsXG4gICAgXCJ0aWxPZ01lZERhdG9cIiA6IFwiMjAyMi0wMS0wMVwiLFxuICAgIFwieXRlbHNlVHlwZVwiIDogXCJEQUdQRU5HRVJfQVJCRUlEU1NPS0VSX09SRElOQUVSXCJcbiAgfSwge1xuICAgIFwiZnJhT2dNZWREYXRvXCIgOiBcIjIwMjItMDEtMDFcIixcbiAgICBcInRpbE9nTWVkRGF0b1wiIDogXCIyMDIzLTAxLTAxXCIsXG4gICAgXCJ5dGVsc2VUeXBlXCIgOiBcIkRBR1BFTkdFUl9BUkJFSURTU09LRVJfT1JESU5BRVJcIlxuICB9IF1cbn0i"
                             }
                             """.trimIndent()
