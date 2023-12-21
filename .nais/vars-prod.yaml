@@ -10,4 +10,4 @@ dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
 #todo Bytt til url som eksterne aktører kan nå
 dpDatadelingHost: dp-datadeling.intern.nav.no
 kafka_pool: nav-prod
-kafkaSporTopic: "public-sporingslogg-loggmeldingmottatt"
+kafkaSporTopic: "pensjonsamhandling.public-sporingslogg-loggmeldingmottatt"
