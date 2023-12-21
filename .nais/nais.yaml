@@ -50,6 +50,9 @@ spec:
       value: {{ dpProxyScope }}
     - name: DP_DATADELING_URL
       value: https://{{ dpDatadelingHost }}
+    - name: KAFKA_SPOR_TOPIC
+      value: {{ kafkaSporTopic }}
+
   azure:
     application:
       enabled: true

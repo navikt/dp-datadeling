@@ -9,17 +9,22 @@ import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
 import no.nav.dagpenger.datadeling.PostgresDataSourceBuilder.dataSource
-import no.nav.dagpenger.datadeling.sporing.KafkaAuditLogger
-import no.nav.dagpenger.datadeling.sporing.NoopAuditLogger
+import no.nav.dagpenger.datadeling.sporing.KafkaLogger
+import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
-import no.nav.helse.rapids_rivers.KafkaConfig
-import no.nav.helse.rapids_rivers.KafkaRapid
+import org.apache.kafka.clients.CommonClientConfigs
+import org.apache.kafka.clients.producer.ProducerConfig
+import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.security.auth.SecurityProtocol
+import org.apache.kafka.common.serialization.StringSerializer
 import java.net.URL
+import java.util.Properties
 import javax.sql.DataSource
 
-private val logger = KotlinLogging.logger {}
+private val log = KotlinLogging.logger {}
 
 internal object Config {
     private val defaultProperties =
@@ -69,34 +74,30 @@ internal object Config {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
     }
 
-    val auditLogger by lazy {
+    val logger by lazy {
         when (isLocalEnvironment) {
             true -> {
-                logger.info("Using no-op audit logger")
-                NoopAuditLogger
+                log.info("Using no-op audit logger")
+                NoopLogger
             }
 
             else -> {
-                logger.info("Using Kafka audit logger")
-                KafkaAuditLogger(rapidsConnection)
+                log.info("Using Kafka audit logger")
+                KafkaLogger()
             }
         }
     }
 
-    private val rapidsConnection by lazy {
-        KafkaRapid.create(
-            KafkaConfig(
-                bootstrapServers = properties[Key("KAFKA_BROKERS", stringType)],
-                consumerGroupId = "dp-datadeling-v1",
-                clientId = "dp-datadeling",
-                truststore = properties.getOrNull(Key("KAFKA_TRUSTSTORE_PATH", stringType)),
-                truststorePassword = properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
-                keystoreLocation = properties[Key("KAFKA_KEYSTORE_PATH", stringType)],
-                keystorePassword = properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
-                autoOffsetResetConfig = "latest",
-            ),
-            topic = "teamdagpenger.rapid.v1",
-            extraTopics = listOf(),
+    val sporTopic: String by lazy {
+        properties.getOrElse(Key("KAFKA_SPOR_TOPIC", stringType)) { "public-sporingslogg-loggmeldingmottatt" }
+    }
+    val auditTopic: String = "rapid.v1"
+
+    val aivenKafkaConfig by lazy {
+        producerConfig(
+            appId = "dp-datadeling",
+            bootStapServerUrl = properties[Key("KAFKA_BROKERS", stringType)],
+            aivenCredentials = KafkaAivenCredentials(),
         )
     }
 
@@ -116,6 +117,59 @@ internal object Config {
         {
             runBlocking { azureAdClient.clientCredentials(scope).accessToken }
         }
+}
+
+data class KafkaAivenCredentials(
+    val securityProtocolConfig: String = SecurityProtocol.SSL.name,
+    val sslEndpointIdentificationAlgorithmConfig: String = "",
+    val sslTruststoreTypeConfig: String = "jks",
+    val sslKeystoreTypeConfig: String = "PKCS12",
+    val sslTruststoreLocationConfig: String = "/var/run/secrets/nais.io/kafka/client.truststore.jks",
+    val sslTruststorePasswordConfig: String = Config.properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
+    val sslKeystoreLocationConfig: String = "/var/run/secrets/nais.io/kafka/client.keystore.p12",
+    val sslKeystorePasswordConfig: String = sslTruststorePasswordConfig,
+) {
+    companion object {
+        private val stringSerializer = StringSerializer()
+
+        internal fun producerConfig(
+            appId: String,
+            bootStapServerUrl: String,
+            aivenCredentials: KafkaAivenCredentials?,
+        ): Properties {
+            return Properties().apply {
+                putAll(
+                    listOf(
+                        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootStapServerUrl,
+                        ProducerConfig.CLIENT_ID_CONFIG to appId,
+                        ProducerConfig.ACKS_CONFIG to "all",
+                        ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to true,
+                        ProducerConfig.RETRIES_CONFIG to Int.MAX_VALUE.toString(),
+                        ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to "5",
+                        ProducerConfig.COMPRESSION_TYPE_CONFIG to "snappy",
+                        ProducerConfig.LINGER_MS_CONFIG to "20",
+                        ProducerConfig.BATCH_SIZE_CONFIG to 32.times(1024).toString(),
+                        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to stringSerializer,
+                        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to stringSerializer,
+                    ),
+                )
+
+                aivenCredentials?.let {
+                    put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, it.securityProtocolConfig)
+                    put(
+                        SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
+                        it.sslEndpointIdentificationAlgorithmConfig,
+                    )
+                    put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, it.sslTruststoreTypeConfig)
+                    put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, it.sslKeystoreTypeConfig)
+                    put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, it.sslTruststoreLocationConfig)
+                    put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, it.sslTruststorePasswordConfig)
+                    put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, it.sslKeystoreLocationConfig)
+                    put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, it.sslKeystorePasswordConfig)
+                }
+            }
+        }
+    }
 }
 
 data class AppConfig(

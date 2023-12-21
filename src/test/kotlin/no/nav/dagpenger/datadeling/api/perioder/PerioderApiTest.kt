@@ -15,9 +15,10 @@ import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
-import no.nav.dagpenger.datadeling.sporing.AuditLogger
+import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
-import no.nav.dagpenger.datadeling.sporing.NoopAuditLogger
+import no.nav.dagpenger.datadeling.sporing.Log
+import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.datadeling.testGet
 import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testutil.FNR
@@ -69,6 +70,25 @@ class PerioderApiTest {
         }
 
     @Test
+    fun `returnerer 404 om en ressus ikke finnes`() {
+        testPerioderEndpoint {
+            val uuid = UUID.randomUUID()
+            val ressurs =
+                enRessurs(
+                    uuid = uuid,
+                    status = RessursStatus.FERDIG,
+                    data = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null)),
+                )
+
+            coEvery { ressursService.hent(uuid) } returns null
+
+            client.testGet("/dagpenger/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
+                response.status shouldBe HttpStatusCode.NotFound
+            }
+        }
+    }
+
+    @Test
     fun `returnerer ressurs om den finnes`() =
         testPerioderEndpoint {
             val uuid = UUID.randomUUID()
@@ -105,19 +125,18 @@ class PerioderApiTest {
         }
 
     @Test
-    fun `Audit logger ved opprettelse av ressurs`() {
-        val auditLogger =
-            object : AuditLogger {
+    fun `Audit og Sporing logger ved opprettelse av ressurs`() {
+        val logger =
+            object : Log {
                 val hendelser = mutableListOf<AuditHendelse>()
 
                 override fun log(hendelse: AuditHendelse) {
                     hendelser.add(hendelse)
                 }
             }
-        testPerioderEndpoint(auditLogger) {
+        testPerioderEndpoint(logger) {
             val ressurs = enRessurs()
             coEvery { ressursService.opprett(any()) } returns ressurs
-            coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
 
             client.testPost(
                 "/dagpenger/v1/periode",
@@ -125,8 +144,8 @@ class PerioderApiTest {
                 issueMaskinportenToken(orgNummer = "Z123456"),
             )
 
-            auditLogger.hendelser.size shouldBe 1
-            auditLogger.hendelser.first().let {
+            logger.hendelser.size shouldBe 1
+            logger.hendelser.first().let {
                 it.shouldBeInstanceOf<DagpengerPeriodeSpørringHendelse>()
                 it.ident() shouldBe FNR
                 // todo test orgnummer
@@ -134,8 +153,42 @@ class PerioderApiTest {
         }
     }
 
+    @Test
+    fun `Audit og Sporing logging ved henting av ressurs`() {
+        val logger =
+            object : Log {
+                val hendelser = mutableListOf<AuditHendelse>()
+
+                override fun log(hendelse: AuditHendelse) {
+                    hendelser.add(hendelse)
+                }
+            }
+        val uuid = UUID.randomUUID()
+        testPerioderEndpoint(logger) {
+            coEvery { ressursService.hent(uuid) } returns
+                enRessurs(
+                    uuid = uuid,
+                    status = RessursStatus.FERDIG,
+                    request = enDatadelingRequest(fnr = FNR),
+                    data = enDatadelingResponse(),
+                )
+
+            client.testGet(
+                "/dagpenger/v1/periode/$uuid",
+                issueMaskinportenToken(orgNummer = "Z123456"),
+            )
+
+            logger.hendelser.size shouldBe 1
+            logger.hendelser.first().let {
+                it.shouldBeInstanceOf<DagpengerPeriodeHentetHendelse>()
+                it.ident() shouldBe FNR
+                // todo test ressurs
+            }
+        }
+    }
+
     private fun testPerioderEndpoint(
-        auditLogger: AuditLogger = NoopAuditLogger,
+        auditLogger: Log = NoopLogger,
         block: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {

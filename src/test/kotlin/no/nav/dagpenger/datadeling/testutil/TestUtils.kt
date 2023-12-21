@@ -73,3 +73,5 @@ internal fun enPeriode(
 )
 
 internal fun Int.januar(year: Int = 2023) = LocalDate.of(year, 1, this)
+
+internal fun Int.oktober(year: Int = 2023) = LocalDate.of(year, 1, this)

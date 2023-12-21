@@ -143,14 +143,13 @@ components:
         fraOgMedDato:
           type: string
           format: date
-          description: Første dato ytelsen gjelder.
+          description: Første dato ytelsen gjelder. Dersom ytelsen startet tidligere enn requestens fraOgMedDato, vil requestens fraOgMedDato benyttes.
         tilOgMedDato:
           type: string
           format: date
-          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv.
+          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv. Dersom det er gitt en tilOgMedDato i request og ytelsen varer lenger enn tilOgMedDatoen, vil requestens tilOgMedDato benyttes.
         ytelseType:
           $ref: '#/components/schemas/YtelseType'
-
 
     YtelseType:
       type: string

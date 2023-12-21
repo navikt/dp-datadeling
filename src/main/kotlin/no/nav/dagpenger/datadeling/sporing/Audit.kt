@@ -5,11 +5,12 @@ import no.nav.dagpenger.aktivitetslogg.AktivitetsloggHendelse
 import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
 import no.nav.dagpenger.aktivitetslogg.IAktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
+import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
 import java.util.UUID
 
 sealed class AuditHendelse(
     private val ident: String,
-    private val saksbehandlerNavIdent: String,
+    val saksbehandlerNavIdent: String,
     auditMelding: String,
     auditOperasjon: AuditOperasjon,
     private val aktivitetsLogg: Aktivitetslogg = Aktivitetslogg(),
@@ -42,6 +43,21 @@ sealed class AuditHendelse(
     abstract fun kontekst(): Map<String, String>
 }
 
+class DagpengerPeriodeHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val ressurs: Ressurs,
+) : AuditHendelse(
+        ident = ressurs.request.personIdent,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut dagpenger periode",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
+    ) {
+    override fun kontekst(): Map<String, String> {
+        return mapOf("ressursUuid" to ressurs.uuid.toString())
+    }
+}
+
 class DagpengerPeriodeSpørringHendelse(
     ident: String,
     saksbehandlerNavIdent: String,
@@ -54,11 +70,8 @@ class DagpengerPeriodeSpørringHendelse(
     override fun kontekst(): Map<String, String> = emptyMap()
 }
 
-interface AuditLogger {
-    fun log(hendelse: AuditHendelse)
-}
-
-object NoopAuditLogger : AuditLogger {
+object NoopLogger : Log {
     override fun log(hendelse: AuditHendelse) {
+        // Noop
     }
 }

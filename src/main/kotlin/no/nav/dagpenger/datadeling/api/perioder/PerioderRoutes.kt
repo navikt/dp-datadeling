@@ -19,8 +19,9 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.datadeling.sporing.AuditLogger
+import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
+import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
@@ -30,7 +31,7 @@ private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 fun Route.perioderRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
-    auditLogger: AuditLogger = Config.auditLogger,
+    auditLogger: Log = Config.logger,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 
@@ -71,14 +72,18 @@ fun Route.perioderRoutes(
 
             get("/{uuid}") {
                 try {
-                    val ressursRef = UUID.fromString(call.parameters.get("uuid"))
-                    val response = ressursService.hent(ressursRef)
+                    val ressursRef = UUID.fromString(call.parameters["uuid"])
+                    val ressurs = ressursService.hent(ressursRef)
 
-                    if (response == null) {
-                        call.respond(HttpStatusCode.NotFound)
-                    } else {
-                        call.respond(HttpStatusCode.OK, response)
-                    }
+                    ressurs?.let { ressurs ->
+                        auditLogger.log(
+                            DagpengerPeriodeHentetHendelse(
+                                saksbehandlerNavIdent = call.orgNummer(),
+                                ressurs = ressurs,
+                            ),
+                        )
+                        call.respond(HttpStatusCode.OK, ressurs)
+                    } ?: call.respond(HttpStatusCode.NotFound)
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest)
                 } catch (e: Exception) {
