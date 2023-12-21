@@ -78,7 +78,7 @@ internal class KafkaLogger(kafkaProps: Properties = Config.aivenKafkaConfig) : S
                     leverteData = leverteData,
                 ).sporingHendelse()
 
-            kafkaProducer.send(ProducerRecord(sporTopic, hendelse.ident(), sporingHendelse))
+            kafkaProducer.send(ProducerRecord(sporTopic, sporingHendelse))
                 .let { recordMetadataFuture ->
                     recordMetadataFuture.get().let { metadata ->
                         sikkerLogger.info { "Sporing logget(Topic: ${metadata.topic()}, Offset: ${metadata.offset()} : $sporingHendelse" }
