@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -42,7 +43,7 @@ class ManuellE2ETest {
         }
     }
 
-    //    @Disabled
+    @Disabled
     @Test
     fun bubba() {
         runBlocking {
