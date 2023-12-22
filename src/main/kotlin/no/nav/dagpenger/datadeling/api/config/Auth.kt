@@ -20,16 +20,16 @@ fun ApplicationCall.orgNummer(): String {
 internal fun String.parseISO6523ToOrgnummer(): String {
     val strings = this.split(":")
     if (strings.size != 2) {
-        throw IllegalArgumentException("Feil format på  ISO6523-formatted string")
+        throw IllegalArgumentException("Feil format på ISO6523-formatted string: $this")
     }
     val muligOrgnummer = strings.last()
 
     if (muligOrgnummer.length != 9) {
-        throw IllegalArgumentException("Feil lengde på orgnummer")
+        throw IllegalArgumentException("Feil lengde på orgnummer. Forventet 9 siffer men var: $muligOrgnummer")
     }
 
     if (!muligOrgnummer.all { it.isDigit() }) {
-        throw IllegalArgumentException("Orgnummer inneholder ikke bare tall")
+        throw IllegalArgumentException("Orgnummer må bestå av kun siffer men var: $muligOrgnummer")
     }
 
     return muligOrgnummer
