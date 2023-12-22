@@ -1,13 +1,15 @@
 package no.nav.dagpenger.datadeling.sporing
 
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Base64
 
 internal class Sporing(
     val personIdent: String,
     val konsumentOrgNr: String,
-    val dataForespørsel: Any,
+    val dataForespørsel: String?,
     val leverteData: Any,
     private val behandlingsgrunnlag: String =
         "GDPR Art. 6(1)e. AFP-tilskottsloven §17 første ledd, §29 andre ledd, første punktum. GDPR Art. 9(2)b",
@@ -26,9 +28,19 @@ internal class Sporing(
               "tema": "${this.tema}",
               "behandlingsGrunnlag": "${this.behandlingsgrunnlag}",
               "uthentingsTidspunkt": "${this.tidspunkt}",
-              "dataForespoersel": ${this.dataForespørsel},
+              "dataForespoersel": "${this.dataForespørsel}",
               "leverteData": "$leverteDataBase64Encoded"
             }
             """.trimIndent()
     }
+}
+
+fun main() {
+    println(
+        DatadelingRequest(
+            personIdent = "augue",
+            fraOgMedDato = LocalDate.MAX,
+            tilOgMedDato = null,
+        ),
+    )
 }

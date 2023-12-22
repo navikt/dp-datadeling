@@ -6,6 +6,8 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
+import no.nav.dagpenger.datadeling.testutil.FNR
+import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enPeriode
 import no.nav.dagpenger.datadeling.testutil.enRessurs
@@ -53,6 +55,11 @@ class KafkaLoggerTest {
                     "999888777",
                     ressurs =
                         enRessurs(
+                            request =
+                                enDatadelingRequest(
+                                    fnr = FNR,
+                                    fraOgMed = 1.januar(),
+                                ),
                             data =
                                 enDatadelingResponse(
                                     enPeriode(periode = 1.januar(2021)..1.januar(2022)),
@@ -80,7 +87,7 @@ class KafkaLoggerTest {
                               "mottaker": "999888777",
                               "tema": "DAG",
                               "behandlingsGrunnlag": "GDPR Art. 6(1)e. AFP-tilskottsloven §17 første ledd, §29 andre ledd, første punktum. GDPR Art. 9(2)b",
-                              "dataForespoersel": {"personIdent": "01020312342","fraOgMedDato": "2023-01-01"},
+                              "dataForespoersel": "DatadelingRequest(personIdent=01020312342, fraOgMedDato=2023-01-01, tilOgMedDato=null)",
                               "leverteData": "IntcbiAgXCJwZXJzb25JZGVudFwiIDogXCIwMTAyMDMxMjM0MlwiLFxuICBcInBlcmlvZGVyXCIgOiBbIHtcbiAgICBcImZyYU9nTWVkRGF0b1wiIDogXCIyMDIxLTAxLTAxXCIsXG4gICAgXCJ0aWxPZ01lZERhdG9cIiA6IFwiMjAyMi0wMS0wMVwiLFxuICAgIFwieXRlbHNlVHlwZVwiIDogXCJEQUdQRU5HRVJfQVJCRUlEU1NPS0VSX09SRElOQUVSXCJcbiAgfSwge1xuICAgIFwiZnJhT2dNZWREYXRvXCIgOiBcIjIwMjItMDEtMDFcIixcbiAgICBcInRpbE9nTWVkRGF0b1wiIDogXCIyMDIzLTAxLTAxXCIsXG4gICAgXCJ5dGVsc2VUeXBlXCIgOiBcIkRBR1BFTkdFUl9BUkJFSURTU09LRVJfT1JESU5BRVJcIlxuICB9IF1cbn0i"
                             }
                             """.trimIndent()

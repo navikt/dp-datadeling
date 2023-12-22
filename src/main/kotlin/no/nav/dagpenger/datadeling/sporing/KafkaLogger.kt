@@ -60,13 +60,10 @@ internal class KafkaLogger(kafkaProps: Properties = Config.aivenKafkaConfig) : S
 
                 is DagpengerPeriodeSpørringHendelse -> null
             }
-        val request: Any? =
+        val request: String? =
             when (hendelse) {
                 is DagpengerPeriodeHentetHendelse ->
-                    hendelse.ressurs.request.let {
-                        objectMapper.writeValueAsString(it)
-                    } ?: ""
-
+                    hendelse.ressurs.request.toString()
                 is DagpengerPeriodeSpørringHendelse -> null
             }
         if (leverteData != null && request != null) {
