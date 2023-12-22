@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import java.util.Properties
 
-private val sikkerLogger = KotlinLogging.logger { "tjenestekall" }
+private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 private val logger = KotlinLogging.logger {}
 
 internal class KafkaLogger(kafkaProps: Properties = Config.aivenKafkaConfig) : SporingOgAudit() {
@@ -63,7 +63,7 @@ internal class KafkaLogger(kafkaProps: Properties = Config.aivenKafkaConfig) : S
         val request: Any? =
             when (hendelse) {
                 is DagpengerPeriodeHentetHendelse ->
-                    hendelse.ressurs.request?.let {
+                    hendelse.ressurs.request.let {
                         objectMapper.writeValueAsString(it)
                     } ?: ""
 
