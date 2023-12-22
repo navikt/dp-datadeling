@@ -11,11 +11,6 @@ import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import java.util.concurrent.TimeUnit
 
-private data class Consumer(
-    val authority: String,
-    val ID: String,
-)
-
 fun ApplicationCall.orgNummer(): String {
     return principal<JWTPrincipal>()?.payload?.claims?.get("consumer")?.asMap()?.get("ID")?.let { it as String }
         ?.parseISO6523ToOrgnummer()
@@ -38,9 +33,7 @@ internal fun String.parseISO6523ToOrgnummer(): String {
     }
 
     return muligOrgnummer
-
 }
-
 
 fun AuthenticationConfig.maskinporten(
     name: String,
