@@ -17,10 +17,30 @@ private data class Consumer(
 )
 
 fun ApplicationCall.orgNummer(): String {
-    return principal<JWTPrincipal>()?.payload?.claims?.get("consumer")?.asMap()?.get("ID")?.let {
-        it as String
-    } ?: throw IllegalArgumentException("Fant ikke orgnummer i jwt")
+    return principal<JWTPrincipal>()?.payload?.claims?.get("consumer")?.asMap()?.get("ID")?.let { it as String }
+        ?.parseISO6523ToOrgnummer()
+        ?: throw IllegalArgumentException("Fant ikke orgnummer i jwt")
 }
+
+internal fun String.parseISO6523ToOrgnummer(): String {
+    val strings = this.split(":")
+    if (strings.size != 2) {
+        throw IllegalArgumentException("Feil format på  ISO6523-formatted string")
+    }
+    val muligOrgnummer = strings.last()
+
+    if (muligOrgnummer.length != 9) {
+        throw IllegalArgumentException("Feil lengde på orgnummer")
+    }
+
+    if (!muligOrgnummer.all { it.isDigit() }) {
+        throw IllegalArgumentException("Orgnummer inneholder ikke bare tall")
+    }
+
+    return muligOrgnummer
+
+}
+
 
 fun AuthenticationConfig.maskinporten(
     name: String,

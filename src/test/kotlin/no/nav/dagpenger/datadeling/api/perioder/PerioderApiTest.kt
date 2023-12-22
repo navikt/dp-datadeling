@@ -141,7 +141,7 @@ class PerioderApiTest {
             client.testPost(
                 "/dagpenger/v1/periode",
                 enDatadelingRequest(),
-                issueMaskinportenToken(orgNummer = "Z123456"),
+                issueMaskinportenToken(orgNummer = "0192:889640782"),
             )
 
             logger.hendelser.size shouldBe 1
@@ -175,7 +175,7 @@ class PerioderApiTest {
 
             client.testGet(
                 "/dagpenger/v1/periode/$uuid",
-                issueMaskinportenToken(orgNummer = "Z123456"),
+                issueMaskinportenToken(orgNummer = "0192:889640782"),
             )
 
             logger.hendelser.size shouldBe 1

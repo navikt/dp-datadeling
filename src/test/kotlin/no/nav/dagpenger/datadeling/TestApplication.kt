@@ -14,7 +14,7 @@ object TestApplication {
         }
     }
 
-    internal fun issueMaskinportenToken(orgNummer: String = "orgNummer"): String {
+    internal fun issueMaskinportenToken(orgNummer: String = "0192:889640782"): String {
         return mockOAuth2Server.issueToken(
             issuerId = MASKINPORTEN_ISSUER_ID,
             claims =
