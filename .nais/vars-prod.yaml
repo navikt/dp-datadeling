@@ -2,12 +2,10 @@ limitsMemory: 1024Mi
 requestsMemory: 512Mi
 requestsCpu: 50m
 db_tier: "db-custom-4-8192"
-#todo Bytt til url som eksterne aktører kan nå
 ingresses:
-  - https://dp-datadeling.intern.nav.no
+  - https://dp-datadeling.ekstern.nav.no
 dpProxyHost: dp-proxy.prod-fss-pub.nais.io
 dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
-#todo Bytt til url som eksterne aktører kan nå
-dpDatadelingHost: dp-datadeling.intern.nav.no
+dpDatadelingHost: dp-datadeling.ekstern.nav.no
 kafka_pool: nav-prod
 kafkaSporTopic: "pensjonsamhandling.public-sporingslogg-loggmeldingmottatt"

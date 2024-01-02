@@ -66,8 +66,6 @@ spec:
           enabled: true
           product: "dagpenger"
           consumers:
-            - name: "NAV"
-              orgno: "889640782"
             - name: "Fellesordningen"
               orgno: "987414502"
   gcp:
