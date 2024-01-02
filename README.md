@@ -19,8 +19,9 @@ Bygg ved å kjøre `./gradlew build`
 
 Swaggerdoc blir publisert til: https://navikt.github.io/dp-datadeling/openapi.html
 
-Vedtaksinformasjon blir enn så lenge kun hentet fra Arena, via:
+Perioder med dagpengerettigheter hentes foreløig kun Arena, via:
 [dp-proxy](https://github.com/navikt/dp-proxy/blob/main/proxy/src/main/kotlin/no/nav/dagpenger/proxy/feature/ArenaDagpengerPerioder.kt)
+Når ny dagpengeløsning er på lufta, skal vedtaksinformasjon hentes både fra Arena og fra ny løsning.
 
 ## Henvendelser
 
