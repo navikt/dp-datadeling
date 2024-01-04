@@ -3,9 +3,9 @@ requestsMemory: 512Mi
 requestsCpu: 50m
 db_tier: "db-custom-4-8192"
 ingresses:
-  - https://dp-datadeling.ekstern.nav.no
+  - https://www.nav.no/dagpenger/datadeling
 dpProxyHost: dp-proxy.prod-fss-pub.nais.io
 dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
-dpDatadelingHost: dp-datadeling.ekstern.nav.no
+dpDatadelingHost: www.nav.no/dagpenger/datadeling
 kafka_pool: nav-prod
 kafkaSporTopic: "pensjonsamhandling.public-sporingslogg-loggmeldingmottatt"
