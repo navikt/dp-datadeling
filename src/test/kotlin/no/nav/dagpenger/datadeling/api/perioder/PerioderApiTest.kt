@@ -38,7 +38,7 @@ class PerioderApiTest {
     @Test
     fun `returnerer 401 uten token`() =
         testPerioderEndpoint {
-            client.testPost("/v1/periode", enDatadelingRequest(), token = null).apply {
+            client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
         }
@@ -51,7 +51,7 @@ class PerioderApiTest {
                 println(it)
             }
 
-            client.testPost("/v1/periode", enDatadelingRequest(), issueMaskinportenToken()).apply {
+            client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), issueMaskinportenToken()).apply {
                 assertEquals(HttpStatusCode.InternalServerError, this.status)
             }
         }
@@ -63,10 +63,10 @@ class PerioderApiTest {
             coEvery { ressursService.opprett(any()) } returns ressurs
             coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
 
-            client.testPost("/v1/periode", enDatadelingRequest(), issueMaskinportenToken())
+            client.testPost("/dagpenger/v1/periode", enDatadelingRequest(), issueMaskinportenToken())
                 .apply { assertEquals(HttpStatusCode.Created, this.status) }
                 .bodyAsText()
-                .apply { assertEquals("http://localhost:8080/v1/periode/${ressurs.uuid}", this) }
+                .apply { assertEquals("http://localhost:8080/dagpenger/v1/periode/${ressurs.uuid}", this) }
         }
 
     @Test
@@ -82,7 +82,7 @@ class PerioderApiTest {
 
             coEvery { ressursService.hent(uuid) } returns null
 
-            client.testGet("/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
+            client.testGet("/dagpenger/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
                 response.status shouldBe HttpStatusCode.NotFound
             }
         }
@@ -101,7 +101,7 @@ class PerioderApiTest {
 
             coEvery { ressursService.hent(uuid) } returns ressurs
 
-            client.testGet("/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
+            client.testGet("/dagpenger/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
                 response.status shouldBe HttpStatusCode.OK
                 //language=JSON
                 response.bodyAsText() shouldEqualJson
@@ -139,7 +139,7 @@ class PerioderApiTest {
             coEvery { ressursService.opprett(any()) } returns ressurs
 
             client.testPost(
-                "/v1/periode",
+                "/dagpenger/v1/periode",
                 enDatadelingRequest(),
                 issueMaskinportenToken(orgNummer = "0192:889640782"),
             )
@@ -174,7 +174,7 @@ class PerioderApiTest {
                 )
 
             client.testGet(
-                "/v1/periode/$uuid",
+                "/dagpenger/v1/periode/$uuid",
                 issueMaskinportenToken(orgNummer = "0192:889640782"),
             )
 

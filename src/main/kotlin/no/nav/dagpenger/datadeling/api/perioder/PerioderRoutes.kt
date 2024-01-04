@@ -36,13 +36,13 @@ fun Route.perioderRoutes(
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 
     authenticate("afpPrivat") {
-        route("/v1/periode") {
+        route("/dagpenger/v1/periode") {
             post {
                 withContext(Dispatchers.IO) {
                     try {
                         val request = call.receive<DatadelingRequest>()
                         val ressurs = requireNotNull(ressursService.opprett(request))
-                        val ressursUrl = "${Config.dpDatadelingUrl}/v1/periode/${ressurs.uuid}"
+                        val ressursUrl = "${Config.dpDatadelingUrl}/dagpenger/v1/periode/${ressurs.uuid}"
                         auditLogger.log(
                             DagpengerPeriodeSpørringHendelse(
                                 ident = request.personIdent,

@@ -73,7 +73,7 @@ class RessursE2ETest : AbstractE2ETest() {
                 )
 
             val ressursUrl =
-                client.post("/v1/periode") {
+                client.post("/dagpenger/v1/periode") {
                     headers {
                         append(HttpHeaders.Accept, ContentType.Application.Json)
                         append(HttpHeaders.ContentType, ContentType.Application.Json)
@@ -142,7 +142,7 @@ class RessursE2ETest : AbstractE2ETest() {
                 )
 
             val ressursUrl =
-                client.post("/v1/periode") {
+                client.post("/dagpenger/v1/periode") {
                     headers {
                         append(HttpHeaders.Accept, ContentType.Application.Json)
                         append(HttpHeaders.ContentType, ContentType.Application.Json)
