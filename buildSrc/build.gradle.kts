@@ -10,5 +10,5 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin"))
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.23.3")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.24.0")
 }
