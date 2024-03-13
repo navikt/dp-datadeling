@@ -53,7 +53,7 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation(libs.testcontainer.postgresql)
-    testImplementation("org.testcontainers:kafka:1.19.3")
+    testImplementation("org.testcontainers:kafka:1.19.7")
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.json)
