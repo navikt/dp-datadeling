@@ -1,6 +1,5 @@
 project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 
-val tokenValidationVersion = "4.1.3"
 val kontrakterVersion = "2.0_20231222084529_f0d8240"
 val mockOauth2Version = "2.1.2"
 val wiremockVersion = "3.0.1"
@@ -32,9 +31,6 @@ dependencies {
     // Jackson
     implementation(libs.bundles.jackson)
     implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:${libs.versions.jackson.get()}")
-
-    // Security
-    implementation("no.nav.security:token-validation-ktor-v2:$tokenValidationVersion")
 
     // Log
     implementation(libs.kotlin.logging)
