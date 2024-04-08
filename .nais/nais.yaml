@@ -34,10 +34,7 @@ spec:
       - {{ url }}
   {{/each}}
   accessPolicy:
-  #  inbound:
     outbound:
-      rules:
-        - application: dp-iverksett
       external:
         - host: {{ dpProxyHost }}
   leaderElection: true
