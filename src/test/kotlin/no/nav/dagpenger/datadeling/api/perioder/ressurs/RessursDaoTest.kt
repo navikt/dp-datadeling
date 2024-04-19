@@ -93,13 +93,11 @@ class RessursDaoTest {
             insertRessurs(FERDIG, opprettet = now)
             insertRessurs(FEILET, opprettet = now)
 
-
             val antallFeilede = ressursDao.markerSomFeilet(eldreEnn = now.minusMinutes(3))
             val antallSlettet = ressursDao.slettFerdigeRessurser(eldreEnn = now.minusMinutes(5))
 
-
             assertEquals(1, antallFeilede)
-            assertEquals(2, antallSlettet)
+            assertEquals(2, antallSlettet.size)
             assertEquals(3, alleRessurser().size)
         }
 

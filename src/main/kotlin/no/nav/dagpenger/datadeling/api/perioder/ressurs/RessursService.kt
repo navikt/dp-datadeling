@@ -45,9 +45,9 @@ class RessursService(
             val antallMarkertSomFeilet =
                 ressursDao.markerSomFeilet(eldreEnn = LocalDateTime.now().minus(minutterLevetidOpprettet))
             logger.info("Markerte $antallMarkertSomFeilet ressurs(er) som feilet")
-            val antallSlettet =
+            val slettet =
                 ressursDao.slettFerdigeRessurser(eldreEnn = LocalDateTime.now().minus(minutterLevetidFerdig))
-            logger.info("Slettet $antallSlettet ferdige og feilede ressurs(er)")
+            logger.info("Slettet ${slettet.size} ferdige og feilede ressurs(er): $slettet")
         }
     }
 

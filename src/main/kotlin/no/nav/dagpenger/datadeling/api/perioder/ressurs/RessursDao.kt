@@ -62,10 +62,15 @@ class RessursDao(private val dataSource: DataSource = Config.datasource) {
             )
         }
 
-    fun slettFerdigeRessurser(eldreEnn: LocalDateTime): Int =
+    fun slettFerdigeRessurser(eldreEnn: LocalDateTime): List<String> =
         sessionOf(dataSource).use { session ->
             session.run(
-                asQuery("delete from ressurs where opprettet < ? and status <> 'opprettet'", eldreEnn).asUpdate,
+                queryOf(
+                    "delete from ressurs where opprettet < :opprettet and status <> 'opprettet' returning *",
+                    paramMap = mapOf("opprettet" to eldreEnn),
+                ).map { row ->
+                    "${row.int("id")}:${row.localDateTime("opprettet")}:${row.string("status")}"
+                }.asList,
             )
         }
 }
