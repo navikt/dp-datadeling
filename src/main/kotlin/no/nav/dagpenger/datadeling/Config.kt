@@ -54,7 +54,7 @@ internal object Config {
                 RessursConfig(
                     minutterLevetidOpprettet = 120,
                     minutterLevetidFerdig = 1440,
-                    oppryddingsfrekvensMinutter = 5,
+                    oppryddingsfrekvensMinutter = 2,
                 ),
         )
     }

@@ -34,8 +34,8 @@ class RessursService(
 
     suspend fun scheduleRessursCleanup(
         delay: Duration = Duration.ofMinutes(config.oppryddingsfrekvensMinutter),
-        minutterLevetidOpprettet: Duration = Duration.ofHours(config.minutterLevetidOpprettet),
-        minutterLevetidFerdig: Duration = Duration.ofHours(config.minutterLevetidFerdig),
+        minutterLevetidOpprettet: Duration = Duration.ofMinutes(config.minutterLevetidOpprettet),
+        minutterLevetidFerdig: Duration = Duration.ofMinutes(config.minutterLevetidFerdig),
     ) {
         schedule(delay) {
             if (!leaderElector.isLeader()) {
@@ -47,7 +47,7 @@ class RessursService(
             logger.info("Markerte $antallMarkertSomFeilet ressurs(er) som feilet")
             val slettet =
                 ressursDao.slettFerdigeRessurser(eldreEnn = LocalDateTime.now().minus(minutterLevetidFerdig))
-            logger.info("Slettet ${slettet.size} ferdige og feilede ressurs(er): $slettet")
+            logger.info("Slettet ${slettet.size} ferdige og feilede ressurs(er)")
         }
     }
 
