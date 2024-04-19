@@ -35,8 +35,8 @@ class RessursDao(private val dataSource: DataSource = Config.datasource) {
     fun ferdigstill(
         uuid: UUID,
         data: DatadelingResponse,
-    ) = sessionOf(dataSource).use {
-        it.run(
+    ) = sessionOf(dataSource).use { session ->
+        session.run(
             asQuery(
                 "update ressurs set status = 'ferdig', response = CAST(? as json) where uuid = ?",
                 objectMapper.writeValueAsString(data),
@@ -46,26 +46,26 @@ class RessursDao(private val dataSource: DataSource = Config.datasource) {
     }
 
     fun markerSomFeilet(uuid: UUID) =
-        sessionOf(dataSource).use {
-            it.run(
+        sessionOf(dataSource).use { session ->
+            session.run(
                 asQuery("update ressurs set status = 'feilet' where uuid = ?", uuid).asUpdate,
             )
         }
 
     fun markerSomFeilet(eldreEnn: LocalDateTime) =
-        sessionOf(dataSource).use {
-            it.run(
-                asQuery("update ressurs set status = 'feilet' where opprettet < ?", eldreEnn).asUpdate,
+        sessionOf(dataSource).use { session ->
+            session.run(
+                asQuery(
+                    "update ressurs set status = 'feilet' where opprettet < ? and status = 'opprettet'",
+                    eldreEnn,
+                ).asUpdate,
             )
         }
 
     fun slettFerdigeRessurser(eldreEnn: LocalDateTime): Int =
         sessionOf(dataSource).use { session ->
             session.run(
-                asQuery(
-                    "delete from ressurs where status <> 'opprettet' and opprettet < ?",
-                    eldreEnn,
-                ).asUpdate,
+                asQuery("delete from ressurs where opprettet < ? and status <> 'opprettet'", eldreEnn).asUpdate,
             )
         }
 }

@@ -86,13 +86,20 @@ class RessursDaoTest {
         withMigratedDb {
             val ressursDao = RessursDao(Config.datasource)
             val now = LocalDateTime.now()
-            insertRessurs(OPPRETTET, opprettet = now.minusMinutes(10))
+
+            insertRessurs(OPPRETTET, opprettet = now.minusMinutes(6))
+            insertRessurs(OPPRETTET, opprettet = now.minusMinutes(2))
             insertRessurs(FERDIG, opprettet = now.minusMinutes(10))
             insertRessurs(FERDIG, opprettet = now)
             insertRessurs(FEILET, opprettet = now)
 
+
+            val antallFeilede = ressursDao.markerSomFeilet(eldreEnn = now.minusMinutes(3))
             val antallSlettet = ressursDao.slettFerdigeRessurser(eldreEnn = now.minusMinutes(5))
-            assertEquals(1, antallSlettet)
+
+
+            assertEquals(1, antallFeilede)
+            assertEquals(2, antallSlettet)
             assertEquals(3, alleRessurser().size)
         }
 
