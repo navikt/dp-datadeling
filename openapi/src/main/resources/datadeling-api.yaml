@@ -36,6 +36,8 @@ info:
 servers:
   - url: https://dp-datadeling.ekstern.dev.nav.no
     description: dev
+  - url: https://www.nav.no/dagpenger/datadeling
+    description: prod
 
 paths:
   /dagpenger/v1/periode:
