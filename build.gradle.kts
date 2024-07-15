@@ -23,7 +23,6 @@ dependencies {
     implementation("io.ktor:ktor-server-cio:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-metrics-micrometer:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
-    implementation(libs.micrometer.registry.prometheus)
 
     // Ktor Client
     implementation(libs.bundles.ktor.client)
