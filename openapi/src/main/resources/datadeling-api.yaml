@@ -42,8 +42,10 @@ servers:
 paths:
   /dagpenger/v1/periode:
     post:
-      description: Mer beskrivelse
-      summary: Oppsummering
+      description: |-
+        Opprett ny ressurs basert på innsendte data, returnerer URL til opprettede ressursen
+        
+        Scope: `nav:dagpenger:afpprivat.read`
       requestBody:
         required: true
         content:
@@ -59,6 +61,10 @@ paths:
                 type: string
                 description: En url man kaller for å få svar på hvilke perioder en person har hatt retten til dagpenger
     get:
+      description: |-
+        Hent informasjon eksisterende ressurs ved hjelp av ressursens UUID
+        
+        Scope: `nav:dagpenger:afpprivat.read`
       parameters:
         - in: path
           name: ressursUuid
@@ -66,8 +72,6 @@ paths:
           schema:
             type: string
             format: uuid
-      description: Beskrivelse
-      summary: Oppsummering
       responses:
         200:
           description: OK

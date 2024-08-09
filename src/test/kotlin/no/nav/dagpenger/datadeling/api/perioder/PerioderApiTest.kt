@@ -73,18 +73,13 @@ class PerioderApiTest {
     fun `returnerer 404 om en ressus ikke finnes`() {
         testPerioderEndpoint {
             val uuid = UUID.randomUUID()
-            val ressurs =
-                enRessurs(
-                    uuid = uuid,
-                    status = RessursStatus.FERDIG,
-                    data = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null)),
-                )
 
             coEvery { ressursService.hent(uuid) } returns null
 
-            client.testGet("/dagpenger/datadeling/v1/periode/$uuid", token = issueMaskinportenToken()).let { response ->
-                response.status shouldBe HttpStatusCode.NotFound
-            }
+            client.testGet(
+                "/dagpenger/datadeling/v1/periode/$uuid",
+                token = issueMaskinportenToken(),
+            ).status shouldBe HttpStatusCode.NotFound
         }
     }
 
