@@ -20,6 +20,7 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol
 import org.apache.kafka.common.serialization.StringSerializer
+import java.net.URI
 import java.net.URL
 import java.util.Properties
 import javax.sql.DataSource
@@ -47,7 +48,7 @@ internal object Config {
                 MaskinportenConfig(
                     discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
                     scope = "nav:dagpenger:afpprivat.read",
-                    jwksUri = URL(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]),
+                    jwksUri = URI(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]).toURL(),
                     issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
                 ),
             ressurs =
@@ -115,7 +116,7 @@ internal object Config {
 
     private fun azureAdTokenSupplier(scope: String): () -> String =
         {
-            runBlocking { azureAdClient.clientCredentials(scope).accessToken }
+            runBlocking { azureAdClient.clientCredentials(scope).accessToken }!!
         }
 }
 
@@ -136,8 +137,8 @@ data class KafkaAivenCredentials(
             appId: String,
             bootStapServerUrl: String,
             aivenCredentials: KafkaAivenCredentials?,
-        ): Properties {
-            return Properties().apply {
+        ): Properties =
+            Properties().apply {
                 putAll(
                     listOf(
                         ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootStapServerUrl,
@@ -168,7 +169,6 @@ data class KafkaAivenCredentials(
                     put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, it.sslKeystorePasswordConfig)
                 }
             }
-        }
     }
 }
 
