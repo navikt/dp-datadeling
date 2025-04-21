@@ -13,7 +13,9 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
 
-class RessursDao(private val dataSource: DataSource = Config.datasource) {
+class RessursDao(
+    private val dataSource: DataSource = Config.datasource,
+) {
     fun opprett(request: DatadelingRequest) =
         sessionOf(dataSource).use { session ->
             session.run(

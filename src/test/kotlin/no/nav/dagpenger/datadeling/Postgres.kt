@@ -47,11 +47,13 @@ internal object Postgres {
 
     fun withCleanDb(block: () -> Unit) {
         setup()
-        PostgresDataSourceBuilder.clean().run {
-            block()
-        }.also {
-            tearDown()
-        }
+        PostgresDataSourceBuilder
+            .clean()
+            .run {
+                block()
+            }.also {
+                tearDown()
+            }
     }
 
     fun withCleanDb(
@@ -60,13 +62,15 @@ internal object Postgres {
         test: () -> Unit,
     ) {
         Postgres.setup()
-        PostgresDataSourceBuilder.clean().run {
-            PostgresDataSourceBuilder.runMigrationTo(target)
-            setup()
-            PostgresDataSourceBuilder.runMigration()
-            test()
-        }.also {
-            tearDown()
-        }
+        PostgresDataSourceBuilder
+            .clean()
+            .run {
+                PostgresDataSourceBuilder.runMigrationTo(target)
+                setup()
+                PostgresDataSourceBuilder.runMigration()
+                test()
+            }.also {
+                tearDown()
+            }
     }
 }

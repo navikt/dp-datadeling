@@ -14,7 +14,8 @@ sealed class AuditHendelse(
     auditMelding: String,
     auditOperasjon: AuditOperasjon,
     private val aktivitetsLogg: Aktivitetslogg = Aktivitetslogg(),
-) : AktivitetsloggHendelse, IAktivitetslogg by aktivitetsLogg {
+) : AktivitetsloggHendelse,
+    IAktivitetslogg by aktivitetsLogg {
     init {
         aktivitetsLogg.info(
             melding = auditMelding,
@@ -26,8 +27,8 @@ sealed class AuditHendelse(
 
     override fun meldingsreferanseId(): UUID = UUID.randomUUID()
 
-    override fun toSpesifikkKontekst(): SpesifikkKontekst {
-        return SpesifikkKontekst(
+    override fun toSpesifikkKontekst(): SpesifikkKontekst =
+        SpesifikkKontekst(
             this.javaClass.simpleName,
             kontekst() +
                 mapOf(
@@ -36,7 +37,6 @@ sealed class AuditHendelse(
                     "saksbehandlerNavIdent" to saksbehandlerNavIdent,
                 ),
         )
-    }
 
     override fun ident() = ident
 
@@ -53,9 +53,7 @@ class DagpengerPeriodeHentetHendelse(
         auditOperasjon = AuditOperasjon.READ,
         aktivitetsLogg = Aktivitetslogg(),
     ) {
-    override fun kontekst(): Map<String, String> {
-        return mapOf("ressursUuid" to ressurs.uuid.toString())
-    }
+    override fun kontekst(): Map<String, String> = mapOf("ressursUuid" to ressurs.uuid.toString())
 }
 
 class DagpengerPeriodeSpørringHendelse(

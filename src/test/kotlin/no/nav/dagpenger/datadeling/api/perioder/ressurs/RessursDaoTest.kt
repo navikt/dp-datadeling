@@ -128,18 +128,21 @@ class RessursDaoTest {
     private fun alleRessurser() =
         sessionOf(Config.datasource).use { session ->
             session.run(
-                asQuery("select * from ressurs").map { row ->
-                    Ressurs(
-                        uuid = row.uuid("uuid"),
-                        status = RessursStatus.valueOf(row.string("status").uppercase()),
-                        request =
-                            row.string("request")
-                                .let { objectMapper.readValue(it, DatadelingRequest::class.java) },
-                        response =
-                            row.stringOrNull("response")
-                                ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) },
-                    )
-                }.asList,
+                asQuery("select * from ressurs")
+                    .map { row ->
+                        Ressurs(
+                            uuid = row.uuid("uuid"),
+                            status = RessursStatus.valueOf(row.string("status").uppercase()),
+                            request =
+                                row
+                                    .string("request")
+                                    .let { objectMapper.readValue(it, DatadelingRequest::class.java) },
+                            response =
+                                row
+                                    .stringOrNull("response")
+                                    ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) },
+                        )
+                    }.asList,
             )
         }
 }

@@ -35,13 +35,12 @@ class ManuellE2ETest {
         val access_token: String,
     )
 
-    fun tokenProvider(): String {
-        return runBlocking {
+    fun tokenProvider(): String =
+        runBlocking {
             client.get("https://dp-maskinporten-client.intern.dev.nav.no/token").bodyAsText().let {
                 objectMapper.readValue(it, Token::class.java).access_token
             }
         }
-    }
 
     @Disabled
     @Test
@@ -54,25 +53,28 @@ class ManuellE2ETest {
                 )
             val token = tokenProvider()
             val ressursUrl =
-                client.post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
-                    headers {
-                        append(HttpHeaders.Accept, ContentType.Application.Json)
-                        append(HttpHeaders.ContentType, ContentType.Application.Json)
-                        bearerAuth(token)
+                client
+                    .post("https://dp-datadeling.ekstern.dev.nav.no/dagpenger/v1/periode") {
+                        headers {
+                            append(HttpHeaders.Accept, ContentType.Application.Json)
+                            append(HttpHeaders.ContentType, ContentType.Application.Json)
+                            bearerAuth(token)
+                        }
+                        setBody(objectMapper.writeValueAsString(request))
+                    }.bodyAsText()
+                    .also {
+                        println("Ressurs url: $it")
                     }
-                    setBody(objectMapper.writeValueAsString(request))
-                }.bodyAsText().also {
-                    println("Ressurs url: $it")
-                }
 
             repeat((1..5).count()) { i ->
                 println("Henter ressurs: $ressursUrl")
-                client.get(ressursUrl) {
-                    bearerAuth(token)
-                }.let { response ->
-                    println("Status: " + response.status)
-                    response.bodyAsText().also { println("Resultat $i: $it") }
-                }
+                client
+                    .get(ressursUrl) {
+                        bearerAuth(token)
+                    }.let { response ->
+                        println("Status: " + response.status)
+                        response.bodyAsText().also { println("Resultat $i: $it") }
+                    }
                 delay(1000)
             }
         }

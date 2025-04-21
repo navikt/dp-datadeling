@@ -15,6 +15,11 @@ fun main() {
     createDatadelingServer().start(wait = true)
 }
 
-fun createDatadelingServer(port: Int = 8080): EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration> {
-    return embeddedServer(port = port, module = { datadelingApi() }, factory = CIO)
-}
+fun createDatadelingServer(port: Int = 8080): EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration> =
+    embeddedServer(
+        port = port,
+        module = {
+            datadelingApi()
+        },
+        factory = CIO,
+    )

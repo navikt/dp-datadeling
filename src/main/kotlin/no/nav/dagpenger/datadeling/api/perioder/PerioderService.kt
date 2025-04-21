@@ -7,7 +7,9 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode
 
-class PerioderService(private val proxyClient: ProxyClient) {
+class PerioderService(
+    private val proxyClient: ProxyClient,
+) {
     fun hentDagpengeperioder(request: DatadelingRequest) =
         runBlocking {
             val proxyResponse = async { proxyClient.hentDagpengeperioder(request) }
@@ -25,8 +27,7 @@ class PerioderService(private val proxyClient: ProxyClient) {
                             fraOgMedDato = maxOf(periode.fraOgMedDato, request.fraOgMedDato),
                             tilOgMedDato = listOfNotNull(periode.tilOgMedDato, request.tilOgMedDato).minOrNull(),
                         )
-                    }
-                    .sortedBy { it.fraOgMedDato }
+                    }.sortedBy { it.fraOgMedDato }
 
             DatadelingResponse(
                 personIdent = request.personIdent,

@@ -11,11 +11,16 @@ import no.nav.dagpenger.datadeling.MaskinportenConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import java.util.concurrent.TimeUnit
 
-fun ApplicationCall.orgNummer(): String {
-    return principal<JWTPrincipal>()?.payload?.claims?.get("consumer")?.asMap()?.get("ID")?.let { it as String }
+fun ApplicationCall.orgNummer(): String =
+    principal<JWTPrincipal>()
+        ?.payload
+        ?.claims
+        ?.get("consumer")
+        ?.asMap()
+        ?.get("ID")
+        ?.let { it as String }
         ?.parseISO6523ToOrgnummer()
         ?: throw IllegalArgumentException("Fant ikke orgnummer i jwt")
-}
 
 internal fun String.parseISO6523ToOrgnummer(): String {
     val strings = this.split(":")

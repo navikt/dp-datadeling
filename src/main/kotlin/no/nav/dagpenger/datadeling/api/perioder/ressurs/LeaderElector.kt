@@ -13,7 +13,9 @@ import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.datadeling.objectMapper
 import java.net.InetAddress.getLocalHost
 
-class LeaderElector(private val appConfig: AppConfig) {
+class LeaderElector(
+    private val appConfig: AppConfig,
+) {
     private val httpClient: HttpClient =
         HttpClient {
             install(ContentNegotiation) {
@@ -32,7 +34,9 @@ class LeaderElector(private val appConfig: AppConfig) {
             }
             val electorPath = System.getenv("ELECTOR_PATH")
             val leaderName =
-                httpClient.request("http://$electorPath").bodyAsText()
+                httpClient
+                    .request("http://$electorPath")
+                    .bodyAsText()
                     .let { objectMapper.readTree(it).get("name").asText() }
             val hostname: String = getLocalHost().hostName
             hostname == leaderName

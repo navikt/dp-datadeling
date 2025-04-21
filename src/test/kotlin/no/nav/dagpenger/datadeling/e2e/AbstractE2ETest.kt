@@ -48,7 +48,8 @@ abstract class AbstractE2ETest {
 
     fun mockProxyError(delayMs: Int = 0) {
         proxyMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
+            WireMock
+                .post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
                 .willReturn(WireMock.serverError().withFixedDelay(delayMs)),
         )
     }
@@ -58,7 +59,8 @@ abstract class AbstractE2ETest {
         delayMs: Int = 0,
     ) {
         proxyMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
+            WireMock
+                .post(WireMock.urlEqualTo("/proxy/v1/arena/dagpengerperioder"))
                 .willReturn(WireMock.jsonResponse(response, 200).withFixedDelay(delayMs)),
         )
     }

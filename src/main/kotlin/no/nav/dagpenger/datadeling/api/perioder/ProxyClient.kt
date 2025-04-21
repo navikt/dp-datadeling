@@ -37,14 +37,15 @@ class ProxyClient(
 
         val result =
             runCatching {
-                client.post(urlString) {
-                    headers {
-                        append(HttpHeaders.Accept, "application/json")
-                        append(HttpHeaders.Authorization, "Bearer $token")
-                        append(HttpHeaders.ContentType, "application/json")
-                    }
-                    setBody(request)
-                }.body<DatadelingResponse>()
+                client
+                    .post(urlString) {
+                        headers {
+                            append(HttpHeaders.Accept, "application/json")
+                            append(HttpHeaders.Authorization, "Bearer $token")
+                            append(HttpHeaders.ContentType, "application/json")
+                        }
+                        setBody(request)
+                    }.body<DatadelingResponse>()
             }
         return result.fold(
             onSuccess = { it },

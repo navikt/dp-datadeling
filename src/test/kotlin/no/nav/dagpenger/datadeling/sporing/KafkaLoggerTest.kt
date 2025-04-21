@@ -28,15 +28,14 @@ private object Kafka {
         KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.3")).apply { this.start() }
     }
 
-    fun consumerProps(): Properties {
-        return Properties().apply {
+    fun consumerProps(): Properties =
+        Properties().apply {
             put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, instance.bootstrapServers)
             put(ConsumerConfig.GROUP_ID_CONFIG, "test-group")
             put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java)
             put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java)
             put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
         }
-    }
 }
 
 class KafkaLoggerTest {
@@ -92,9 +91,7 @@ class KafkaLoggerTest {
                             }
                             """.trimIndent()
                     }
-                    records.filter { it.topic() == Config.auditTopic }.let { auditRecords ->
-                        auditRecords.count() shouldBe 2
-                    }
+                    records.count { it.topic() == Config.auditTopic } shouldBe 2
                 }
             }
         }

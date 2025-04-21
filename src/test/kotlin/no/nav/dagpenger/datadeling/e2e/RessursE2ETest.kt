@@ -73,14 +73,16 @@ class RessursE2ETest : AbstractE2ETest() {
                 )
 
             val ressursUrl =
-                client.post("/dagpenger/datadeling/v1/periode") {
-                    headers {
-                        append(HttpHeaders.Accept, ContentType.Application.Json)
-                        append(HttpHeaders.ContentType, ContentType.Application.Json)
-                        bearerAuth(TestApplication.issueMaskinportenToken())
-                    }
-                    setBody(objectMapper.writeValueAsString(request))
-                }.apply { assertEquals(HttpStatusCode.Created, this.status) }.bodyAsText()
+                client
+                    .post("/dagpenger/datadeling/v1/periode") {
+                        headers {
+                            append(HttpHeaders.Accept, ContentType.Application.Json)
+                            append(HttpHeaders.ContentType, ContentType.Application.Json)
+                            bearerAuth(TestApplication.issueMaskinportenToken())
+                        }
+                        setBody(objectMapper.writeValueAsString(request))
+                    }.apply { assertEquals(HttpStatusCode.Created, this.status) }
+                    .bodyAsText()
 
             ressursUrl.fetchRessursResponse {
                 this["status"].asText() shouldBe RessursStatus.OPPRETTET.name
@@ -142,14 +144,15 @@ class RessursE2ETest : AbstractE2ETest() {
                 )
 
             val ressursUrl =
-                client.post("/dagpenger/datadeling/v1/periode") {
-                    headers {
-                        append(HttpHeaders.Accept, ContentType.Application.Json)
-                        append(HttpHeaders.ContentType, ContentType.Application.Json)
-                        bearerAuth(TestApplication.issueMaskinportenToken())
-                    }
-                    setBody(objectMapper.writeValueAsString(request))
-                }.bodyAsText()
+                client
+                    .post("/dagpenger/datadeling/v1/periode") {
+                        headers {
+                            append(HttpHeaders.Accept, ContentType.Application.Json)
+                            append(HttpHeaders.ContentType, ContentType.Application.Json)
+                            bearerAuth(TestApplication.issueMaskinportenToken())
+                        }
+                        setBody(objectMapper.writeValueAsString(request))
+                    }.bodyAsText()
 
             val uuid =
                 ressursUrl.let {
@@ -172,12 +175,14 @@ class RessursE2ETest : AbstractE2ETest() {
         }
 
     private suspend fun String.fetchRessursResponse(block: ObjectNode.() -> Unit) {
-        client.get(this) {
-            headers {
-                append(HttpHeaders.Accept, ContentType.Application.Json)
-                append(HttpHeaders.Authorization, "Bearer ${TestApplication.issueMaskinportenToken()}")
-            }
-        }.apply { assertEquals(HttpStatusCode.OK, this.status) }
-            .let { objectMapper.readValue(it.bodyAsText(), ObjectNode::class.java) }.apply { block() }
+        client
+            .get(this) {
+                headers {
+                    append(HttpHeaders.Accept, ContentType.Application.Json)
+                    append(HttpHeaders.Authorization, "Bearer ${TestApplication.issueMaskinportenToken()}")
+                }
+            }.apply { assertEquals(HttpStatusCode.OK, this.status) }
+            .let { objectMapper.readValue(it.bodyAsText(), ObjectNode::class.java) }
+            .apply { block() }
     }
 }

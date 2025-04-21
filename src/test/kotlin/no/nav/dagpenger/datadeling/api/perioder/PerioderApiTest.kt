@@ -63,7 +63,8 @@ class PerioderApiTest {
             coEvery { ressursService.opprett(any()) } returns ressurs
             coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
 
-            client.testPost("/dagpenger/datadeling/v1/periode", enDatadelingRequest(), issueMaskinportenToken())
+            client
+                .testPost("/dagpenger/datadeling/v1/periode", enDatadelingRequest(), issueMaskinportenToken())
                 .apply { assertEquals(HttpStatusCode.Created, this.status) }
                 .bodyAsText()
                 .apply { assertEquals("http://localhost:8080/dagpenger/datadeling/v1/periode/${ressurs.uuid}", this) }
@@ -76,10 +77,11 @@ class PerioderApiTest {
 
             coEvery { ressursService.hent(uuid) } returns null
 
-            client.testGet(
-                "/dagpenger/datadeling/v1/periode/$uuid",
-                token = issueMaskinportenToken(),
-            ).status shouldBe HttpStatusCode.NotFound
+            client
+                .testGet(
+                    "/dagpenger/datadeling/v1/periode/$uuid",
+                    token = issueMaskinportenToken(),
+                ).status shouldBe HttpStatusCode.NotFound
         }
     }
 

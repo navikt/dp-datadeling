@@ -18,7 +18,8 @@ internal class Sporing(
 ) {
     fun sporingHendelse(): String {
         val leverteDataBase64Encoded =
-            Base64.getEncoder()
+            Base64
+                .getEncoder()
                 .encodeToString(objectMapper.writeValueAsString(this.leverteData).encodeToByteArray())
 
         return """

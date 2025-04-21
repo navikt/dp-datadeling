@@ -25,8 +25,8 @@ class TestServerRuntime : AutoCloseable {
         server.stop(0, 0)
     }
 
-    fun restClient(): HttpClient {
-        return HttpClient {
+    fun restClient(): HttpClient =
+        HttpClient {
             defaultRequest {
                 host = "localhost"
                 port = SERVER_PORT
@@ -39,5 +39,4 @@ class TestServerRuntime : AutoCloseable {
                 )
             }
         }
-    }
 }

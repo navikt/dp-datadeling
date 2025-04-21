@@ -14,20 +14,20 @@ object TestApplication {
         }
     }
 
-    internal fun issueMaskinportenToken(orgNummer: String = "0192:889640782"): String {
-        return mockOAuth2Server.issueToken(
-            issuerId = MASKINPORTEN_ISSUER_ID,
-            claims =
-                mapOf(
-                    "scope" to Config.appConfig.maskinporten.scope,
-                    "consumer" to
-                        mapOf(
-                            "authority" to "NO",
-                            "ID" to orgNummer,
-                        ),
-                ),
-        ).serialize()
-    }
+    internal fun issueMaskinportenToken(orgNummer: String = "0192:889640782"): String =
+        mockOAuth2Server
+            .issueToken(
+                issuerId = MASKINPORTEN_ISSUER_ID,
+                claims =
+                    mapOf(
+                        "scope" to Config.appConfig.maskinporten.scope,
+                        "consumer" to
+                            mapOf(
+                                "authority" to "NO",
+                                "ID" to orgNummer,
+                            ),
+                    ),
+            ).serialize()
 
     fun setup() {
         System.setProperty("MASKINPORTEN_JWKS_URI", mockOAuth2Server.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
@@ -51,12 +51,10 @@ object TestApplication {
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
         test: suspend ApplicationTestBuilder.() -> Unit,
-    ) {
-        return testApplication {
-            setup()
-            application(moduleFunction)
-            test()
-            teardown()
-        }
+    ) = testApplication {
+        setup()
+        application(moduleFunction)
+        test()
+        teardown()
     }
 }
