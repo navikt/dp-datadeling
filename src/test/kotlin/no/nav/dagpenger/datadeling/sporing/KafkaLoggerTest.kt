@@ -16,7 +16,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.kafka.ConfluentKafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.util.Properties
 import kotlin.time.Duration.Companion.seconds
@@ -25,7 +25,7 @@ import kotlin.time.toJavaDuration
 private object Kafka {
     val instance by lazy {
         // See https://docs.confluent.io/current/installation/versions-interoperability.html#cp-and-apache-kafka-compatibility
-        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.3")).apply { this.start() }
+        ConfluentKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.3")).apply { this.start() }
     }
 
     fun consumerProps(): Properties =
