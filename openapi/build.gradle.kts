@@ -15,7 +15,16 @@ tasks.named("spotlessKotlin").configure {
 sourceSets {
     main {
         java {
-            setSrcDirs(listOf("src/main/kotlin", "$buildDir/generated/src/main/kotlin"))
+            setSrcDirs(
+                listOf(
+                    "src/main/kotlin",
+                    layout.buildDirectory
+                        .dir("generated/src/main/kotlin")
+                        .get()
+                        .asFile
+                        .path,
+                ),
+            )
         }
     }
 }
@@ -33,7 +42,13 @@ dependencies {
 openApiGenerate {
     generatorName.set("kotlin-server")
     inputSpec.set("$projectDir/src/main/resources/datadeling-api.yaml")
-    outputDir.set("$buildDir/generated/")
+    outputDir.set(
+        layout.buildDirectory
+            .dir("generated/")
+            .get()
+            .asFile
+            .path,
+    )
     packageName.set("no.nav.dagpenger.datadeling")
     globalProperties.set(
         mapOf(
