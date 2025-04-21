@@ -53,7 +53,7 @@ dependencies {
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.json)
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
-    testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
+    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
 }
 
 application {
