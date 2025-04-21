@@ -1,5 +1,5 @@
 plugins {
-    id("org.openapi.generator") version "7.10.0"
+    id("org.openapi.generator") version "7.12.0"
     id("common")
     `java-library`
 }
@@ -27,7 +27,7 @@ spotless {
 }
 
 dependencies {
-    implementation(libs.jackson.annotation)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 }
 
 openApiGenerate {
