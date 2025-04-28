@@ -40,7 +40,7 @@ dependencies {
     // Nav
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
-    implementation("no.nav.dagpenger:oauth2-klient:2025.03.31-22.36.fc954bf09c91")
+    implementation("no.nav.dagpenger:oauth2-klient:2025.04.26-14.51.bbf9ece5f5ec")
     implementation(libs.rapids.and.rivers)
     implementation("no.nav.dagpenger:aktivitetslogg:20240412.29.afd090")
     // Test
