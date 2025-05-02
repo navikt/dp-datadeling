@@ -1,13 +1,12 @@
 package no.nav.dagpenger.datadeling.api.config
 
-import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.AuthenticationConfig
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.auth.principal
-import no.nav.dagpenger.datadeling.MaskinportenConfig
+import no.nav.dagpenger.datadeling.IssuerConfig
 import no.nav.dagpenger.datadeling.defaultLogger
 import java.util.concurrent.TimeUnit
 
@@ -40,20 +39,27 @@ internal fun String.parseISO6523ToOrgnummer(): String {
     return muligOrgnummer
 }
 
-fun AuthenticationConfig.maskinporten(
+fun ApplicationCall.clientId(): String =
+    principal<JWTPrincipal>()
+        ?.payload
+        ?.getClaim("azp")
+        ?.asString()
+        ?: throw IllegalArgumentException("Fant ikke clientId i jwt")
+
+fun AuthenticationConfig.jwtAuth(
     name: String,
-    maskinportenConfig: MaskinportenConfig,
+    config: IssuerConfig,
 ) {
-    val maskinportenJwkProvider: JwkProvider =
-        JwkProviderBuilder(maskinportenConfig.jwksUri)
+    val jwkProvider =
+        JwkProviderBuilder(config.jwksUri)
             .cached(10, 24, TimeUnit.HOURS)
             .rateLimited(10, 1, TimeUnit.MINUTES)
             .build()
 
     jwt(name) {
-        verifier(maskinportenJwkProvider, maskinportenConfig.issuer)
+        verifier(jwkProvider, config.issuer)
         validate { cred ->
-            if (cred.getClaim("scope", String::class) != maskinportenConfig.scope) {
+            if (cred.getClaim("scope", String::class) != config.scope) {
                 defaultLogger.warn("Wrong scope in claim")
                 return@validate null
             }

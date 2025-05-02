@@ -12,7 +12,8 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.api.perioder.PerioderService
 import no.nav.dagpenger.datadeling.api.perioder.ProxyClient
-import no.nav.dagpenger.datadeling.api.perioder.perioderRoutes
+import no.nav.dagpenger.datadeling.api.perioder.afpPrivatRoutes
+import no.nav.dagpenger.datadeling.api.perioder.dagpengerRoutes
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
@@ -30,7 +31,8 @@ fun Application.datadelingApi(config: AppConfig = Config.appConfig) {
 
     routing {
         livenessRoutes(appMicrometerRegistry)
-        perioderRoutes(ressursService, perioderService)
+        afpPrivatRoutes(ressursService, perioderService)
+        dagpengerRoutes(perioderService)
     }
 
     launch {

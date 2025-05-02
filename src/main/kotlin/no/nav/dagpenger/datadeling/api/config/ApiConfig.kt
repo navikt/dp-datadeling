@@ -21,7 +21,8 @@ fun Application.konfigurerApi(
     appConfig: AppConfig,
 ) {
     install(Authentication) {
-        maskinporten(name = "afpPrivat", maskinportenConfig = appConfig.maskinporten)
+        jwtAuth(name = "afpPrivat", config = appConfig.maskinporten)
+        jwtAuth(name = "azure", config = appConfig.azure)
     }
 
     install(MicrometerMetrics) {

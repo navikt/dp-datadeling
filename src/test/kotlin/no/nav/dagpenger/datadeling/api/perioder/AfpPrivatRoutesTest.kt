@@ -31,7 +31,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class PerioderApiTest {
+class AfpPrivatRoutesTest {
     private val ressursService: RessursService = mockk(relaxed = true)
     private val perioderService: PerioderService = mockk(relaxed = true)
 
@@ -191,7 +191,7 @@ class PerioderApiTest {
         withMockAuthServerAndTestApplication(moduleFunction = {
             konfigurerApi(appConfig = Config.appConfig)
         }) {
-            routing { perioderRoutes(ressursService, perioderService, auditLogger) }
+            routing { afpPrivatRoutes(ressursService, perioderService, auditLogger) }
             block()
         }
     }

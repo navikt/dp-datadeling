@@ -79,7 +79,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ressurs'
-
+  /dagpenger/v1/perioder:
+    post:
+      description: |-
+        Returnerer perioder basert på innsendte data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatadelingResponse'
+      security:
+        - azure: [ ]
 
 
 components:
@@ -164,3 +182,14 @@ components:
         - DAGPENGER_ARBEIDSSOKER_ORDINAER
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
+
+  securitySchemes:
+    azure:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bruker [Azure AD](https://docs.nais.io/auth/entra-id/) til autentisering.
+        
+        For å teste APIet kan du lage et gyldig OBO-token ved å bruke wonderwalled:
+        - [dev-gcp](https://azure-token-generator.intern.dev.nav.no/api/obo?aud=dev-gcp:teamdagpenger:dp-datadeling)

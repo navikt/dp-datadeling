@@ -6,6 +6,8 @@ import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
 import no.nav.dagpenger.aktivitetslogg.IAktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
+import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
 
 sealed class AuditHendelse(
@@ -54,6 +56,20 @@ class DagpengerPeriodeHentetHendelse(
         aktivitetsLogg = Aktivitetslogg(),
     ) {
     override fun kontekst(): Map<String, String> = mapOf("ressursUuid" to ressurs.uuid.toString())
+}
+
+class DagpengerPerioderHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: DatadelingRequest,
+    val response: DatadelingResponse,
+) : AuditHendelse(
+        ident = request.personIdent,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut dagpenger perioder",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
+    ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
 }
 
 class DagpengerPeriodeSpørringHendelse(
