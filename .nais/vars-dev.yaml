@@ -4,6 +4,7 @@ requestsCpu: 50m
 db_tier: "db-f1-micro"
 ingresses:
   - https://dp-datadeling.ekstern.dev.nav.no
+  - https://dp-datadeling.intern.dev.nav.no
 dpProxyHost: dp-proxy.dev-fss-pub.nais.io
 dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
