@@ -34,6 +34,11 @@ spec:
       - {{ url }}
   {{/each}}
   accessPolicy:
+    inbound:
+      rules:
+        - application: azure-token-generator
+          namespace: nais
+          cluster: dev-gcp
     outbound:
       external:
         - host: {{ dpProxyHost }}
@@ -53,6 +58,7 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: true
   kafka:
     pool: {{ kafka_pool }}
   maskinporten:

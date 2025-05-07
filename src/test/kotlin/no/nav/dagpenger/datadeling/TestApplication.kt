@@ -7,6 +7,7 @@ import no.nav.security.mock.oauth2.MockOAuth2Server
 
 object TestApplication {
     private const val MASKINPORTEN_ISSUER_ID = "maskinporten"
+    private const val AZURE_ISSUER_ID = "azure"
 
     val mockOAuth2Server: MockOAuth2Server by lazy {
         MockOAuth2Server().also { server ->
@@ -20,7 +21,7 @@ object TestApplication {
                 issuerId = MASKINPORTEN_ISSUER_ID,
                 claims =
                     mapOf(
-                        "scope" to Config.appConfig.maskinporten.scope,
+                        "scope" to Config.appConfig.maskinporten.scope!!,
                         "consumer" to
                             mapOf(
                                 "authority" to "NO",
@@ -29,14 +30,19 @@ object TestApplication {
                     ),
             ).serialize()
 
+    internal fun issueAzureToken(): String = mockOAuth2Server.issueToken(AZURE_ISSUER_ID).serialize()
+
     fun setup() {
         System.setProperty("MASKINPORTEN_JWKS_URI", mockOAuth2Server.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())
-        System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", "${mockOAuth2Server.wellKnownUrl(MASKINPORTEN_ISSUER_ID)}")
+        System.setProperty("MASKINPORTEN_WELL_KNOWN_URL", mockOAuth2Server.wellKnownUrl(MASKINPORTEN_ISSUER_ID).toString())
         System.setProperty("MASKINPORTEN_ISSUER", mockOAuth2Server.issuerUrl(MASKINPORTEN_ISSUER_ID).toString())
 
-        System.setProperty("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT", "${mockOAuth2Server.tokenEndpointUrl("azureAd")}")
+        System.setProperty("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT", "${mockOAuth2Server.tokenEndpointUrl(AZURE_ISSUER_ID)}")
         System.setProperty("AZURE_APP_CLIENT_ID", "test")
         System.setProperty("AZURE_APP_CLIENT_SECRET", "tull")
+        System.setProperty("AZURE_OPENID_CONFIG_JWKS_URI", mockOAuth2Server.jwksUrl(AZURE_ISSUER_ID).toString())
+        System.setProperty("AZURE_APP_WELL_KNOWN_URL", mockOAuth2Server.wellKnownUrl(AZURE_ISSUER_ID).toString())
+        System.setProperty("AZURE_OPENID_CONFIG_ISSUER", mockOAuth2Server.issuerUrl(AZURE_ISSUER_ID).toString())
     }
 
     fun teardown() {
@@ -46,6 +52,9 @@ object TestApplication {
         System.clearProperty("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
         System.clearProperty("AZURE_APP_CLIENT_ID")
         System.clearProperty("AZURE_APP_CLIENT_SECRET")
+        System.clearProperty("AZURE_APP_WELL_KNOWN_URL")
+        System.clearProperty("AZURE_OPENID_CONFIG_JWKS_URI")
+        System.clearProperty("AZURE_OPENID_CONFIG_ISSUER")
     }
 
     internal fun withMockAuthServerAndTestApplication(

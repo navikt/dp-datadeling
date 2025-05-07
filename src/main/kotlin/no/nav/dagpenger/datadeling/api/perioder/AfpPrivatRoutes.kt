@@ -1,7 +1,6 @@
 package no.nav.dagpenger.datadeling.api.perioder
 
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.ContentTransformationException
@@ -28,7 +27,7 @@ import java.util.UUID
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
-fun Route.perioderRoutes(
+fun Route.afpPrivatRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
     auditLogger: Log = Config.logger,

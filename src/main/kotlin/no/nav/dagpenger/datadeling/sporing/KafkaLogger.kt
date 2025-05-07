@@ -62,12 +62,18 @@ internal class KafkaLogger(
                         objectMapper.writeValueAsString(it)
                     } ?: ""
 
+                is DagpengerPerioderHentetHendelse ->
+                    objectMapper.writeValueAsString(hendelse.response)
+
                 is DagpengerPeriodeSpørringHendelse -> null
             }
         val request: String? =
             when (hendelse) {
                 is DagpengerPeriodeHentetHendelse ->
                     hendelse.ressurs.request.toString()
+
+                is DagpengerPerioderHentetHendelse ->
+                    hendelse.request.toString()
 
                 is DagpengerPeriodeSpørringHendelse -> null
             }

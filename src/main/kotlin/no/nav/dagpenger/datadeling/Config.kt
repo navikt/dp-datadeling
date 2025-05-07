@@ -45,11 +45,18 @@ internal object Config {
         AppConfig(
             isLocal = false,
             maskinporten =
-                MaskinportenConfig(
+                IssuerConfig(
                     discoveryUrl = properties[Key("MASKINPORTEN_WELL_KNOWN_URL", stringType)],
                     scope = "nav:dagpenger:afpprivat.read",
                     jwksUri = URI(properties[Key("MASKINPORTEN_JWKS_URI", stringType)]).toURL(),
                     issuer = properties[Key("MASKINPORTEN_ISSUER", stringType)],
+                ),
+            azure =
+                IssuerConfig(
+                    discoveryUrl = properties[Key("AZURE_APP_WELL_KNOWN_URL", stringType)],
+                    scope = null,
+                    jwksUri = URI(properties[Key("AZURE_OPENID_CONFIG_JWKS_URI", stringType)]).toURL(),
+                    issuer = properties[Key("AZURE_OPENID_CONFIG_ISSUER", stringType)],
                 ),
             ressurs =
                 RessursConfig(
@@ -174,13 +181,14 @@ data class KafkaAivenCredentials(
 
 data class AppConfig(
     val isLocal: Boolean = false,
-    val maskinporten: MaskinportenConfig,
+    val maskinporten: IssuerConfig,
+    val azure: IssuerConfig,
     val ressurs: RessursConfig,
 )
 
-data class MaskinportenConfig(
+data class IssuerConfig(
     val discoveryUrl: String,
-    val scope: String,
+    val scope: String?,
     val jwksUri: URL,
     val issuer: String,
 )
