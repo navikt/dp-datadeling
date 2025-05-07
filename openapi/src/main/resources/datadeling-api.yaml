@@ -60,6 +60,8 @@ paths:
               schema:
                 type: string
                 description: En url man kaller for å få svar på hvilke perioder en person har hatt retten til dagpenger
+      security:
+        - maskinporten: [ ]
     get:
       description: |-
         Hent informasjon eksisterende ressurs ved hjelp av ressursens UUID
@@ -79,6 +81,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ressurs'
+      security:
+        - maskinporten: [ ]
   /dagpenger/v1/perioder:
     post:
       description: |-
@@ -184,6 +188,12 @@ components:
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
 
   securitySchemes:
+    maskinporten:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bearer token utstedt av Maskinporten.
     azure:
       type: http
       scheme: bearer
