@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder
+package no.nav.dagpenger.datadeling.api
 
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
@@ -12,8 +12,9 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.TestApplication.issueMaskinportenToken
 import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestApplication
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse

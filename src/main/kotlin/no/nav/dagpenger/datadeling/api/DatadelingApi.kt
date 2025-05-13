@@ -10,13 +10,11 @@ import kotlinx.coroutines.launch
 import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
-import no.nav.dagpenger.datadeling.api.perioder.PerioderService
-import no.nav.dagpenger.datadeling.api.perioder.ProxyClient
-import no.nav.dagpenger.datadeling.api.perioder.afpPrivatRoutes
-import no.nav.dagpenger.datadeling.api.perioder.dagpengerRoutes
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.LeaderElector
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
+import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
+import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
+import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.service.PerioderService
+import no.nav.dagpenger.datadeling.service.ProxyClient
 
 fun Application.datadelingApi(config: AppConfig = Config.appConfig) {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)

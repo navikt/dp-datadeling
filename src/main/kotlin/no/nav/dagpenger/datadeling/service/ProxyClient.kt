@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder
+package no.nav.dagpenger.datadeling.service
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule

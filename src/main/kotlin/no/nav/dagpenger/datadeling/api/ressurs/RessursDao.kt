@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder.ressurs
+package no.nav.dagpenger.datadeling.api.ressurs
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotliquery.Row

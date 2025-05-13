@@ -18,9 +18,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.TestApplication
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursService
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
+import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.januar
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest

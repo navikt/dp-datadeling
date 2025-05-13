@@ -1,7 +1,7 @@
 package no.nav.dagpenger.datadeling.testutil
 
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.api.perioder.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import no.nav.dagpenger.kontrakter.datadeling.Periode

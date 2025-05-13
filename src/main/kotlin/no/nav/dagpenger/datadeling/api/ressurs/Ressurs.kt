@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder.ressurs
+package no.nav.dagpenger.datadeling.api.ressurs
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest

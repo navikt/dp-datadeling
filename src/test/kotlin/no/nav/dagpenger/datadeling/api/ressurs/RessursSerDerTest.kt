@@ -1,8 +1,9 @@
-package no.nav.dagpenger.datadeling.api.perioder.ressurs
+package no.nav.dagpenger.datadeling.api.ressurs
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.assertions.json.shouldEqualSpecifiedJsonIgnoringOrder
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse

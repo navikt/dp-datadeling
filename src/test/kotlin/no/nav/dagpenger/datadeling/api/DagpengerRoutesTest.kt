@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder
+package no.nav.dagpenger.datadeling.api
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -12,6 +12,7 @@ import no.nav.dagpenger.datadeling.TestApplication.issueAzureToken
 import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestApplication
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log

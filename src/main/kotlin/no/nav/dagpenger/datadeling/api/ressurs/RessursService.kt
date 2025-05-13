@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder.ressurs
+package no.nav.dagpenger.datadeling.api.ressurs
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

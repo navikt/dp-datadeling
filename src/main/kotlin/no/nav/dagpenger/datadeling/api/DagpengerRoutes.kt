@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.api.perioder
+package no.nav.dagpenger.datadeling.api
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -13,6 +13,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
