@@ -13,8 +13,13 @@ import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.models.SoknadDTO
+import no.nav.dagpenger.datadeling.models.VedtakDTO
+import no.nav.dagpenger.datadeling.service.InnsynService
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
+import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
+import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
@@ -23,35 +28,94 @@ private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
+    innsynService: InnsynService,
     auditLogger: Log = Config.logger,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 
     authenticate("azure") {
-        route("/dagpenger/datadeling/v1/perioder") {
-            post {
-                try {
-                    val request = call.receive<DatadelingRequest>()
+        route("/dagpenger/datadeling/v1") {
+            route("/perioder") {
+                post {
+                    try {
+                        val request = call.receive<DatadelingRequest>()
 
-                    val response: DatadelingResponse = perioderService.hentDagpengeperioder(request)
+                        val response: DatadelingResponse = perioderService.hentDagpengeperioder(request)
 
-                    auditLogger.log(
-                        DagpengerPerioderHentetHendelse(
-                            saksbehandlerNavIdent = call.clientId(),
-                            request = request,
-                            response = response,
-                        ),
-                    )
+                        auditLogger.log(
+                            DagpengerPerioderHentetHendelse(
+                                saksbehandlerNavIdent = call.clientId(),
+                                request = request,
+                                response = response,
+                            ),
+                        )
 
-                    call.respond(HttpStatusCode.OK, response)
-                } catch (e: BadRequestException) {
-                    defaultLogger.error("Kunne ikke lese innholdet i forespørselen. Se sikkerlogg for detaljer")
-                    sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen. Detaljer:" }
-                    call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen")
-                } catch (e: Exception) {
-                    defaultLogger.error("Kunne ikke hente perioder. Se sikkerlogg for detaljer")
-                    sikkerlogger.error(e) { "Kunne ikke hente perioder. Detaljer:" }
-                    call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente perioder")
+                        call.respond(HttpStatusCode.OK, response)
+                    } catch (e: BadRequestException) {
+                        defaultLogger.error("Kunne ikke lese innholdet i forespørselen om perioder. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om perioder. Detaljer:" }
+                        call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om perioder")
+                    } catch (e: Exception) {
+                        defaultLogger.error("Kunne ikke hente perioder. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke hente perioder. Detaljer:" }
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente perioder")
+                    }
+                }
+            }
+
+            route("/soknader") {
+                post {
+                    try {
+                        val request = call.receive<DatadelingRequest>()
+
+                        val response: List<SoknadDTO> = innsynService.hentSoknader(request)
+
+                        auditLogger.log(
+                            DagpengerSøknaderHentetHendelse(
+                                saksbehandlerNavIdent = call.clientId(),
+                                request = request,
+                                response = response,
+                            ),
+                        )
+
+                        call.respond(HttpStatusCode.OK, response)
+                    } catch (e: BadRequestException) {
+                        defaultLogger.error("Kunne ikke lese innholdet i forespørselen om søknader. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om søknader. Detaljer:" }
+                        call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om søknader")
+                    } catch (e: Exception) {
+                        defaultLogger.error("Kunne ikke hente søknader. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke hente søknader. Detaljer:" }
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente søknader")
+                    }
+                }
+            }
+
+            route("/vedtak") {
+                post {
+                    try {
+                        val request = call.receive<DatadelingRequest>()
+
+                        val response: List<VedtakDTO> = innsynService.hentVedtak(request)
+
+                        auditLogger.log(
+                            DagpengerVedtakHentetHendelse(
+                                saksbehandlerNavIdent = call.clientId(),
+                                request = request,
+                                response = response,
+                            ),
+                        )
+
+                        call.respond(HttpStatusCode.OK, response)
+                    } catch (e: BadRequestException) {
+                        defaultLogger.error("Kunne ikke lese innholdet i forespørselen om vedtak. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om vedtak. Detaljer:" }
+                        call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om vedtak")
+                    } catch (e: Exception) {
+                        defaultLogger.error("Kunne ikke hente vedtak. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke hente vedtak. Detaljer:" }
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente vedtak")
+                    }
                 }
             }
         }

@@ -19,6 +19,7 @@ abstract class AbstractE2ETest {
     @BeforeAll
     fun setupServer() {
         System.setProperty("DP_PROXY_CLIENT_MAX_RETRIES", "1")
+        System.setProperty("DP_INNSYN_SCOPE", "api://test.teamdagpenger.dp-innsyn/.default")
         TestApplication.setup()
 
         proxyMockServer =

@@ -6,6 +6,8 @@ import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
 import no.nav.dagpenger.aktivitetslogg.IAktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.models.SoknadDTO
+import no.nav.dagpenger.datadeling.models.VedtakDTO
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
@@ -80,6 +82,34 @@ class DagpengerPeriodeSpørringHendelse(
         saksbehandlerNavIdent = saksbehandlerNavIdent,
         auditMelding = "Spør om dagpenger periode",
         auditOperasjon = AuditOperasjon.CREATE,
+    ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
+}
+
+class DagpengerSøknaderHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: DatadelingRequest,
+    val response: List<SoknadDTO>,
+) : AuditHendelse(
+        ident = request.personIdent,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut dagpenger søknader",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
+    ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
+}
+
+class DagpengerVedtakHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: DatadelingRequest,
+    val response: List<VedtakDTO>,
+) : AuditHendelse(
+        ident = request.personIdent,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut dagpenger vedtak",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
     ) {
     override fun kontekst(): Map<String, String> = emptyMap()
 }
