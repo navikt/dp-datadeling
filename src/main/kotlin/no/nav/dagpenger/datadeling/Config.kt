@@ -82,6 +82,10 @@ internal object Config {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
     }
 
+    val dpInnsynTokenProvider by lazy {
+        azureAdTokenSupplier(properties[Key("DP_INNSYN_SCOPE", stringType)])
+    }
+
     val logger by lazy {
         when (isLocalEnvironment) {
             true -> {

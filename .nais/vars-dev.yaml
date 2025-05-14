@@ -7,6 +7,7 @@ ingresses:
   - https://dp-datadeling.intern.dev.nav.no
 dpProxyHost: dp-proxy.dev-fss-pub.nais.io
 dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default
+dpInnsynScope: api://dev-gcp.teamdagpenger.dp-innsyn/.default
 dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
 kafka_pool: nav-dev
 kafkaSporTopic: "pensjonsamhandling.public-sporingslogg-loggmeldingmottatt-q2"
