@@ -65,6 +65,12 @@ internal class KafkaLogger(
                 is DagpengerPerioderHentetHendelse ->
                     objectMapper.writeValueAsString(hendelse.response)
 
+                is DagpengerSøknaderHentetHendelse ->
+                    objectMapper.writeValueAsString(hendelse.response)
+
+                is DagpengerVedtakHentetHendelse ->
+                    objectMapper.writeValueAsString(hendelse.response)
+
                 is DagpengerPeriodeSpørringHendelse -> null
             }
         val request: String? =
@@ -73,6 +79,12 @@ internal class KafkaLogger(
                     hendelse.ressurs.request.toString()
 
                 is DagpengerPerioderHentetHendelse ->
+                    hendelse.request.toString()
+
+                is DagpengerSøknaderHentetHendelse ->
+                    hendelse.request.toString()
+
+                is DagpengerVedtakHentetHendelse ->
                     hendelse.request.toString()
 
                 is DagpengerPeriodeSpørringHendelse -> null

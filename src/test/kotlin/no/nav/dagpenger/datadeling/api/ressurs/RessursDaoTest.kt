@@ -3,13 +3,9 @@ package no.nav.dagpenger.datadeling.api.ressurs
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.Postgres.withMigratedDb
-import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
-import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
-import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.FEILET
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.FERDIG
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.OPPRETTET
-import no.nav.dagpenger.datadeling.api.ressurs.asQuery
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest

@@ -13,6 +13,7 @@ import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.service.InnsynService
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.service.ProxyClient
 
@@ -20,8 +21,9 @@ fun Application.datadelingApi(config: AppConfig = Config.appConfig) {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     konfigurerApi(appMicrometerRegistry, config)
 
-    val proxyClient = ProxyClient(Config.dpProxyUrl, Config.dpProxyTokenProvider)
+    val proxyClient = ProxyClient()
     val perioderService = PerioderService(proxyClient)
+    val innsynService = InnsynService()
 
     val leaderElector = LeaderElector(config)
     val ressursDao = RessursDao()
@@ -30,7 +32,7 @@ fun Application.datadelingApi(config: AppConfig = Config.appConfig) {
     routing {
         livenessRoutes(appMicrometerRegistry)
         afpPrivatRoutes(ressursService, perioderService)
-        dagpengerRoutes(perioderService)
+        dagpengerRoutes(perioderService, innsynService)
     }
 
     launch {

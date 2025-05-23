@@ -12,9 +12,7 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractE2ETest {
-    private lateinit var testServerRuntime: TestServerRuntime
     private lateinit var proxyMockServer: WireMockServer
-    protected val client get() = testServerRuntime.restClient()
 
     @BeforeAll
     fun setupServer() {
@@ -28,7 +26,6 @@ abstract class AbstractE2ETest {
                 System.setProperty("DP_PROXY_SCOPE", "nav:dagpenger:afpprivat.read")
             }
         Postgres.withMigratedDb()
-        testServerRuntime = TestServer().start()
     }
 
     @BeforeEach
@@ -38,7 +35,6 @@ abstract class AbstractE2ETest {
 
     @AfterAll
     fun tearDownServer() {
-        testServerRuntime.close()
         proxyMockServer.shutdownServer()
         TestApplication.teardown()
         System.clearProperty("DP_PROXY_CLIENT_MAX_RETRIES")
