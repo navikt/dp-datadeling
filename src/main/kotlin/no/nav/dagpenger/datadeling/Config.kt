@@ -33,7 +33,7 @@ internal object Config {
             mapOf(
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-datadeling-v1",
                 "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-                "KAFKA_EXTRA_TOPIC" to "teamdagpenger.arena.oppgave.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-q1",
+                "KAFKA_EXTRA_TOPIC" to "teamdagpenger.arena.oppgave.v1",
                 "KAFKA_RESET_POLICY" to "latest",
                 "DP_DATADELING_URL" to "http://localhost",
                 "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
