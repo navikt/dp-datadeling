@@ -11,11 +11,8 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.TestApplication.issueAzureToken
 import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestApplication
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
-import no.nav.dagpenger.datadeling.models.KanalDTO
-import no.nav.dagpenger.datadeling.models.SoknadDTO
-import no.nav.dagpenger.datadeling.models.SoknadstypeDTO
-import no.nav.dagpenger.datadeling.models.StatusDTO
-import no.nav.dagpenger.datadeling.models.VedtakDTO
+import no.nav.dagpenger.datadeling.model.Søknad
+import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.service.InnsynService
 import no.nav.dagpenger.datadeling.service.PerioderService
@@ -33,6 +30,7 @@ import no.nav.dagpenger.kontrakter.datadeling.Periode
 import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
 import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_PERMITTERING_ORDINAER
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -169,8 +167,22 @@ class DagpengerRoutesTest {
 
         val response =
             listOf(
-                SoknadDTO(UUID.randomUUID(), "1", "2", KanalDTO.Digital, "", SoknadstypeDTO.NySøknad),
-                SoknadDTO(UUID.randomUUID(), "2", "3", KanalDTO.Digital, "", SoknadstypeDTO.Gjenopptak),
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "1",
+                    "2",
+                    Søknad.SøknadsType.NySøknad,
+                    Søknad.Kanal.Digital,
+                    LocalDateTime.now(),
+                ),
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "2",
+                    "3",
+                    Søknad.SøknadsType.Gjenopptak,
+                    Søknad.Kanal.Digital,
+                    LocalDateTime.now(),
+                ),
             )
         coEvery { innsynService.hentSoknader(any()) } returns response
 
@@ -208,8 +220,21 @@ class DagpengerRoutesTest {
 
         val response =
             listOf(
-                VedtakDTO("1", "2", StatusDTO.AVSLÅTT, "", "", ""),
-                VedtakDTO("2", "3", StatusDTO.INNVILGET, "", ""),
+                Vedtak(
+                    "1",
+                    "2",
+                    Vedtak.Status.AVSLÅTT,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                ),
+                Vedtak(
+                    "2",
+                    "3",
+                    Vedtak.Status.INNVILGET,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                ),
             )
         coEvery { innsynService.hentVedtak(any()) } returns response
 

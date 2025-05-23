@@ -1,6 +1,7 @@
 package no.nav.dagpenger.datadeling
 
 import com.zaxxer.hikari.HikariDataSource
+import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder
 import org.flywaydb.core.internal.configuration.ConfigUtils
 import org.testcontainers.containers.PostgreSQLContainer
 

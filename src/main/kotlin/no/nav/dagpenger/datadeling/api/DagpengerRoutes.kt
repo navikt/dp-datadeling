@@ -13,8 +13,8 @@ import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.datadeling.models.SoknadDTO
-import no.nav.dagpenger.datadeling.models.VedtakDTO
+import no.nav.dagpenger.datadeling.model.Søknad
+import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.datadeling.service.InnsynService
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
@@ -68,7 +68,7 @@ fun Route.dagpengerRoutes(
                     try {
                         val request = call.receive<DatadelingRequest>()
 
-                        val response: List<SoknadDTO> = innsynService.hentSoknader(request)
+                        val response: List<Søknad> = innsynService.hentSoknader(request)
 
                         auditLogger.log(
                             DagpengerSøknaderHentetHendelse(
@@ -96,7 +96,7 @@ fun Route.dagpengerRoutes(
                     try {
                         val request = call.receive<DatadelingRequest>()
 
-                        val response: List<VedtakDTO> = innsynService.hentVedtak(request)
+                        val response: List<Vedtak> = innsynService.hentVedtak(request)
 
                         auditLogger.log(
                             DagpengerVedtakHentetHendelse(

@@ -68,7 +68,7 @@ class AfpPrivatRoutesTest {
                 .testPost("/dagpenger/datadeling/v1/periode", enDatadelingRequest(), issueMaskinportenToken())
                 .apply { assertEquals(HttpStatusCode.Created, this.status) }
                 .bodyAsText()
-                .apply { assertEquals("http://localhost:8080/dagpenger/datadeling/v1/periode/${ressurs.uuid}", this) }
+                .apply { assertEquals("http://localhost/dagpenger/datadeling/v1/periode/${ressurs.uuid}", this) }
         }
 
     @Test

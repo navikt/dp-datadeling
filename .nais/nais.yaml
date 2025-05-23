@@ -40,8 +40,6 @@ spec:
           namespace: nais
           cluster: dev-gcp
     outbound:
-      rules:
-        - application: dp-innsyn
       external:
         - host: {{ dpProxyHost }}
   leaderElection: true
@@ -52,8 +50,6 @@ spec:
       value: https://{{ dpProxyHost }}
     - name: DP_PROXY_SCOPE
       value: {{ dpProxyScope }}
-    - name: DP_INNSYN_SCOPE
-      value: {{ dpInnsynScope }}
     - name: DP_DATADELING_URL
       value: https://{{ dpDatadelingHost }}
     - name: KAFKA_SPOR_TOPIC
