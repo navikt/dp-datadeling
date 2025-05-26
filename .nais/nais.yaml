@@ -7,7 +7,7 @@ metadata:
     team: teamdagpenger
 
 spec:
-  image: {{ image }}
+  image: "{{ image }}"
   port: 8080
   liveness:
     path: /internal/liveness
@@ -25,10 +25,10 @@ spec:
     max: 4
   resources:
     limits:
-      memory: {{ limitsMemory }}
+      memory: "{{ limitsMemory }}"
     requests:
-      memory: {{ requestsMemory }}
-      cpu: {{ requestsCpu }}
+      memory: "{{ requestsMemory }}"
+      cpu: "{{ requestsCpu }}"
   ingresses:
   {{#each ingresses as |url|}}
       - {{ url }}
@@ -41,7 +41,7 @@ spec:
           cluster: dev-gcp
     outbound:
       external:
-        - host: {{ dpProxyHost }}
+        - host: "{{ dpProxyHost }}"
   leaderElection: true
   secureLogs:
     enabled: true
@@ -49,18 +49,18 @@ spec:
     - name: DP_PROXY_URL
       value: https://{{ dpProxyHost }}
     - name: DP_PROXY_SCOPE
-      value: {{ dpProxyScope }}
+      value: "{{ dpProxyScope }}"
     - name: DP_DATADELING_URL
       value: https://{{ dpDatadelingHost }}
     - name: KAFKA_SPOR_TOPIC
-      value: {{ kafkaSporTopic }}
+      value: "{{ kafkaSporTopic }}"
 
   azure:
     application:
       enabled: true
       allowAllUsers: true
   kafka:
-    pool: {{ kafka_pool }}
+    pool: "{{ kafka_pool }}"
   maskinporten:
     enabled: true
     scopes:
@@ -88,7 +88,7 @@ spec:
           day: 4
           hour: 3
         pointInTimeRecovery: false
-        tier: {{ db_tier }}
+        tier: "{{ db_tier }}"
         type: POSTGRES_15
         #cascadingDelete: true # DETTE ER EN DESTRUKTIV OPERASJON! cascadingDelete=true sletter db-instans hvis appen slettes
         # OBS! Man kan ikke opprette, slette og opprette instance igjen med en gang:
