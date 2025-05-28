@@ -1,7 +1,7 @@
 package no.nav.dagpenger.datadeling
 
 import com.natpryce.konfig.ConfigurationMap
-import com.natpryce.konfig.ConfigurationProperties
+import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.intType
@@ -10,7 +10,7 @@ import com.natpryce.konfig.stringType
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
-import no.nav.dagpenger.datadeling.PostgresDataSourceBuilder.dataSource
+import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
 import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
@@ -31,15 +31,29 @@ internal object Config {
     private val defaultProperties =
         ConfigurationMap(
             mapOf(
-                "DP_DATADELING_URL" to "http://localhost:8080",
+                "KAFKA_CONSUMER_GROUP_ID" to "dp-datadeling-v1",
+                "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
+                "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-q1",
+                "KAFKA_RESET_POLICY" to "latest",
+                "DP_DATADELING_URL" to "http://localhost",
                 "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
             ),
         )
 
+    private val prodProperties =
+        ConfigurationMap(
+            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-p",
+        )
+
     val datasource: DataSource by lazy { dataSource }
 
-    val properties =
-        ConfigurationProperties.systemProperties() overriding EnvironmentVariables() overriding defaultProperties
+    val properties by lazy {
+        val envProperties = systemProperties() overriding EnvironmentVariables()
+        when (envProperties.getOrNull(Key("NAIS_CLUSTER_NAME", stringType))) {
+            "prod-gcp" -> envProperties overriding prodProperties overriding defaultProperties
+            else -> envProperties overriding defaultProperties
+        }
+    }
 
     val appConfig: AppConfig by lazy {
         AppConfig(
@@ -80,10 +94,6 @@ internal object Config {
 
     val dpProxyTokenProvider by lazy {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
-    }
-
-    val dpInnsynTokenProvider by lazy {
-        azureAdTokenSupplier(properties[Key("DP_INNSYN_SCOPE", stringType)])
     }
 
     val logger by lazy {
@@ -128,6 +138,11 @@ internal object Config {
     private fun azureAdTokenSupplier(scope: String): () -> String =
         {
             runBlocking { azureAdClient.clientCredentials(scope).access_token }!!
+        }
+
+    fun asMap(): Map<String, String> =
+        properties.list().reversed().fold(emptyMap()) { map, pair ->
+            map + pair.second
         }
 }
 

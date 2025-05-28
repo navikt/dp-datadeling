@@ -52,6 +52,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.json)
+    testImplementation(libs.rapids.and.rivers.test)
     testImplementation("com.github.tomakehurst:wiremock-standalone:$wiremockVersion")
     testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
 }

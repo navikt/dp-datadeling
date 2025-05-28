@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling
+package no.nav.dagpenger.datadeling.db
 
 import ch.qos.logback.core.util.OptionHelper.getEnv
 import ch.qos.logback.core.util.OptionHelper.getSystemProperty
