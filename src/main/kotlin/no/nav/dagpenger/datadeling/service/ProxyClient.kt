@@ -14,7 +14,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
-import no.nav.dagpenger.datadeling.Config.dpProxyTokenProvider
 import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
@@ -22,8 +21,8 @@ import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 class ProxyClient(
-    private val dpProxyBaseUrl: String,
-    private val tokenProvider: () -> String = dpProxyTokenProvider,
+    private val dpProxyBaseUrl: String = Config.dpProxyUrl,
+    private val tokenProvider: () -> String = Config.dpProxyTokenProvider,
 ) : PerioderClient {
     override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
