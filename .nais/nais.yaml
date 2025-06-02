@@ -93,3 +93,11 @@ spec:
         #cascadingDelete: true # DETTE ER EN DESTRUKTIV OPERASJON! cascadingDelete=true sletter db-instans hvis appen slettes
         # OBS! Man kan ikke opprette, slette og opprette instance igjen med en gang:
         # man kan ikke gjenbruke samme instansnavn på 7 dager. Dette er en "feature" i gcp.
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
