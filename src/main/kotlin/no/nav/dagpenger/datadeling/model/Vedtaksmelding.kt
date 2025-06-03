@@ -25,11 +25,11 @@ internal class Vedtaksmelding(
         if (packet["tokens"].isMissingOrNull()) packet["FODSELSNR"].asText() else packet["tokens"]["FODSELSNR"].asText()
     internal val vedtakId = packet["after"]["VEDTAK_ID"].asText()
     internal val fagsakId = packet["after"]["SAK_ID"].asText()
-    internal val status
+    internal val utfall
         get() =
             when (packet["after"]["UTFALLKODE"].asText()) {
-                "JA" -> Vedtak.Status.INNVILGET
-                "NEI" -> Vedtak.Status.AVSLÅTT
+                "JA" -> Vedtak.Utfall.INNVILGET
+                "NEI" -> Vedtak.Utfall.AVSLÅTT
                 else -> throw IllegalArgumentException("Ukjent utfallskode")
             }
     internal val fattet = packet["op_ts"].asArenaDato()

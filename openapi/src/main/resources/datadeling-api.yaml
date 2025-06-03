@@ -263,7 +263,7 @@ components:
 
     Kanal:
       type: string
-      description: Søknadstype
+      description: Kanal
       enum:
         - Digital
         - Papir
@@ -279,37 +279,41 @@ components:
       required:
         - vedtakId
         - fagsakId
-        - status
-        - datoFattet
-        - fraDato
+        - utfall
+        - stønadType
+        - fraOgMedDato
       properties:
         vedtakId:
           type: string
         fagsakId:
           type: string
-        status:
-          $ref: '#/components/schemas/Status'
-        datoFattet:
+        utfall:
+          $ref: '#/components/schemas/Utfall'
+        stønadType:
+          $ref: '#/components/schemas/StonadType'
+        fraOgMedDato:
           type: string
-          format: date-time
-          description: Tidspunkt for vedtak
-        fraDato:
+          format: date
+          description: Dato som vedtak gjelder fra og med
+        tilOgMedDato:
           type: string
-          format: date-time
-          description: Tidspunkt som vedtak gjelder fra
-        tilDato:
-          type: string
-          format: date-time
-          description: Tidspunkt som vedtak gjelder til
+          format: date
+          description: Dato som vedtak gjelder til og med
 
-    Status:
+    Utfall:
       type: string
-      description: Vedtaksstatus
+      description: Utfall
       enum:
         - INNVILGET
         - AVSLÅTT
-        - STANS
-        - ENDRING
+
+    StonadType:
+      type: string
+      description: Stønadstype
+      enum:
+        - DAGPENGER_ARBEIDSSOKER_ORDINAER
+        - DAGPENGER_PERMITTERING_ORDINAER
+        - DAGPENGER_PERMITTERING_FISKEINDUSTRI
 
     Vedtaksliste:
       type: array

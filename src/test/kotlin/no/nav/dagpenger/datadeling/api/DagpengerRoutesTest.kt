@@ -14,8 +14,9 @@ import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.datadeling.service.InnsynService
 import no.nav.dagpenger.datadeling.service.PerioderService
+import no.nav.dagpenger.datadeling.service.SøknaderService
+import no.nav.dagpenger.datadeling.service.VedtakService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
@@ -37,7 +38,8 @@ import kotlin.test.assertEquals
 
 class DagpengerRoutesTest {
     private val perioderService: PerioderService = mockk(relaxed = true)
-    private val innsynService: InnsynService = mockk(relaxed = true)
+    private val søknaderService: SøknaderService = mockk(relaxed = true)
+    private val vedtakService: VedtakService = mockk(relaxed = true)
 
     @Test
     fun `returnerer 401 uten token for perioder`() =
@@ -184,7 +186,7 @@ class DagpengerRoutesTest {
                     LocalDateTime.now(),
                 ),
             )
-        coEvery { innsynService.hentSoknader(any()) } returns response
+        coEvery { søknaderService.hentSoknader(any()) } returns response
 
         testPerioderEndpoint(logger) {
             client.testPost(
@@ -223,20 +225,21 @@ class DagpengerRoutesTest {
                 Vedtak(
                     "1",
                     "2",
-                    Vedtak.Status.AVSLÅTT,
-                    LocalDateTime.now(),
-                    LocalDateTime.now(),
-                    LocalDateTime.now(),
+                    Vedtak.Utfall.AVSLÅTT,
+                    DAGPENGER_PERMITTERING_ORDINAER,
+                    LocalDate.now(),
+                    LocalDate.now(),
                 ),
                 Vedtak(
                     "2",
                     "3",
-                    Vedtak.Status.INNVILGET,
-                    LocalDateTime.now(),
-                    LocalDateTime.now(),
+                    Vedtak.Utfall.INNVILGET,
+                    DAGPENGER_PERMITTERING_ORDINAER,
+                    LocalDate.now(),
+                    LocalDate.now(),
                 ),
             )
-        coEvery { innsynService.hentVedtak(any()) } returns response
+        coEvery { vedtakService.hentVedtak(any()) } returns response
 
         testPerioderEndpoint(logger) {
             client.testPost(
@@ -262,7 +265,7 @@ class DagpengerRoutesTest {
         withMockAuthServerAndTestApplication(moduleFunction = {
             konfigurerApi(appConfig = Config.appConfig)
         }) {
-            routing { dagpengerRoutes(perioderService, innsynService, auditLogger) }
+            routing { dagpengerRoutes(perioderService, søknaderService, vedtakService, auditLogger) }
             block()
         }
     }

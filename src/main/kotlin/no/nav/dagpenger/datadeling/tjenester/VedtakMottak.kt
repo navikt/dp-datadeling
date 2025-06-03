@@ -9,7 +9,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import mu.withLoggingContext
-import no.nav.dagpenger.datadeling.db.VedtakRepository
 import no.nav.dagpenger.datadeling.model.Vedtaksmelding
 
 private val logg = KotlinLogging.logger {}
@@ -17,7 +16,6 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakMottak")
 
 internal class VedtakMottak(
     rapidsConnection: RapidsConnection,
-    private val vedtakRepository: VedtakRepository = VedtakRepository(),
 ) : River.PacketListener {
     init {
         River(rapidsConnection)
@@ -59,16 +57,6 @@ internal class VedtakMottak(
         ) {
             logg.info { "Mottok nytt vedtak" }
             sikkerlogg.info { "Mottok nytt vedtak for person ${vedtaksmelding.ident}: ${packet.toJson()}" }
-
-            vedtakRepository.lagreVedtak(
-                vedtaksmelding.ident,
-                vedtaksmelding.vedtakId,
-                vedtaksmelding.fagsakId,
-                vedtaksmelding.status,
-                vedtaksmelding.fattet,
-                vedtaksmelding.fraDato,
-                vedtaksmelding.tilDato,
-            )
 
             // TODO: Konverter til en "ekstern"-hendelse og videresend til RnR
         }

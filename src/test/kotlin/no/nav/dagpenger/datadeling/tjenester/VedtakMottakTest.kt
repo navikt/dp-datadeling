@@ -1,23 +1,14 @@
 package no.nav.dagpenger.datadeling.tjenester
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import no.nav.dagpenger.datadeling.db.VedtakRepository
-import no.nav.dagpenger.datadeling.model.Vedtak
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class VedtakMottakTest {
     private val testRapid = TestRapid()
-    private val vedtakRepository = mockk<VedtakRepository>()
 
     init {
-        every { vedtakRepository.lagreVedtak(any(), any(), any(), any(), any(), any(), any()) } returns 1
-
-        VedtakMottak(testRapid, vedtakRepository)
+        VedtakMottak(testRapid)
     }
 
     @BeforeEach
@@ -29,34 +20,14 @@ class VedtakMottakTest {
     fun `vi kan motta vedtak (v1)`() {
         testRapid.sendTestMessage(vedtakJsonV1)
 
-        verify {
-            vedtakRepository.lagreVedtak(
-                eq("01020312345"),
-                eq("29501880"),
-                eq("123"),
-                eq(Vedtak.Status.INNVILGET),
-                eq(LocalDateTime.parse("2020-04-07T14:31:08.840468")),
-                eq(LocalDateTime.parse("2018-03-05T00:00:00")),
-                null,
-            )
-        }
+        // TODO: Test når vi begynner å sende "eksterne"-hendelser videre
     }
 
     @Test
     fun `vi kan motta vedtak (v2)`() {
         testRapid.sendTestMessage(vedtakJsonV2)
 
-        verify {
-            vedtakRepository.lagreVedtak(
-                eq("01020312345"),
-                eq("29501880"),
-                eq("123"),
-                eq(Vedtak.Status.INNVILGET),
-                eq(LocalDateTime.parse("2021-11-12T08:31:33.092337")),
-                eq(LocalDateTime.parse("2018-03-05T00:00:00")),
-                eq(LocalDateTime.parse("2022-01-06T00:00:00")),
-            )
-        }
+        // TODO: Test når vi begynner å sende "eksterne"-hendelser videre
     }
 }
 

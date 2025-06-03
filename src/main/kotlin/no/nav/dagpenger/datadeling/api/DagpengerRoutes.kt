@@ -15,8 +15,9 @@ import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
-import no.nav.dagpenger.datadeling.service.InnsynService
 import no.nav.dagpenger.datadeling.service.PerioderService
+import no.nav.dagpenger.datadeling.service.SøknaderService
+import no.nav.dagpenger.datadeling.service.VedtakService
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
@@ -28,7 +29,8 @@ private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
-    innsynService: InnsynService,
+    søknaderService: SøknaderService,
+    vedtakService: VedtakService,
     auditLogger: Log = Config.logger,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
@@ -68,7 +70,7 @@ fun Route.dagpengerRoutes(
                     try {
                         val request = call.receive<DatadelingRequest>()
 
-                        val response: List<Søknad> = innsynService.hentSoknader(request)
+                        val response: List<Søknad> = søknaderService.hentSoknader(request)
 
                         auditLogger.log(
                             DagpengerSøknaderHentetHendelse(
@@ -96,7 +98,7 @@ fun Route.dagpengerRoutes(
                     try {
                         val request = call.receive<DatadelingRequest>()
 
-                        val response: List<Vedtak> = innsynService.hentVedtak(request)
+                        val response: List<Vedtak> = vedtakService.hentVedtak(request)
 
                         auditLogger.log(
                             DagpengerVedtakHentetHendelse(
