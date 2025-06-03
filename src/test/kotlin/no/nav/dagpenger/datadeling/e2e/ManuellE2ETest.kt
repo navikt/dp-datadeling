@@ -12,8 +12,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.append
 import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import org.junit.jupiter.api.Disabled
@@ -45,7 +47,11 @@ class ManuellE2ETest {
     @Disabled
     @Test
     fun bubba() {
-        runBlocking {
+        testApplication {
+            application {
+                datadelingApi()
+            }
+
             val request =
                 DatadelingRequest(
                     personIdent = "02929898071",

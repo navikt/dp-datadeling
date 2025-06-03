@@ -102,6 +102,44 @@ paths:
                 $ref: '#/components/schemas/DatadelingResponse'
       security:
         - azure: [ ]
+  /dagpenger/v1/soknader:
+    post:
+      description: |-
+        Returnerer søknader basert på innsendte data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Soknadsliste"
+      security:
+        - azure: [ ]
+  /dagpenger/v1/vedtak:
+    post:
+      description: |-
+        Returnerer vedtak basert på innsendte data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vedtaksliste"
+      security:
+        - azure: [ ]
 
 
 components:
@@ -186,6 +224,102 @@ components:
         - DAGPENGER_ARBEIDSSOKER_ORDINAER
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
+
+    Soknad:
+      type: object
+      required:
+        - søknadId
+        - journalpostId
+        - søknadsType
+        - skjemaKode
+        - kanal
+        - datoInnsendt
+      properties:
+        søknadId:
+          type: string
+          format: uuid
+          description: Søknad ID
+        journalpostId:
+          type: string
+          description: Journalpost ID
+        søknadstype:
+          $ref: '#/components/schemas/Soknadstype'
+        skjemaKode:
+          type: string
+          description: Skjemakode f.eks. NAV 04-16.03
+        kanal:
+          $ref: '#/components/schemas/Kanal'
+        datoInnsendt:
+          type: string
+          format: date-time
+          description: Tidspunkt for innsending
+
+    Soknadstype:
+      type: string
+      description: Søknadstype
+      enum:
+        - NySøknad
+        - Gjenopptak
+
+    Kanal:
+      type: string
+      description: Kanal
+      enum:
+        - Digital
+        - Papir
+
+    Soknadsliste:
+      type: array
+      description: Liste med søknader bruker har. Kan være en tom liste.
+      items:
+        $ref: '#/components/schemas/Soknad'
+
+    Vedtak:
+      type: object
+      required:
+        - vedtakId
+        - fagsakId
+        - utfall
+        - stønadType
+        - fraOgMedDato
+      properties:
+        vedtakId:
+          type: string
+        fagsakId:
+          type: string
+        utfall:
+          $ref: '#/components/schemas/Utfall'
+        stønadType:
+          $ref: '#/components/schemas/StonadType'
+        fraOgMedDato:
+          type: string
+          format: date
+          description: Dato som vedtak gjelder fra og med
+        tilOgMedDato:
+          type: string
+          format: date
+          description: Dato som vedtak gjelder til og med
+
+    Utfall:
+      type: string
+      description: Utfall
+      enum:
+        - INNVILGET
+        - AVSLÅTT
+
+    StonadType:
+      type: string
+      description: Stønadstype
+      enum:
+        - DAGPENGER_ARBEIDSSOKER_ORDINAER
+        - DAGPENGER_PERMITTERING_ORDINAER
+        - DAGPENGER_PERMITTERING_FISKEINDUSTRI
+
+    Vedtaksliste:
+      type: array
+      description: Liste med vedtak bruker har. Kan være en tom liste.
+      items:
+        $ref: '#/components/schemas/Vedtak'
 
   securitySchemes:
     maskinporten:

@@ -6,7 +6,6 @@ import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
-import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
@@ -23,10 +22,6 @@ fun Application.konfigurerApi(
     install(Authentication) {
         jwtAuth(name = "afpPrivat", config = appConfig.maskinporten)
         jwtAuth(name = "azure", config = appConfig.azure)
-    }
-
-    install(MicrometerMetrics) {
-        registry = appMicrometerRegistry
     }
 
     install(ContentNegotiation) {
