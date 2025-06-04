@@ -10,6 +10,8 @@ data class Vedtak(
     val stønadType: StønadType,
     val fraOgMedDato: LocalDate,
     val tilOgMedDato: LocalDate? = null,
+    val dagsats: Int? = null,
+    val barnetillegg: Int? = null,
 ) {
     enum class Utfall {
         INNVILGET,

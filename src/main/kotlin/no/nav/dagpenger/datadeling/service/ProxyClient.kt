@@ -10,13 +10,11 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.installRetryClient
-import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse

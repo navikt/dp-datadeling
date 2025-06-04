@@ -299,6 +299,10 @@ components:
           type: string
           format: date
           description: Dato som vedtak gjelder til og med
+        dagsats:
+          type: integer
+        barnetillegg:
+          type: integer
 
     Utfall:
       type: string

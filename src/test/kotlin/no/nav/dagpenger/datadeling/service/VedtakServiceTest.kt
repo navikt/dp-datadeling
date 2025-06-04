@@ -67,6 +67,7 @@ class VedtakServiceTest {
                         StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER,
                         LocalDate.now(),
                         LocalDate.now(),
+                        1111,
                     ),
                     Vedtak(
                         "VedtakId2",
@@ -75,6 +76,8 @@ class VedtakServiceTest {
                         StønadTypeDagpenger.DAGPENGER_PERMITTERING_FISKEINDUSTRI,
                         LocalDate.now(),
                         LocalDate.now(),
+                        2222,
+                        333,
                     ),
                 )
             coEvery { proxyClient.hentVedtak(any()) } returns vedtak
