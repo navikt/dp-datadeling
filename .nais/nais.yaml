@@ -39,6 +39,8 @@ spec:
         - application: azure-token-generator
           namespace: nais
           cluster: dev-gcp
+        - application: tilleggsstonader-integrasjoner
+          namespace: tilleggsstonader
     outbound:
       external:
         - host: "{{ dpProxyHost }}"
