@@ -35,7 +35,9 @@ info:
 
 servers:
   - url: https://dp-datadeling.ekstern.dev.nav.no
-    description: dev
+    description: dev for eksterne
+  - url: https://dp-datadeling.intern.dev.nav.no
+    description: dev for interne
   - url: https://www.nav.no/dagpenger/datadeling
     description: prod
 
