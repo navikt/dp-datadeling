@@ -38,11 +38,11 @@ servers:
     description: dev for eksterne
   - url: https://dp-datadeling.intern.dev.nav.no
     description: dev for interne
-  - url: https://www.nav.no/dagpenger/datadeling
+  - url: https://www.nav.no
     description: prod
 
 paths:
-  /dagpenger/v1/periode:
+  /dagpenger/datadeling/v1/periode:
     post:
       description: |-
         Opprett ny ressurs basert på innsendte data, returnerer URL til opprettede ressursen
@@ -85,7 +85,7 @@ paths:
                 $ref: '#/components/schemas/Ressurs'
       security:
         - maskinporten: [ ]
-  /dagpenger/v1/perioder:
+  /dagpenger/datadeling/v1/perioder:
     post:
       description: |-
         Returnerer perioder basert på innsendte data
@@ -104,7 +104,7 @@ paths:
                 $ref: '#/components/schemas/DatadelingResponse'
       security:
         - azure: [ ]
-  /dagpenger/v1/soknader:
+  /dagpenger/datadeling/v1/soknader:
     post:
       description: |-
         Returnerer søknader basert på innsendte data
@@ -123,7 +123,7 @@ paths:
                 $ref: "#/components/schemas/Soknadsliste"
       security:
         - azure: [ ]
-  /dagpenger/v1/vedtak:
+  /dagpenger/datadeling/v1/vedtak:
     post:
       description: |-
         Returnerer vedtak basert på innsendte data
