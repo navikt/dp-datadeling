@@ -41,6 +41,8 @@ spec:
           cluster: dev-gcp
         - application: tilleggsstonader-integrasjoner
           namespace: tilleggsstonader
+        - application: saas-proxy
+          namespace: teamcrm
     outbound:
       external:
         - host: "{{ dpProxyHost }}"
