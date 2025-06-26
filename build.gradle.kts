@@ -42,7 +42,7 @@ dependencies {
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
     implementation("no.nav.dagpenger:oauth2-klient:2025.04.26-14.51.bbf9ece5f5ec")
     implementation(libs.rapids.and.rivers)
-    implementation("no.nav.dagpenger:aktivitetslogg:20250624.31.bf07ce")
+    implementation("com.github.navikt:dp-aktivitetslogg:20250624.31.bf07ce")
     // Test
     testImplementation(libs.ktor.server.test.host)
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
