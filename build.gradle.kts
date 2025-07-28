@@ -3,7 +3,6 @@ project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
 val kontrakterVersion = "3.0_20240408122747_6eff346"
 val mockOauth2Version = "2.2.1"
 val wiremockVersion = "3.0.1"
-val testcontainersVersion = "1.19.2"
 
 plugins {
     id("common")
@@ -40,7 +39,7 @@ dependencies {
     // Nav
     implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
-    implementation("no.nav.dagpenger:oauth2-klient:2025.04.26-14.51.bbf9ece5f5ec")
+    implementation("no.nav.dagpenger:oauth2-klient:2025.07.23-08.30.31e64aee9725")
     implementation(libs.rapids.and.rivers)
     implementation("com.github.navikt:dp-aktivitetslogg:20250624.31.bf07ce")
     // Test
@@ -48,7 +47,7 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation(libs.testcontainer.postgresql)
-    testImplementation("org.testcontainers:kafka:1.21.2")
+    testImplementation("org.testcontainers:kafka:1.21.3")
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.json)
