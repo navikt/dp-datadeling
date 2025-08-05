@@ -26,6 +26,23 @@ suspend fun HttpClient.testPost(
     }
 }
 
+suspend fun HttpClient.testPostText(
+    path: String,
+    body: Any?,
+    token: String?,
+) = post(path) {
+    headers {
+        append(HttpHeaders.Accept, ContentType.Application.Json)
+        append(HttpHeaders.ContentType, ContentType.Text.Plain)
+        token?.let {
+            append(HttpHeaders.Authorization, "Bearer $token")
+        }
+    }
+    body?.let {
+        setBody(body)
+    }
+}
+
 suspend fun HttpClient.testGet(
     path: String,
     token: String?,

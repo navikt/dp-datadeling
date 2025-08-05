@@ -123,6 +123,28 @@ paths:
                 $ref: "#/components/schemas/Soknadsliste"
       security:
         - azure: [ ]
+  /dagpenger/datadeling/v1/siste_soknad:
+    post:
+      description: |-
+        Returnerer siste innsendt søknad
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: Personens fødselsnummer eller D-nummer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Soknad"
+        404:
+          description: Det finnes ikke søknader
+      security:
+        - azure: [ ]
   /dagpenger/datadeling/v1/vedtak:
     post:
       description: |-

@@ -85,6 +85,61 @@ internal class SøknadRepositoryTest {
         }
     }
 
+    @Test
+    fun `skal hente siste søknad`() {
+        withMigratedDb {
+            val ident = "01020312345"
+
+            val søknad1 =
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "journalpostId1",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Søknad.Kanal.Digital,
+                    LocalDateTime.now().minusDays(14).truncatedTo(ChronoUnit.MICROS),
+                )
+
+            repository.lagreSøknad(
+                ident,
+                søknad1.søknadId,
+                søknad1.journalpostId,
+                søknad1.skjemaKode,
+                søknad1.søknadsType,
+                søknad1.kanal,
+                søknad1.datoInnsendt,
+            )
+
+            repository.hentSisteSøknad(ident).also {
+                assertEquals(søknad1, it)
+            }
+
+            val søknad2 =
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "journalpostId2",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Søknad.Kanal.Digital,
+                    LocalDateTime.now().truncatedTo(ChronoUnit.MICROS),
+                )
+
+            repository.lagreSøknad(
+                ident,
+                søknad2.søknadId,
+                søknad2.journalpostId,
+                søknad2.skjemaKode,
+                søknad2.søknadsType,
+                søknad2.kanal,
+                søknad2.datoInnsendt,
+            )
+
+            repository.hentSisteSøknad(ident).also {
+                assertEquals(søknad2, it)
+            }
+        }
+    }
+
     private fun assertSøknadEquals(
         expected: Søknad,
         result: Søknad,

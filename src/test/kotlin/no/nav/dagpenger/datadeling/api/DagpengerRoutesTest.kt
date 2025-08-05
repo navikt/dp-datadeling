@@ -19,11 +19,13 @@ import no.nav.dagpenger.datadeling.service.SøknaderService
 import no.nav.dagpenger.datadeling.service.VedtakService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
+import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.datadeling.testPost
+import no.nav.dagpenger.datadeling.testPostText
 import no.nav.dagpenger.datadeling.testutil.FNR
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
@@ -58,6 +60,14 @@ class DagpengerRoutesTest {
         }
 
     @Test
+    fun `returnerer 401 uten token for siste soknad`() =
+        testPerioderEndpoint {
+            client.testPost("/dagpenger/datadeling/v1/siste_soknad", enDatadelingRequest(), token = null).apply {
+                assertEquals(HttpStatusCode.Unauthorized, this.status)
+            }
+        }
+
+    @Test
     fun `returnerer 401 uten token for vedtak`() =
         testPerioderEndpoint {
             client.testPost("/dagpenger/datadeling/v1/vedtak", enDatadelingRequest(), token = null).apply {
@@ -77,6 +87,14 @@ class DagpengerRoutesTest {
     fun `returnerer 400 hvis ikke kan prosessere request for soknader`() =
         testPerioderEndpoint {
             client.testPost("/dagpenger/datadeling/v1/soknader", "", issueAzureToken()).apply {
+                assertEquals(HttpStatusCode.BadRequest, this.status)
+            }
+        }
+
+    @Test
+    fun `returnerer 400 hvis ikke kan prosessere request for siste søknad`() =
+        testPerioderEndpoint {
+            client.testPostText("/dagpenger/datadeling/v1/siste_soknad", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
         }
@@ -186,7 +204,7 @@ class DagpengerRoutesTest {
                     LocalDateTime.now(),
                 ),
             )
-        coEvery { søknaderService.hentSoknader(any()) } returns response
+        coEvery { søknaderService.hentSøknader(any()) } returns response
 
         testPerioderEndpoint(logger) {
             client.testPost(
@@ -200,6 +218,45 @@ class DagpengerRoutesTest {
                 it.shouldBeInstanceOf<DagpengerSøknaderHentetHendelse>()
                 it.ident() shouldBe FNR
                 it.request shouldBe request
+                it.response shouldBe response
+            }
+        }
+    }
+
+    @Test
+    fun `Audit og Sporing logger ved henting av siste søknad`() {
+        val logger =
+            object : Log {
+                val hendelser = mutableListOf<AuditHendelse>()
+
+                override fun log(hendelse: AuditHendelse) {
+                    hendelser.add(hendelse)
+                }
+            }
+
+        val response =
+            Søknad(
+                UUID.randomUUID().toString(),
+                "1",
+                "2",
+                Søknad.SøknadsType.NySøknad,
+                Søknad.Kanal.Digital,
+                LocalDateTime.now(),
+            )
+        coEvery { søknaderService.hentSisteSøknad(any()) } returns response
+
+        testPerioderEndpoint(logger) {
+            client.testPostText(
+                "/dagpenger/datadeling/v1/siste_soknad",
+                FNR,
+                issueAzureToken(),
+            )
+
+            logger.hendelser.size shouldBe 1
+            logger.hendelser.first().let {
+                it.shouldBeInstanceOf<DagpengerSisteSøknadHentetHendelse>()
+                it.ident() shouldBe FNR
+                it.request shouldBe FNR
                 it.response shouldBe response
             }
         }

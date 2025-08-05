@@ -6,6 +6,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.db.SøknadRepository
 import no.nav.dagpenger.datadeling.model.Søknad
+import no.nav.dagpenger.datadeling.testutil.FNR
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.januar
 import org.junit.jupiter.api.AfterEach
@@ -24,18 +25,28 @@ class SøknaderServiceTest {
     }
 
     @Test
-    fun `ingen søknader`() =
+    fun `hentSøknader returnerer en tom liste når det ikke finnes søknader`() =
         runTest {
-            every { søknadRepository.hentSøknaderFor(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
+            every {
+                søknadRepository.hentSøknaderFor(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns emptyList()
 
             val request = enDatadelingRequest(1.januar()..10.januar())
-            val response = søknaderService.hentSoknader(request)
+            val response = søknaderService.hentSøknader(request)
 
             assertEquals(emptyList<Søknad>(), response)
         }
 
     @Test
-    fun `én søknad`() =
+    fun `hentSøknader returnerer en liste med ett element når det finnes én søknad`() =
         runTest {
             val søknader =
                 listOf(
@@ -51,13 +62,13 @@ class SøknaderServiceTest {
             every { søknadRepository.hentSøknaderFor(any(), any(), any(), any(), any(), any(), any()) } returns søknader
 
             val request = enDatadelingRequest(1.januar()..10.januar())
-            val response = søknaderService.hentSoknader(request)
+            val response = søknaderService.hentSøknader(request)
 
             assertEquals(søknader, response)
         }
 
     @Test
-    fun `flere søknader`() =
+    fun `hentSøknader returnerer en liste med flere søknader`() =
         runTest {
             val søknader =
                 listOf(
@@ -81,8 +92,35 @@ class SøknaderServiceTest {
             every { søknadRepository.hentSøknaderFor(any(), any(), any(), any(), any(), any(), any()) } returns søknader
 
             val request = enDatadelingRequest(1.januar()..10.januar())
-            val response = søknaderService.hentSoknader(request)
+            val response = søknaderService.hentSøknader(request)
 
             assertEquals(søknader, response)
+        }
+
+    @Test
+    fun `hentSisteSøknad returnerer null når det ikke finnes søknader`() =
+        runTest {
+            every { søknadRepository.hentSisteSøknad(any()) } returns null
+
+            val sisteSoknad = søknaderService.hentSisteSøknad(FNR)
+            assertEquals(null, sisteSoknad)
+        }
+
+    @Test
+    fun `hentSisteSøknad returnerer søknad når den finnes`() =
+        runTest {
+            val søknad =
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "12345",
+                    "Skjemakode",
+                    Søknad.SøknadsType.NySøknad,
+                    Søknad.Kanal.Digital,
+                    LocalDateTime.now(),
+                )
+            every { søknadRepository.hentSisteSøknad(any()) } returns søknad
+
+            val sisteSoknad = søknaderService.hentSisteSøknad(FNR)
+            assertEquals(søknad, sisteSoknad)
         }
 }
