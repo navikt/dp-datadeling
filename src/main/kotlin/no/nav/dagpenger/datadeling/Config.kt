@@ -28,6 +28,8 @@ import javax.sql.DataSource
 private val log = KotlinLogging.logger {}
 
 internal object Config {
+    val IDENT_REGEX = Regex("^[0-9]{11}$")
+
     private val defaultProperties =
         ConfigurationMap(
             mapOf(

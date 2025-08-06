@@ -11,6 +11,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
+import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.model.Søknad
@@ -98,7 +99,7 @@ fun Route.dagpengerRoutes(
                 post {
                     try {
                         val ident = call.receive<String>()
-                        if (Regex("^[0-9]{11}$").matches(ident).not()) {
+                        if (IDENT_REGEX.matches(ident).not()) {
                             throw BadRequestException("Fødselsnummer/D-nummer må inneholde 11 siffer")
                         }
 
