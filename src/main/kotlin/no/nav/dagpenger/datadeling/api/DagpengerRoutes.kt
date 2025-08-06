@@ -11,6 +11,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
+import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.model.Søknad
@@ -19,6 +20,7 @@ import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.service.SøknaderService
 import no.nav.dagpenger.datadeling.service.VedtakService
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
+import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
@@ -70,7 +72,7 @@ fun Route.dagpengerRoutes(
                     try {
                         val request = call.receive<DatadelingRequest>()
 
-                        val response: List<Søknad> = søknaderService.hentSoknader(request)
+                        val response: List<Søknad> = søknaderService.hentSøknader(request)
 
                         auditLogger.log(
                             DagpengerSøknaderHentetHendelse(
@@ -89,6 +91,44 @@ fun Route.dagpengerRoutes(
                         defaultLogger.error("Kunne ikke hente søknader. Se sikkerlogg for detaljer")
                         sikkerlogger.error(e) { "Kunne ikke hente søknader. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente søknader")
+                    }
+                }
+            }
+
+            route("/siste_soknad") {
+                post {
+                    try {
+                        val ident = call.receive<String>()
+                        if (IDENT_REGEX.matches(ident).not()) {
+                            throw BadRequestException("Fødselsnummer/D-nummer må inneholde 11 siffer")
+                        }
+
+                        val søknad = søknaderService.hentSisteSøknad(ident)
+
+                        auditLogger.log(
+                            DagpengerSisteSøknadHentetHendelse(
+                                saksbehandlerNavIdent = call.clientId(),
+                                request = ident,
+                                response = søknad,
+                            ),
+                        )
+
+                        if (søknad == null) {
+                            call.respond(HttpStatusCode.NotFound)
+                        } else {
+                            call.respond(HttpStatusCode.OK, søknad)
+                        }
+                    } catch (e: BadRequestException) {
+                        defaultLogger.error("Kunne ikke lese ident fra forespørselen om siste søknad. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke lese ident fra forespørselen om siste søknad. Detaljer:" }
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            "Kunne ikke lese ident fra forespørselen om siste søknad",
+                        )
+                    } catch (e: Exception) {
+                        defaultLogger.error("Kunne ikke hente siste søknad. Se sikkerlogg for detaljer")
+                        sikkerlogger.error(e) { "Kunne ikke hente siste søknad. Detaljer:" }
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente siste søknad")
                     }
                 }
             }

@@ -68,6 +68,9 @@ internal class KafkaLogger(
                 is DagpengerSøknaderHentetHendelse ->
                     objectMapper.writeValueAsString(hendelse.response)
 
+                is DagpengerSisteSøknadHentetHendelse ->
+                    objectMapper.writeValueAsString(hendelse.response)
+
                 is DagpengerVedtakHentetHendelse ->
                     objectMapper.writeValueAsString(hendelse.response)
 
@@ -83,6 +86,9 @@ internal class KafkaLogger(
 
                 is DagpengerSøknaderHentetHendelse ->
                     hendelse.request.toString()
+
+                is DagpengerSisteSøknadHentetHendelse ->
+                    hendelse.request
 
                 is DagpengerVedtakHentetHendelse ->
                     hendelse.request.toString()
