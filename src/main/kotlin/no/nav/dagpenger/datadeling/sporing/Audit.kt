@@ -100,6 +100,20 @@ class DagpengerSøknaderHentetHendelse(
     override fun kontekst(): Map<String, String> = emptyMap()
 }
 
+class DagpengerSisteSøknadHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: String,
+    val response: Søknad?,
+) : AuditHendelse(
+        ident = request,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut siste søknad om dagpenger",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
+    ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
+}
+
 class DagpengerVedtakHentetHendelse(
     saksbehandlerNavIdent: String,
     val request: DatadelingRequest,

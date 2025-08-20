@@ -71,6 +71,25 @@ class SøknadRepository {
         )
     }
 
+    fun hentSisteSøknad(ident: String) =
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(
+                    //language=PostgreSQL
+                    """
+                    SELECT *
+                    FROM soknad s
+                    WHERE s.ident = :ident
+                    ORDER BY s.dato_innsendt DESC
+                    LIMIT 1
+                    """.trimIndent(),
+                    mapOf(
+                        "ident" to ident.param(),
+                    ),
+                ).map { row -> row.toSøknad() }.asSingle,
+            )
+        }
+
     private fun Row.toSøknad() =
         Søknad(
             søknadId = stringOrNull("soknad_id"),
