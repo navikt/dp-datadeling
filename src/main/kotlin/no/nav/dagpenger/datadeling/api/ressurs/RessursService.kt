@@ -1,12 +1,12 @@
 package no.nav.dagpenger.datadeling.api.ressurs
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.RessursConfig
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse

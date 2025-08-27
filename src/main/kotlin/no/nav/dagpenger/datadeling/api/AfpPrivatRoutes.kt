@@ -1,5 +1,6 @@
 package no.nav.dagpenger.datadeling.api
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.swagger.swaggerUI
@@ -13,7 +14,6 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
@@ -63,7 +63,7 @@ fun Route.afpPrivatRoutes(
                     } catch (e: ContentTransformationException) {
                         call.respond(HttpStatusCode.BadRequest, "Kan ikke lese innholdet i forespørselen")
                     } catch (e: Exception) {
-                        defaultLogger.error("Kunne ikke opprette ressurs. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke opprette ressurs. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke opprette ressurs. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke opprette ressurs")
                     }
@@ -87,7 +87,7 @@ fun Route.afpPrivatRoutes(
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest)
                 } catch (e: Exception) {
-                    defaultLogger.error("Kunne ikke hente ressurs. Se sikkerlogg for detaljer")
+                    defaultLogger.error { "Kunne ikke hente ressurs. Se sikkerlogg for detaljer" }
                     sikkerlogger.error(e) { "Kunne ikke hente ressurs. Detaljer:" }
                     call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente ressurs")
                 }

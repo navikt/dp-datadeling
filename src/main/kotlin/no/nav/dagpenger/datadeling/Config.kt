@@ -7,8 +7,8 @@ import com.natpryce.konfig.Key
 import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
