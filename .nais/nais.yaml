@@ -36,13 +36,11 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: azure-token-generator
-          namespace: nais
-          cluster: dev-gcp
-        - application: tilleggsstonader-integrasjoner
-          namespace: tilleggsstonader
-        - application: saas-proxy
-          namespace: teamcrm
+        {{#each inbounds}}
+        - application: "{{application}}"
+          namespace: "{{namespace}}"
+          cluster: "{{cluster}}"
+        {{/each }}
     outbound:
       external:
         - host: "{{ dpProxyHost }}"
