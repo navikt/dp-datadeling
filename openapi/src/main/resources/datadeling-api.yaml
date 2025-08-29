@@ -306,6 +306,7 @@ components:
         - utfall
         - stønadType
         - fraOgMedDato
+        - kilde
       properties:
         vedtakId:
           type: string
@@ -327,6 +328,8 @@ components:
           type: integer
         barnetillegg:
           type: integer
+        kilde:
+          $ref: '#/components/schemas/Kilde'
 
     Utfall:
       type: string
@@ -342,6 +345,13 @@ components:
         - DAGPENGER_ARBEIDSSOKER_ORDINAER
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
+
+    Kilde:
+      type: string
+      description: Kilde
+      enum:
+        - ARENA
+        - DP
 
     Vedtaksliste:
       type: array
