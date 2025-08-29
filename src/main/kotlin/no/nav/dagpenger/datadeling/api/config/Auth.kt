@@ -59,8 +59,12 @@ fun AuthenticationConfig.jwtAuth(
     jwt(name) {
         verifier(jwkProvider, config.issuer)
         validate { cred ->
-            if (cred.getClaim("scope", String::class) != config.scope) {
-                defaultLogger.warn("Wrong scope in claim")
+            // Scope i maskinporten token
+            // Aud i Azure AD token
+            if (cred.getClaim("scope", String::class) != config.scope &&
+                cred.getClaim("aud", String::class) != config.scope
+            ) {
+                defaultLogger.warn { "Wrong scope/aud in claim" }
                 return@validate null
             }
 
