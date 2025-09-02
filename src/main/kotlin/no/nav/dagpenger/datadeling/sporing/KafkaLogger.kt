@@ -1,7 +1,7 @@
 package no.nav.dagpenger.datadeling.sporing
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.AktivitetsloggEventMapper
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.objectMapper

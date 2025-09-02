@@ -12,9 +12,15 @@ data class Vedtak(
     val tilOgMedDato: LocalDate? = null,
     val dagsats: Int? = null,
     val barnetillegg: Int? = null,
+    val kilde: Kilde = Kilde.ARENA,
 ) {
     enum class Utfall {
         INNVILGET,
         AVSLÅTT,
+    }
+
+    enum class Kilde {
+        ARENA,
+        DP,
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.datadeling.api
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.BadRequestException
@@ -9,7 +10,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.clientId
@@ -56,11 +56,11 @@ fun Route.dagpengerRoutes(
 
                         call.respond(HttpStatusCode.OK, response)
                     } catch (e: BadRequestException) {
-                        defaultLogger.error("Kunne ikke lese innholdet i forespørselen om perioder. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om perioder. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om perioder. Detaljer:" }
                         call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om perioder")
                     } catch (e: Exception) {
-                        defaultLogger.error("Kunne ikke hente perioder. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke hente perioder. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke hente perioder. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente perioder")
                     }
@@ -84,11 +84,11 @@ fun Route.dagpengerRoutes(
 
                         call.respond(HttpStatusCode.OK, response)
                     } catch (e: BadRequestException) {
-                        defaultLogger.error("Kunne ikke lese innholdet i forespørselen om søknader. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om søknader. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om søknader. Detaljer:" }
                         call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om søknader")
                     } catch (e: Exception) {
-                        defaultLogger.error("Kunne ikke hente søknader. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke hente søknader. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke hente søknader. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente søknader")
                     }
@@ -119,14 +119,14 @@ fun Route.dagpengerRoutes(
                             call.respond(HttpStatusCode.OK, søknad)
                         }
                     } catch (e: BadRequestException) {
-                        defaultLogger.error("Kunne ikke lese ident fra forespørselen om siste søknad. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke lese ident fra forespørselen om siste søknad. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke lese ident fra forespørselen om siste søknad. Detaljer:" }
                         call.respond(
                             HttpStatusCode.BadRequest,
                             "Kunne ikke lese ident fra forespørselen om siste søknad",
                         )
                     } catch (e: Exception) {
-                        defaultLogger.error("Kunne ikke hente siste søknad. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke hente siste søknad. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke hente siste søknad. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente siste søknad")
                     }
@@ -150,11 +150,11 @@ fun Route.dagpengerRoutes(
 
                         call.respond(HttpStatusCode.OK, response)
                     } catch (e: BadRequestException) {
-                        defaultLogger.error("Kunne ikke lese innholdet i forespørselen om vedtak. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om vedtak. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om vedtak. Detaljer:" }
                         call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om vedtak")
                     } catch (e: Exception) {
-                        defaultLogger.error("Kunne ikke hente vedtak. Se sikkerlogg for detaljer")
+                        defaultLogger.error { "Kunne ikke hente vedtak. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke hente vedtak. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente vedtak")
                     }

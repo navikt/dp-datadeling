@@ -7,8 +7,8 @@ import com.natpryce.konfig.Key
 import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
@@ -70,7 +70,7 @@ internal object Config {
             azure =
                 IssuerConfig(
                     discoveryUrl = properties[Key("AZURE_APP_WELL_KNOWN_URL", stringType)],
-                    scope = null,
+                    scope = properties[Key("AZURE_APP_CLIENT_ID", stringType)],
                     jwksUri = URI(properties[Key("AZURE_OPENID_CONFIG_JWKS_URI", stringType)]).toURL(),
                     issuer = properties[Key("AZURE_OPENID_CONFIG_ISSUER", stringType)],
                 ),
@@ -209,7 +209,7 @@ data class AppConfig(
 
 data class IssuerConfig(
     val discoveryUrl: String,
-    val scope: String?,
+    val scope: String,
     val jwksUri: URL,
     val issuer: String,
 )

@@ -10,3 +10,14 @@ dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: www.nav.no
 kafka_pool: nav-prod
 kafkaSporTopic: "pensjonsamhandling.public-sporingslogg-loggmeldingmottatt"
+
+inbounds:
+  - application: tilleggsstonader-integrasjoner
+    namespace: tilleggsstonader
+    cluster: prod-gcp
+  - application: saas-proxy
+    namespace: teamcrm
+    cluster: prod-gcp
+  - application: arena
+    namespace: teamarenanais
+    cluster: prod-fss

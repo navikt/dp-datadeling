@@ -1,6 +1,6 @@
 package no.nav.dagpenger.datadeling
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 
 val defaultLogger = KotlinLogging.logger {}
 
