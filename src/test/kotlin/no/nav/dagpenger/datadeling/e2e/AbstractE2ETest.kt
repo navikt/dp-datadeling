@@ -16,7 +16,6 @@ abstract class AbstractE2ETest {
 
     @BeforeAll
     fun setupServer() {
-        System.setProperty("DP_PROXY_CLIENT_MAX_RETRIES", "1")
         TestApplication.setup()
 
         proxyMockServer =
@@ -37,7 +36,6 @@ abstract class AbstractE2ETest {
     fun tearDownServer() {
         proxyMockServer.shutdownServer()
         TestApplication.teardown()
-        System.clearProperty("DP_PROXY_CLIENT_MAX_RETRIES")
         System.clearProperty("DP_PROXY_URL")
         System.clearProperty("DP_PROXY_SCOPE")
     }

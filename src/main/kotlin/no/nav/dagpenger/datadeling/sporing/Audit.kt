@@ -6,6 +6,7 @@ import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
 import no.nav.dagpenger.aktivitetslogg.IAktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
+import no.nav.dagpenger.datadeling.model.Meldekort
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
@@ -71,6 +72,20 @@ class DagpengerPerioderHentetHendelse(
         auditOperasjon = AuditOperasjon.READ,
         aktivitetsLogg = Aktivitetslogg(),
     ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
+}
+
+class DagpengerMeldekortHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: DatadelingRequest,
+    val response: List<Meldekort>,
+) : AuditHendelse(
+    ident = request.personIdent,
+    saksbehandlerNavIdent = saksbehandlerNavIdent,
+    auditMelding = "Henter ut dagpenger meldekort",
+    auditOperasjon = AuditOperasjon.READ,
+    aktivitetsLogg = Aktivitetslogg(),
+) {
     override fun kontekst(): Map<String, String> = emptyMap()
 }
 
