@@ -9,12 +9,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.dagpenger.datadeling.model.Vedtaksmelding
+import no.nav.dagpenger.datadeling.model.ArenaVedtaksmelding
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakMottak")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.ArenaVedtakMottak")
 
-internal class VedtakMottak(
+internal class ArenaVedtakMottak(
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     init {
@@ -49,14 +49,14 @@ internal class VedtakMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val vedtaksmelding = Vedtaksmelding(packet)
+        val arenaVedtaksmelding = ArenaVedtaksmelding(packet)
 
         withLoggingContext(
-            "fagsakId" to vedtaksmelding.fagsakId,
-            "vedtakId" to vedtaksmelding.vedtakId,
+            "fagsakId" to arenaVedtaksmelding.fagsakId,
+            "vedtakId" to arenaVedtaksmelding.vedtakId,
         ) {
             logg.info { "Mottok nytt vedtak" }
-            sikkerlogg.info { "Mottok nytt vedtak for person ${vedtaksmelding.ident}: ${packet.toJson()}" }
+            sikkerlogg.info { "Mottok nytt vedtak for person ${arenaVedtaksmelding.ident}: ${packet.toJson()}" }
 
             // TODO: Konverter til en "ekstern"-hendelse og videresend til RnR
         }
