@@ -4,11 +4,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class VedtakMottakTest {
+class ArenaVedtakMottakTest {
     private val testRapid = TestRapid()
 
     init {
-        VedtakMottak(testRapid)
+        ArenaVedtakMottak(testRapid)
     }
 
     @BeforeEach

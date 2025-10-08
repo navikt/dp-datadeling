@@ -31,7 +31,7 @@ class SøknadMottakTest {
     fun `vi kan motta søknader`() {
         testRapid.sendTestMessage(søknadJson)
 
-        verify {
+        verify(exactly = 1) {
             søknadRepository.lagreSøknad(
                 eq("01020312345"),
                 eq("123"),
@@ -48,7 +48,7 @@ class SøknadMottakTest {
     fun `vi kan motta papirsøknad`() {
         testRapid.sendTestMessage(papirsøknadJson)
 
-        verify {
+        verify(exactly = 1) {
             søknadRepository.lagreSøknad(
                 eq("01020312346"),
                 null,
@@ -65,7 +65,7 @@ class SøknadMottakTest {
     fun `vi kan motta søknad fra ny søknadssdialog (quiz-format)`() {
         testRapid.sendTestMessage(søknadJsonFraNyQuiz)
 
-        verify {
+        verify(exactly = 1) {
             søknadRepository.lagreSøknad(
                 eq("01020312347"),
                 eq("4c4e3f15-ab4b-4de8-8950-773684e1ad59"),

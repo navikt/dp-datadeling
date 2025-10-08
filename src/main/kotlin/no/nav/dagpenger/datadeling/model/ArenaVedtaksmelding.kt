@@ -6,7 +6,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-internal class Vedtaksmelding(
+internal class ArenaVedtaksmelding(
     private val packet: JsonMessage,
 ) {
     companion object {
