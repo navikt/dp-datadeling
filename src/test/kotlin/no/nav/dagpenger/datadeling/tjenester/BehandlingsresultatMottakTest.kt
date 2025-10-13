@@ -1,12 +1,12 @@
 package no.nav.dagpenger.datadeling.tjenester
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.datadeling.db.BehandlingRepository
 import no.nav.dagpenger.datadeling.db.VedtakRepository
 import no.nav.dagpenger.datadeling.model.Vedtak
+import no.nav.dagpenger.datadeling.service.SakApiClient
 import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,13 +15,13 @@ import java.util.UUID
 
 class BehandlingsresultatMottakTest {
     private val testRapid = TestRapid()
-    private val behandlingRepository = mockk<BehandlingRepository>(relaxed = true)
+    private val sakApiClient = mockk<SakApiClient>(relaxed = true)
     private val vedtakRepository = mockk<VedtakRepository>(relaxed = true)
 
     init {
         BehandlingsresultatMottak(
             testRapid,
-            behandlingRepository,
+            sakApiClient,
             vedtakRepository,
         )
     }
@@ -40,7 +40,7 @@ class BehandlingsresultatMottakTest {
         val tilOgMed1 = LocalDate.now()
         val fraOgMed2 = LocalDate.now().plusDays(1)
 
-        every { behandlingRepository.hentSakIdForBehandlingId(eq(behandlingId)) } returns sakId
+        coEvery { sakApiClient.hentSakId(eq(behandlingId)) } returns sakId
 
         val behandlingsresultat =
             """

@@ -7,6 +7,8 @@ ingresses:
   - https://dp-datadeling.intern.nav.no
 dpProxyHost: dp-proxy.prod-fss-pub.nais.io
 dpProxyScope: api://prod-fss.teamdagpenger.dp-proxy/.default
+dpSaksbehandlingUrl: https://dp-saksbehandling.intern.nav.no
+dpSaksbehandlingScope: api://prod-gcp.teamdagpenger.dp-saksbehandling/.default
 dpDatadelingHost: www.nav.no
 kafka_pool: nav-prod
 kafkaSporTopic: "pensjonsamhandling.public-sporingslogg-loggmeldingmottatt"

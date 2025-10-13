@@ -44,6 +44,8 @@ spec:
     outbound:
       external:
         - host: "{{ dpProxyHost }}"
+      rules:
+        - application: dp-saksbehandling
   leaderElection: true
   secureLogs:
     enabled: true
@@ -52,6 +54,10 @@ spec:
       value: https://{{ dpProxyHost }}
     - name: DP_PROXY_SCOPE
       value: "{{ dpProxyScope }}"
+    - name: DP_SAKSBEHANDLING_URL
+      value: {{ dpSaksbehandlingUrl }}
+    - name: DP_SAKSBEHANDLING_SCOPE
+      value: "{{ dpSaksbehandlingScope }}"
     - name: DP_DATADELING_URL
       value: https://{{ dpDatadelingHost }}
     - name: KAFKA_SPOR_TOPIC

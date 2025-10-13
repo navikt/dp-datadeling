@@ -57,7 +57,7 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og poll til ressurs har status FERDIG`() =
         testApplication {
             application {
-                datadelingApi()
+                datadelingApi(Config.appConfig.copy(isLocal = true))
             }
 
             val response =
@@ -136,7 +136,7 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og marker som FEILET ved error fra baksystem`() =
         testApplication {
             application {
-                datadelingApi()
+                datadelingApi(Config.appConfig.copy(isLocal = true))
             }
 
             mockProxyError()

@@ -1,7 +1,5 @@
 package no.nav.dagpenger.datadeling.api
 
-import io.ktor.client.HttpClientConfig
-import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.server.application.Application
 import io.ktor.server.routing.routing
 import io.micrometer.prometheusmetrics.PrometheusConfig
@@ -39,16 +37,5 @@ fun Application.datadelingApi(config: AppConfig = Config.appConfig) {
 
     launch {
         ressursService.scheduleRessursCleanup()
-    }
-}
-
-fun HttpClientConfig<*>.installRetryClient(
-    maksRetries: Int = 5,
-    delayFunc: suspend (Long) -> Unit = { kotlinx.coroutines.delay(it) },
-) {
-    install(HttpRequestRetry) {
-        delay { delayFunc(it) }
-        retryOnServerErrors(maxRetries = maksRetries)
-        exponentialDelay()
     }
 }

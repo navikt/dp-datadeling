@@ -10,9 +10,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.dagpenger.datadeling.db.BehandlingRepository
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.db.VedtakRepository
 import no.nav.dagpenger.datadeling.model.Vedtak
+import no.nav.dagpenger.datadeling.service.SakApiClient
 import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger
 
 private val logg = KotlinLogging.logger {}
@@ -20,7 +21,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.BehandlingsresultatM
 
 internal class BehandlingsresultatMottak(
     rapidsConnection: RapidsConnection,
-    private val behandlingRepository: BehandlingRepository = BehandlingRepository(),
+    private val sakApiClient: SakApiClient = SakApiClient(),
     private val vedtakRepository: VedtakRepository = VedtakRepository(),
 ) : River.PacketListener {
     init {
@@ -58,11 +59,7 @@ internal class BehandlingsresultatMottak(
             }
 
             // Her er vi avhengige av at vi får vedtak_fattet_utenfor_arena før behandlingsresultat
-            val sakId = behandlingRepository.hentSakIdForBehandlingId(behandlingId)
-            if (sakId == null) {
-                logg.error { "Kan ikke finne søknadId for behandlingId $behandlingId" }
-                throw Exception("Kan ikke finne søknadId for behandlingId $behandlingId")
-            }
+            val sakId = runBlocking { sakApiClient.hentSakId(behandlingId) }
 
             // Slett alle vedtak for denne saken
             vedtakRepository.slettAlleVedtakForSak(sakId)

@@ -90,12 +90,21 @@ internal object Config {
     val dpProxyUrl by lazy {
         properties[Key("DP_PROXY_URL", stringType)]
     }
+
     val dpProxyClientMaxRetries: Int by lazy {
         properties[Key("DP_PROXY_CLIENT_MAX_RETRIES", intType)]
     }
 
     val dpProxyTokenProvider by lazy {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
+    }
+
+    val sakApiBaseUrl: String by lazy {
+        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
+    }
+
+    val sakApiTokenProvider by lazy {
+        azureAdTokenSupplier(properties[Key("DP_SAKSBEHANDLING_SCOPE", stringType)])
     }
 
     val logger by lazy {
