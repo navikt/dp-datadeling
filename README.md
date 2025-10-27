@@ -15,6 +15,10 @@ githubPassword=%YOUR_GITHUB_TOKEN%
 
 Bygg ved å kjøre `./gradlew build`
 
+### Linting
+
+Prosjektet bruker [ktlint](https://ktlint.github.io/) for å sikre enhetlig kodeformat. Hvis du bruker IntelliJ, anbefales det å installere ktlint-plugin for automatisk formatering av koden.
+
 ## Dokumentasjon 
 
 Swaggerdoc blir publisert til: https://navikt.github.io/dp-datadeling/openapi.html
@@ -30,3 +34,5 @@ Spørsmål knyttet til koden eller prosjektet kan stilles ved å opprette et iss
 ### For NAV-ansatte
 
 Interne henvendelser kan sendes via Slack i kanalen #po-arbeid-dev.
+
+

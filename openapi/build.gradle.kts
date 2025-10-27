@@ -4,11 +4,11 @@ plugins {
     `java-library`
 }
 
-tasks.named("compileKotlin").configure {
+tasks.named("runKtlintCheckOverMainSourceSet").configure {
     dependsOn("openApiGenerate")
 }
 
-tasks.named("spotlessKotlin").configure {
+tasks.named("runKtlintFormatOverMainSourceSet").configure {
     dependsOn("openApiGenerate")
 }
 
@@ -29,12 +29,11 @@ sourceSets {
     }
 }
 
-spotless {
-    kotlin {
-        targetExclude("**/generated/**")
+ktlint {
+    filter {
+        exclude { element -> element.file.path.contains("generated/") }
     }
 }
-
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 }
