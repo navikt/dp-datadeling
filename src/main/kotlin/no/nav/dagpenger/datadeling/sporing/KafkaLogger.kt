@@ -26,10 +26,10 @@ internal class KafkaLogger(
     init {
         Runtime.getRuntime().addShutdownHook(
             Thread {
-                logger.info("Closing KafkaAuditLogger Kafka producer")
+                logger.info { "Closing KafkaAuditLogger Kafka producer" }
                 kafkaProducer.flush()
                 kafkaProducer.close()
-                logger.info("done! ")
+                logger.info { "done! " }
             },
         )
     }

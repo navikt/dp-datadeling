@@ -41,13 +41,13 @@ class RessursService(
             if (!leaderElector.isLeader()) {
                 return@schedule
             }
-            logger.info("Starter opprydding av ressurser")
+            logger.info { "Starter opprydding av ressurser" }
             val antallMarkertSomFeilet =
                 ressursDao.markerSomFeilet(eldreEnn = LocalDateTime.now().minus(minutterLevetidOpprettet))
-            logger.info("Markerte $antallMarkertSomFeilet ressurs(er) som feilet")
+            logger.info { "Markerte $antallMarkertSomFeilet ressurs(er) som feilet" }
             val slettet =
                 ressursDao.slettFerdigeRessurser(eldreEnn = LocalDateTime.now().minus(minutterLevetidFerdig))
-            logger.info("Slettet ${slettet.size} ferdige og feilede ressurs(er)")
+            logger.info { "Slettet ${slettet.size} ferdige og feilede ressurs(er)" }
         }
     }
 

@@ -1,4 +1,4 @@
-project.setProperty("mainClassName", "no.nav.dagpenger.datadeling.AppKt")
+
 
 val kontrakterVersion = "3.0_20240408122747_6eff346"
 val mockOauth2Version = "3.0.0"
@@ -57,7 +57,7 @@ dependencies {
 }
 
 application {
-    mainClass.set(project.property("mainClassName").toString())
+    mainClass.set("no.nav.dagpenger.datadeling.AppKt")
 }
 
 tasks.named<Test>("test") {

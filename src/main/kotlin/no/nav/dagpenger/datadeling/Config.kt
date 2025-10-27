@@ -101,12 +101,12 @@ internal object Config {
     val logger by lazy {
         when (isLocalEnvironment) {
             true -> {
-                log.info("Using no-op audit logger")
+                log.info { "Using no-op audit logger" }
                 NoopLogger
             }
 
             else -> {
-                log.info("Using Kafka audit logger")
+                log.info { "Using Kafka audit logger" }
                 KafkaLogger()
             }
         }
