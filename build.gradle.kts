@@ -37,7 +37,6 @@ dependencies {
     implementation(libs.bundles.postgres)
 
     // Nav
-    implementation("no.nav.dagpenger.kontrakter:iverksett:$kontrakterVersion")
     implementation("no.nav.dagpenger.kontrakter:iverksett-integrasjoner:$kontrakterVersion")
     implementation("no.nav.dagpenger:oauth2-klient:2025.08.20-08.53.9250ac7fbd99")
     implementation(libs.rapids.and.rivers)
