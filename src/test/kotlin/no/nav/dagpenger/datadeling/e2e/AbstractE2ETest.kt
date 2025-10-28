@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.dagpenger.datadeling.Postgres
 import no.nav.dagpenger.datadeling.TestApplication
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -51,7 +51,7 @@ abstract class AbstractE2ETest {
     }
 
     fun mockProxyResponse(
-        response: DatadelingResponse,
+        response: DatadelingResponseDTO,
         delayMs: Int = 0,
     ) {
         proxyMockServer.stubFor(

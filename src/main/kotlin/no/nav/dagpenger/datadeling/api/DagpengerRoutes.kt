@@ -16,6 +16,8 @@ import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.service.SøknaderService
 import no.nav.dagpenger.datadeling.service.VedtakService
@@ -24,8 +26,6 @@ import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
@@ -42,9 +42,9 @@ fun Route.dagpengerRoutes(
             route("/perioder") {
                 post {
                     try {
-                        val request = call.receive<DatadelingRequest>()
+                        val request = call.receive<DatadelingRequestDTO>()
 
-                        val response: DatadelingResponse = perioderService.hentDagpengeperioder(request)
+                        val response: DatadelingResponseDTO = perioderService.hentDagpengeperioder(request)
 
                         auditLogger.log(
                             DagpengerPerioderHentetHendelse(
@@ -70,7 +70,7 @@ fun Route.dagpengerRoutes(
             route("/soknader") {
                 post {
                     try {
-                        val request = call.receive<DatadelingRequest>()
+                        val request = call.receive<DatadelingRequestDTO>()
 
                         val response: List<Søknad> = søknaderService.hentSøknader(request)
 
@@ -136,7 +136,7 @@ fun Route.dagpengerRoutes(
             route("/vedtak") {
                 post {
                     try {
-                        val request = call.receive<DatadelingRequest>()
+                        val request = call.receive<DatadelingRequestDTO>()
 
                         val response: List<Vedtak> = vedtakService.hentVedtak(request)
 

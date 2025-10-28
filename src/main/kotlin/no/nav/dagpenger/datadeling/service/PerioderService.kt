@@ -3,14 +3,14 @@ package no.nav.dagpenger.datadeling.service
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
-import no.nav.dagpenger.kontrakter.datadeling.Periode
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
 
 class PerioderService(
     private val proxyClient: ProxyClient,
 ) {
-    fun hentDagpengeperioder(request: DatadelingRequest) =
+    fun hentDagpengeperioder(request: DatadelingRequestDTO) =
         runBlocking {
             val proxyResponse = async { proxyClient.hentDagpengeperioder(request) }
 
@@ -29,14 +29,14 @@ class PerioderService(
                         )
                     }.sortedBy { it.fraOgMedDato }
 
-            DatadelingResponse(
+            DatadelingResponseDTO(
                 personIdent = request.personIdent,
                 perioder = perioder,
             )
         }
 }
 
-private fun List<Periode>.sammenslått(): List<Periode> =
+private fun List<PeriodeDTO>.sammenslått(): List<PeriodeDTO> =
     fold(emptyList()) { perioder, periode ->
         if (perioder.isEmpty()) {
             return@fold listOf(periode)
@@ -51,6 +51,6 @@ private fun List<Periode>.sammenslått(): List<Periode> =
         }
     }
 
-private fun Periode.kanSlåsSammen(forrige: Periode): Boolean =
+private fun PeriodeDTO.kanSlåsSammen(forrige: PeriodeDTO): Boolean =
     this.ytelseType == forrige.ytelseType &&
         this.fraOgMedDato.minusDays(1) <= forrige.tilOgMedDato

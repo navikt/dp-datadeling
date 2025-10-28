@@ -16,8 +16,8 @@ import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.api.datadelingApi
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -53,7 +53,7 @@ class ManuellE2ETest {
             }
 
             val request =
-                DatadelingRequest(
+                DatadelingRequestDTO(
                     personIdent = "02929898071",
                     fraOgMedDato = LocalDate.of(2023, 10, 1),
                 )

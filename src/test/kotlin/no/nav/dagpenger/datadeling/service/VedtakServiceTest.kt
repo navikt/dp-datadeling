@@ -5,9 +5,9 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import no.nav.dagpenger.datadeling.model.Vedtak
+import no.nav.dagpenger.datadeling.models.StonadTypeDTO
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.januar
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ class VedtakServiceTest {
                         "VedtakId",
                         "FagsakId",
                         Vedtak.Utfall.INNVILGET,
-                        StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                        StonadTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
                         LocalDate.now(),
                         LocalDate.now(),
                     ),
@@ -64,7 +64,7 @@ class VedtakServiceTest {
                         "VedtakId1",
                         "FagsakId1",
                         Vedtak.Utfall.INNVILGET,
-                        StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                        StonadTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
                         LocalDate.now(),
                         LocalDate.now(),
                         1111,
@@ -73,7 +73,7 @@ class VedtakServiceTest {
                         "VedtakId2",
                         "FagsakId2",
                         Vedtak.Utfall.AVSLÅTT,
-                        StønadTypeDagpenger.DAGPENGER_PERMITTERING_FISKEINDUSTRI,
+                        StonadTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI,
                         LocalDate.now(),
                         LocalDate.now(),
                         2222,

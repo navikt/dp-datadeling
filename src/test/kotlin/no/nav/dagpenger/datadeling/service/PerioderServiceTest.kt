@@ -4,14 +4,13 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.testutil.emptyResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enPeriode
 import no.nav.dagpenger.datadeling.testutil.januar
-import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_PERMITTERING_ORDINAER
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -33,7 +32,7 @@ class PerioderServiceTest {
             val request = enDatadelingRequest(1.januar()..10.januar())
             val response = perioderService.hentDagpengeperioder(request)
 
-            assertEquals(emptyList<Periode>(), response.perioder)
+            assertEquals(emptyList<PeriodeDTO>(), response.perioder)
         }
 
     @Test
@@ -93,8 +92,8 @@ class PerioderServiceTest {
 
             val response =
                 enDatadelingResponse(
-                    enPeriode(1.januar()..6.januar(), DAGPENGER_PERMITTERING_ORDINAER),
-                    enPeriode(7.januar()..11.januar(), DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                    enPeriode(1.januar()..6.januar(), YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER),
+                    enPeriode(7.januar()..11.januar(), YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
                 )
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response

@@ -1,7 +1,7 @@
 package no.nav.dagpenger.datadeling.sporing
 
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Base64
@@ -38,7 +38,7 @@ internal class Sporing(
 
 fun main() {
     println(
-        DatadelingRequest(
+        DatadelingRequestDTO(
             personIdent = "augue",
             fraOgMedDato = LocalDate.MAX,
             tilOgMedDato = null,

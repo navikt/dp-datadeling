@@ -8,8 +8,8 @@ import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import java.util.UUID
 
 sealed class AuditHendelse(
@@ -62,8 +62,8 @@ class DagpengerPeriodeHentetHendelse(
 
 class DagpengerPerioderHentetHendelse(
     saksbehandlerNavIdent: String,
-    val request: DatadelingRequest,
-    val response: DatadelingResponse,
+    val request: DatadelingRequestDTO,
+    val response: DatadelingResponseDTO,
 ) : AuditHendelse(
         ident = request.personIdent,
         saksbehandlerNavIdent = saksbehandlerNavIdent,
@@ -88,7 +88,7 @@ class DagpengerPeriodeSpørringHendelse(
 
 class DagpengerSøknaderHentetHendelse(
     saksbehandlerNavIdent: String,
-    val request: DatadelingRequest,
+    val request: DatadelingRequestDTO,
     val response: List<Søknad>,
 ) : AuditHendelse(
         ident = request.personIdent,
@@ -116,7 +116,7 @@ class DagpengerSisteSøknadHentetHendelse(
 
 class DagpengerVedtakHentetHendelse(
     saksbehandlerNavIdent: String,
-    val request: DatadelingRequest,
+    val request: DatadelingRequestDTO,
     val response: List<Vedtak>,
 ) : AuditHendelse(
         ident = request.personIdent,

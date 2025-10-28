@@ -13,6 +13,9 @@ import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestAppl
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.StonadTypeDTO
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.service.SøknaderService
@@ -29,9 +32,6 @@ import no.nav.dagpenger.datadeling.testPostText
 import no.nav.dagpenger.datadeling.testutil.FNR
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
-import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_PERMITTERING_ORDINAER
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -112,11 +112,11 @@ class DagpengerRoutesTest {
         testPerioderEndpoint {
             val response =
                 enDatadelingResponse(
-                    Periode(fraOgMedDato = LocalDate.now(), ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER),
-                    Periode(
+                    PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                    PeriodeDTO(
                         fraOgMedDato = LocalDate.now().minusDays(100),
                         tilOgMedDato = LocalDate.now().minusDays(1),
-                        ytelseType = DAGPENGER_PERMITTERING_ORDINAER,
+                        ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                     ),
                 )
             coEvery { perioderService.hentDagpengeperioder(any()) } returns response
@@ -144,11 +144,11 @@ class DagpengerRoutesTest {
 
         val response =
             enDatadelingResponse(
-                Periode(fraOgMedDato = LocalDate.now(), ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER),
-                Periode(
+                PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                PeriodeDTO(
                     fraOgMedDato = LocalDate.now().minusDays(100),
                     tilOgMedDato = LocalDate.now().minusDays(1),
-                    ytelseType = DAGPENGER_PERMITTERING_ORDINAER,
+                    ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                 ),
             )
         coEvery { perioderService.hentDagpengeperioder(any()) } returns response
@@ -283,7 +283,7 @@ class DagpengerRoutesTest {
                     "1",
                     "2",
                     Vedtak.Utfall.AVSLÅTT,
-                    DAGPENGER_PERMITTERING_ORDINAER,
+                    StonadTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                     LocalDate.now(),
                     LocalDate.now(),
                 ),
@@ -291,7 +291,7 @@ class DagpengerRoutesTest {
                     "2",
                     "3",
                     Vedtak.Utfall.INNVILGET,
-                    DAGPENGER_PERMITTERING_ORDINAER,
+                    StonadTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                     LocalDate.now(),
                     LocalDate.now(),
                 ),

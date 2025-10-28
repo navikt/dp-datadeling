@@ -16,8 +16,8 @@ import io.ktor.serialization.jackson.jackson
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.datadeling.model.Vedtak
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
@@ -26,7 +26,7 @@ class ProxyClient(
     private val tokenProvider: () -> String = Config.dpProxyTokenProvider,
 ) : PerioderClient,
     VedtakClient {
-    override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
+    override suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): DatadelingResponseDTO {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
 
         val token =
@@ -46,7 +46,7 @@ class ProxyClient(
                             append(HttpHeaders.ContentType, "application/json")
                         }
                         setBody(request)
-                    }.body<DatadelingResponse>()
+                    }.body<DatadelingResponseDTO>()
             }
         return result.fold(
             onSuccess = { it },
@@ -57,7 +57,7 @@ class ProxyClient(
         )
     }
 
-    override suspend fun hentVedtak(request: DatadelingRequest): List<Vedtak> {
+    override suspend fun hentVedtak(request: DatadelingRequestDTO): List<Vedtak> {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/vedtaksliste").replace("//p", "/p")
 
         val token =

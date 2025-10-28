@@ -1,8 +1,8 @@
 package no.nav.dagpenger.datadeling.api.ressurs
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import java.util.UUID
 
 enum class RessursStatus {
@@ -15,6 +15,6 @@ enum class RessursStatus {
 data class Ressurs(
     val uuid: UUID,
     val status: RessursStatus,
-    val request: DatadelingRequest,
-    val response: DatadelingResponse?,
+    val request: DatadelingRequestDTO,
+    val response: DatadelingResponseDTO?,
 )

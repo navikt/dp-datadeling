@@ -2,11 +2,10 @@ package no.nav.dagpenger.datadeling.testutil
 
 import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
-import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadType
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import java.time.LocalDate
 import java.util.UUID
 
@@ -25,7 +24,7 @@ internal fun enDatadelingRequest(
     fraOgMed: LocalDate = 1.januar(),
     tilOgMed: LocalDate? = null,
     fnr: String = FNR,
-) = DatadelingRequest(
+) = DatadelingRequestDTO(
     personIdent = fnr,
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
@@ -34,8 +33,8 @@ internal fun enDatadelingRequest(
 internal fun enRessurs(
     uuid: UUID = UUID.randomUUID(),
     status: RessursStatus = RessursStatus.OPPRETTET,
-    request: DatadelingRequest = enDatadelingRequest(),
-    data: DatadelingResponse? = null,
+    request: DatadelingRequestDTO = enDatadelingRequest(),
+    data: DatadelingResponseDTO? = null,
 ) = Ressurs(
     uuid = uuid,
     status = status,
@@ -44,18 +43,18 @@ internal fun enRessurs(
 )
 
 internal fun enDatadelingResponse(
-    vararg perioder: Periode,
+    vararg perioder: PeriodeDTO,
     fnr: String = FNR,
-) = DatadelingResponse(
+) = DatadelingResponseDTO(
     personIdent = fnr,
     perioder = perioder.asList(),
 )
 
-internal fun emptyResponse() = DatadelingResponse(FNR, emptyList())
+internal fun emptyResponse() = DatadelingResponseDTO(FNR, emptyList())
 
 internal fun enPeriode(
     periode: ClosedRange<LocalDate>,
-    ytelseType: StønadType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
+    ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
 ) = enPeriode(
     fraOgMed = periode.start,
     tilOgMed = periode.endInclusive,
@@ -65,8 +64,8 @@ internal fun enPeriode(
 internal fun enPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
-    ytelseType: StønadType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
-) = Periode(
+    ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+) = PeriodeDTO(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
     ytelseType = ytelseType,
