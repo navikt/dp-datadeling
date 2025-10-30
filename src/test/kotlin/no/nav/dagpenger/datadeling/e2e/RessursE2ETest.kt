@@ -25,12 +25,12 @@ import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.januar
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
-import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -57,18 +57,18 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og poll til ressurs har status FERDIG`() =
         testApplication {
             application {
-                datadelingApi()
+                datadelingApi(Config.appConfig.copy(isLocal = true))
             }
 
             val response =
-                DatadelingResponse(
+                DatadelingResponseDTO(
                     personIdent = "123",
                     perioder =
                         listOf(
-                            Periode(
+                            PeriodeDTO(
                                 fraOgMedDato = 10.januar(),
                                 tilOgMedDato = 25.januar(),
-                                ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                                ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
                             ),
                         ),
                 )
@@ -76,7 +76,7 @@ class RessursE2ETest : AbstractE2ETest() {
             mockProxyResponse(response, delayMs = 200)
 
             val request =
-                DatadelingRequest(
+                DatadelingRequestDTO(
                     personIdent = response.personIdent,
                     fraOgMedDato = 1.januar(),
                     tilOgMedDato = 31.januar(),
@@ -136,13 +136,13 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og marker som FEILET ved error fra baksystem`() =
         testApplication {
             application {
-                datadelingApi()
+                datadelingApi(Config.appConfig.copy(isLocal = true))
             }
 
             mockProxyError()
 
             val request =
-                DatadelingRequest(
+                DatadelingRequestDTO(
                     personIdent = "01020312345",
                     fraOgMedDato = 1.januar(),
                     tilOgMedDato = 31.januar(),

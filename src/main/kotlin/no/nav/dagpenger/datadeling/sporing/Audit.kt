@@ -8,8 +8,9 @@ import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import java.util.UUID
 
 sealed class AuditHendelse(
@@ -62,12 +63,26 @@ class DagpengerPeriodeHentetHendelse(
 
 class DagpengerPerioderHentetHendelse(
     saksbehandlerNavIdent: String,
-    val request: DatadelingRequest,
-    val response: DatadelingResponse,
+    val request: DatadelingRequestDTO,
+    val response: DatadelingResponseDTO,
 ) : AuditHendelse(
         ident = request.personIdent,
         saksbehandlerNavIdent = saksbehandlerNavIdent,
         auditMelding = "Henter ut dagpenger perioder",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
+    ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
+}
+
+class DagpengerMeldekortHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: DatadelingRequestDTO,
+    val response: List<MeldekortDTO>,
+) : AuditHendelse(
+        ident = request.personIdent,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut dagpenger meldekort",
         auditOperasjon = AuditOperasjon.READ,
         aktivitetsLogg = Aktivitetslogg(),
     ) {
@@ -88,7 +103,7 @@ class DagpengerPeriodeSpørringHendelse(
 
 class DagpengerSøknaderHentetHendelse(
     saksbehandlerNavIdent: String,
-    val request: DatadelingRequest,
+    val request: DatadelingRequestDTO,
     val response: List<Søknad>,
 ) : AuditHendelse(
         ident = request.personIdent,
@@ -116,7 +131,7 @@ class DagpengerSisteSøknadHentetHendelse(
 
 class DagpengerVedtakHentetHendelse(
     saksbehandlerNavIdent: String,
-    val request: DatadelingRequest,
+    val request: DatadelingRequestDTO,
     val response: List<Vedtak>,
 ) : AuditHendelse(
         ident = request.personIdent,

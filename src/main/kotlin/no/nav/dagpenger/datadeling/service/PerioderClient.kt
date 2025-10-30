@@ -1,8 +1,8 @@
 package no.nav.dagpenger.datadeling.service
 
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 
 interface PerioderClient {
-    suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse
+    suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): DatadelingResponseDTO
 }

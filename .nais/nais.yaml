@@ -42,12 +42,18 @@ spec:
           cluster: "{{cluster}}"
         {{/each }}
     outbound:
+      rules:
+        - application: dp-meldekortregister
       external:
         - host: "{{ dpProxyHost }}"
   leaderElection: true
   secureLogs:
     enabled: true
   env:
+    - name: DP_MELDEKORTREGISTER_URL
+      value: https://{{ dpMeldekortregisterHost }}
+    - name: DP_MELDEKORTREGISTER_SCOPE
+      value: "{{ dpMeldekortregisterScope }}"
     - name: DP_PROXY_URL
       value: https://{{ dpProxyHost }}
     - name: DP_PROXY_SCOPE
@@ -83,8 +89,14 @@ spec:
         diskAutoresize: true
         diskType: SSD
         flags:
-          - name: max_connections
+          - name: "max_connections"
             value: "100"
+          - name: "cloudsql.enable_pgaudit"
+            value: "on"
+          - name: "pgaudit.log"
+            value: "write,ddl,role"
+          - name: "pgaudit.log_parameter"
+            value: "on"
         highAvailability: true
         maintenance:
           day: 4

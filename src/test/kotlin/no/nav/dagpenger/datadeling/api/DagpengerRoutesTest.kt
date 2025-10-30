@@ -13,11 +13,17 @@ import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestAppl
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
+import no.nav.dagpenger.datadeling.models.MeldekortDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.StonadTypeDTO
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.datadeling.service.MeldekortService
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.service.SøknaderService
 import no.nav.dagpenger.datadeling.service.VedtakService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
+import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
@@ -29,9 +35,6 @@ import no.nav.dagpenger.datadeling.testPostText
 import no.nav.dagpenger.datadeling.testutil.FNR
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
-import no.nav.dagpenger.kontrakter.datadeling.Periode
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_ARBEIDSSOKER_ORDINAER
-import no.nav.dagpenger.kontrakter.felles.StønadTypeDagpenger.DAGPENGER_PERMITTERING_ORDINAER
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -40,20 +43,29 @@ import kotlin.test.assertEquals
 
 class DagpengerRoutesTest {
     private val perioderService: PerioderService = mockk(relaxed = true)
+    private val meldekortservice: MeldekortService = mockk(relaxed = true)
     private val søknaderService: SøknaderService = mockk(relaxed = true)
     private val vedtakService: VedtakService = mockk(relaxed = true)
 
     @Test
     fun `returnerer 401 uten token for perioder`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/perioder", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
         }
 
     @Test
+    fun `returnerer 401 uten token for meldekort`() =
+        testEndpoint {
+            client.testPost("/dagpenger/datadeling/v1/meldekort", enDatadelingRequest(), token = null).apply {
+                assertEquals(HttpStatusCode.Unauthorized, this.status)
+            }
+        }
+
+    @Test
     fun `returnerer 401 uten token for soknader`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/soknader", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -61,7 +73,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for siste soknad`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/siste_soknad", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -69,7 +81,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for vedtak`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/vedtak", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -77,15 +89,23 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for perioder`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/perioder", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
         }
 
     @Test
+    fun `returnerer 400 hvis ikke kan prosessere request for meldekort`() =
+        testEndpoint {
+            client.testPost("/dagpenger/datadeling/v1/meldekort", "", issueAzureToken()).apply {
+                assertEquals(HttpStatusCode.BadRequest, this.status)
+            }
+        }
+
+    @Test
     fun `returnerer 400 hvis ikke kan prosessere request for soknader`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/soknader", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -93,7 +113,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for siste søknad`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPostText("/dagpenger/datadeling/v1/siste_soknad", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -101,7 +121,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for vedtak`() =
-        testPerioderEndpoint {
+        testEndpoint {
             client.testPost("/dagpenger/datadeling/v1/vedtak", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -109,20 +129,32 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 200 og DatadelingResponse`() =
-        testPerioderEndpoint {
+        testEndpoint {
             val response =
                 enDatadelingResponse(
-                    Periode(fraOgMedDato = LocalDate.now(), ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER),
-                    Periode(
+                    PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                    PeriodeDTO(
                         fraOgMedDato = LocalDate.now().minusDays(100),
                         tilOgMedDato = LocalDate.now().minusDays(1),
-                        ytelseType = DAGPENGER_PERMITTERING_ORDINAER,
+                        ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                     ),
                 )
             coEvery { perioderService.hentDagpengeperioder(any()) } returns response
 
             client
                 .testPost("/dagpenger/datadeling/v1/perioder", enDatadelingRequest(), issueAzureToken())
+                .bodyAsText()
+                .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
+        }
+
+    @Test
+    fun `returnerer 200 og Meldekort-liste`() =
+        testEndpoint {
+            val response = listOf<MeldekortDTO>()
+            coEvery { meldekortservice.hentMeldekort(any()) } returns response
+
+            client
+                .testPost("/dagpenger/datadeling/v1/meldekort", enDatadelingRequest(), issueAzureToken())
                 .bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
         }
@@ -144,16 +176,16 @@ class DagpengerRoutesTest {
 
         val response =
             enDatadelingResponse(
-                Periode(fraOgMedDato = LocalDate.now(), ytelseType = DAGPENGER_ARBEIDSSOKER_ORDINAER),
-                Periode(
+                PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                PeriodeDTO(
                     fraOgMedDato = LocalDate.now().minusDays(100),
                     tilOgMedDato = LocalDate.now().minusDays(1),
-                    ytelseType = DAGPENGER_PERMITTERING_ORDINAER,
+                    ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                 ),
             )
         coEvery { perioderService.hentDagpengeperioder(any()) } returns response
 
-        testPerioderEndpoint(logger) {
+        testEndpoint(logger) {
             client.testPost(
                 "/dagpenger/datadeling/v1/perioder",
                 request,
@@ -163,6 +195,41 @@ class DagpengerRoutesTest {
             logger.hendelser.size shouldBe 1
             logger.hendelser.first().let {
                 it.shouldBeInstanceOf<DagpengerPerioderHentetHendelse>()
+                it.ident() shouldBe FNR
+                it.request shouldBe request
+                it.response shouldBe response
+            }
+        }
+    }
+
+    @Test
+    fun `Audit og Sporing logger ved henting av meldekort`() {
+        val logger =
+            object : Log {
+                val hendelser = mutableListOf<AuditHendelse>()
+
+                override fun log(hendelse: AuditHendelse) {
+                    hendelser.add(hendelse)
+                }
+            }
+
+        val fraOgMedDato = LocalDate.now().minusDays(100)
+        val tilOgMedDato = LocalDate.now().minusDays(1)
+        val request = enDatadelingRequest(fraOgMed = fraOgMedDato, tilOgMed = tilOgMedDato)
+
+        val response = listOf<MeldekortDTO>()
+        coEvery { meldekortservice.hentMeldekort(any()) } returns response
+
+        testEndpoint(logger) {
+            client.testPost(
+                "/dagpenger/datadeling/v1/meldekort",
+                request,
+                issueAzureToken(),
+            )
+
+            logger.hendelser.size shouldBe 1
+            logger.hendelser.first().let {
+                it.shouldBeInstanceOf<DagpengerMeldekortHentetHendelse>()
                 it.ident() shouldBe FNR
                 it.request shouldBe request
                 it.response shouldBe response
@@ -206,7 +273,7 @@ class DagpengerRoutesTest {
             )
         coEvery { søknaderService.hentSøknader(any()) } returns response
 
-        testPerioderEndpoint(logger) {
+        testEndpoint(logger) {
             client.testPost(
                 "/dagpenger/datadeling/v1/soknader",
                 request,
@@ -245,7 +312,7 @@ class DagpengerRoutesTest {
             )
         coEvery { søknaderService.hentSisteSøknad(any()) } returns response
 
-        testPerioderEndpoint(logger) {
+        testEndpoint(logger) {
             client.testPostText(
                 "/dagpenger/datadeling/v1/siste_soknad",
                 FNR,
@@ -283,7 +350,7 @@ class DagpengerRoutesTest {
                     "1",
                     "2",
                     Vedtak.Utfall.AVSLÅTT,
-                    DAGPENGER_PERMITTERING_ORDINAER,
+                    StonadTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                     LocalDate.now(),
                     LocalDate.now(),
                 ),
@@ -291,14 +358,14 @@ class DagpengerRoutesTest {
                     "2",
                     "3",
                     Vedtak.Utfall.INNVILGET,
-                    DAGPENGER_PERMITTERING_ORDINAER,
+                    StonadTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
                     LocalDate.now(),
                     LocalDate.now(),
                 ),
             )
         coEvery { vedtakService.hentVedtak(any()) } returns response
 
-        testPerioderEndpoint(logger) {
+        testEndpoint(logger) {
             client.testPost(
                 "/dagpenger/datadeling/v1/vedtak",
                 request,
@@ -315,14 +382,14 @@ class DagpengerRoutesTest {
         }
     }
 
-    private fun testPerioderEndpoint(
+    private fun testEndpoint(
         auditLogger: Log = NoopLogger,
         block: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
             konfigurerApi(appConfig = Config.appConfig)
         }) {
-            routing { dagpengerRoutes(perioderService, søknaderService, vedtakService, auditLogger) }
+            routing { dagpengerRoutes(perioderService, meldekortservice, søknaderService, vedtakService, auditLogger) }
             block()
         }
     }

@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.datadeling.RessursConfig
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,13 +21,13 @@ class RessursService(
     private val leaderElector: LeaderElector,
     private val config: RessursConfig,
 ) {
-    fun opprett(request: DatadelingRequest) = ressursDao.opprett(request)
+    fun opprett(request: DatadelingRequestDTO) = ressursDao.opprett(request)
 
     fun hent(uuid: UUID) = ressursDao.hent(uuid)
 
     fun ferdigstill(
         uuid: UUID,
-        response: DatadelingResponse,
+        response: DatadelingResponseDTO,
     ) = ressursDao.ferdigstill(uuid, response)
 
     fun markerSomFeilet(uuid: UUID) = ressursDao.markerSomFeilet(uuid)
@@ -41,13 +41,13 @@ class RessursService(
             if (!leaderElector.isLeader()) {
                 return@schedule
             }
-            logger.info("Starter opprydding av ressurser")
+            logger.info { "Starter opprydding av ressurser" }
             val antallMarkertSomFeilet =
                 ressursDao.markerSomFeilet(eldreEnn = LocalDateTime.now().minus(minutterLevetidOpprettet))
-            logger.info("Markerte $antallMarkertSomFeilet ressurs(er) som feilet")
+            logger.info { "Markerte $antallMarkertSomFeilet ressurs(er) som feilet" }
             val slettet =
                 ressursDao.slettFerdigeRessurser(eldreEnn = LocalDateTime.now().minus(minutterLevetidFerdig))
-            logger.info("Slettet ${slettet.size} ferdige og feilede ressurs(er)")
+            logger.info { "Slettet ${slettet.size} ferdige og feilede ressurs(er)" }
         }
     }
 

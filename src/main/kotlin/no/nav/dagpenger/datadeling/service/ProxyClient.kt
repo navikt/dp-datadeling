@@ -1,23 +1,16 @@
 package no.nav.dagpenger.datadeling.service
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
-import io.ktor.serialization.jackson.jackson
 import no.nav.dagpenger.datadeling.Config
-import no.nav.dagpenger.datadeling.api.installRetryClient
+import no.nav.dagpenger.datadeling.Config.defaultHttpClient
 import no.nav.dagpenger.datadeling.model.Vedtak
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
@@ -26,7 +19,7 @@ class ProxyClient(
     private val tokenProvider: () -> String = Config.dpProxyTokenProvider,
 ) : PerioderClient,
     VedtakClient {
-    override suspend fun hentDagpengeperioder(request: DatadelingRequest): DatadelingResponse {
+    override suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): DatadelingResponseDTO {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
 
         val token =
@@ -38,7 +31,7 @@ class ProxyClient(
 
         val result =
             runCatching {
-                client
+                defaultHttpClient
                     .post(urlString) {
                         headers {
                             append(HttpHeaders.Accept, "application/json")
@@ -46,7 +39,7 @@ class ProxyClient(
                             append(HttpHeaders.ContentType, "application/json")
                         }
                         setBody(request)
-                    }.body<DatadelingResponse>()
+                    }.body<DatadelingResponseDTO>()
             }
         return result.fold(
             onSuccess = { it },
@@ -57,7 +50,7 @@ class ProxyClient(
         )
     }
 
-    override suspend fun hentVedtak(request: DatadelingRequest): List<Vedtak> {
+    override suspend fun hentVedtak(request: DatadelingRequestDTO): List<Vedtak> {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/vedtaksliste").replace("//p", "/p")
 
         val token =
@@ -69,7 +62,7 @@ class ProxyClient(
 
         val result =
             runCatching {
-                client
+                defaultHttpClient
                     .post(urlString) {
                         headers {
                             append(HttpHeaders.Accept, "application/json")
@@ -87,20 +80,4 @@ class ProxyClient(
             },
         )
     }
-
-    private val client =
-        HttpClient {
-            install(ContentNegotiation) {
-                jackson {
-                    registerModule(JavaTimeModule())
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                }
-            }
-            installRetryClient(
-                maksRetries = Config.dpProxyClientMaxRetries,
-            )
-            install(Logging) {
-                level = LogLevel.INFO
-            }
-        }
 }

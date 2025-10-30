@@ -6,10 +6,10 @@ import no.nav.dagpenger.datadeling.Postgres.withMigratedDb
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.FEILET
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.FERDIG
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.OPPRETTET
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -23,7 +23,7 @@ class RessursDaoTest {
     fun `opprett og hent ressurs`() =
         withMigratedDb {
             val ressursDao = RessursDao(Config.datasource)
-            val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+            val ressurs = ressursDao.opprett(DatadelingRequestDTO("123", LocalDate.now(), LocalDate.now()))
             assertEquals(OPPRETTET, ressurs!!.status)
             assertEquals(ressurs, ressursDao.hent(ressurs.uuid))
         }
@@ -39,12 +39,12 @@ class RessursDaoTest {
     fun `ferdigstill ressurs`() =
         withMigratedDb {
             val ressursDao = RessursDao(Config.datasource)
-            val opprettet = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+            val opprettet = ressursDao.opprett(DatadelingRequestDTO("123", LocalDate.now(), LocalDate.now()))
             assertNotNull(opprettet)
             assertEquals(OPPRETTET, opprettet!!.status)
 
             val response =
-                DatadelingResponse(
+                DatadelingResponseDTO(
                     personIdent = "EN-IDENT",
                     perioder = emptyList(),
                 )
@@ -60,7 +60,7 @@ class RessursDaoTest {
     fun `marker ressurs som feilet`() =
         withMigratedDb {
             val ressursDao = RessursDao(Config.datasource)
-            val ressurs = ressursDao.opprett(DatadelingRequest("123", LocalDate.now(), LocalDate.now()))
+            val ressurs = ressursDao.opprett(DatadelingRequestDTO("123", LocalDate.now(), LocalDate.now()))
             requireNotNull(ressurs)
             assertEquals(OPPRETTET, ressurs.status)
 
@@ -73,7 +73,7 @@ class RessursDaoTest {
         withMigratedDb {
             val ressursDao = RessursDao(Config.datasource)
             val today = LocalDate.now()
-            val ressurs = ressursDao.opprett(DatadelingRequest("123", today, today))
+            val ressurs = ressursDao.opprett(DatadelingRequestDTO("123", today, today))
             requireNotNull(ressurs)
             assertEquals(OPPRETTET, ressurs.status)
 
@@ -103,8 +103,8 @@ class RessursDaoTest {
 
     private fun insertRessurs(
         status: RessursStatus = OPPRETTET,
-        request: DatadelingRequest = enDatadelingRequest(),
-        response: DatadelingResponse? = null,
+        request: DatadelingRequestDTO = enDatadelingRequest(),
+        response: DatadelingResponseDTO? = null,
         opprettet: LocalDateTime = LocalDateTime.now(),
     ) = sessionOf(Config.datasource).use { session ->
         session.run(
@@ -136,11 +136,11 @@ class RessursDaoTest {
                             request =
                                 row
                                     .string("request")
-                                    .let { objectMapper.readValue(it, DatadelingRequest::class.java) },
+                                    .let { objectMapper.readValue(it, DatadelingRequestDTO::class.java) },
                             response =
                                 row
                                     .stringOrNull("response")
-                                    ?.let { objectMapper.readValue(it, DatadelingResponse::class.java) },
+                                    ?.let { objectMapper.readValue(it, DatadelingResponseDTO::class.java) },
                         )
                     }.asList,
             )

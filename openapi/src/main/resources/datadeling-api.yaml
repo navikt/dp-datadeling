@@ -104,6 +104,25 @@ paths:
                 $ref: '#/components/schemas/DatadelingResponse'
       security:
         - azure: [ ]
+  /dagpenger/datadeling/v1/meldekort:
+    post:
+      description: |-
+        Returnerer meldekort basert på innsendte data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meldekort'
+      security:
+        - azure: [ ]
   /dagpenger/datadeling/v1/soknader:
     post:
       description: |-
@@ -248,6 +267,124 @@ components:
         - DAGPENGER_ARBEIDSSOKER_ORDINAER
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
+
+    Meldekort:
+      type: object
+      required:
+        - id
+        - ident
+        - status
+        - periode
+        - dager
+        - kanSendes
+        - kanEndres
+        - kanSendesFra
+        - sisteFristForTrekk
+        - opprettetAv
+        - type
+        - migrert
+      properties:
+        id:
+          type: string
+        ident:
+          type: string
+          description: Ident til dagpengebruker
+        status:
+          type: string
+          enum: [ TilUtfylling, Innsendt ]
+        type:
+          type: string
+          enum: [ Original, Korrigert ]
+        periode:
+          $ref: '#/components/schemas/MeldekortPeriode'
+        dager:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dag'
+        kanSendes:
+          type: boolean
+        kanEndres:
+          type: boolean
+        kanSendesFra:
+          type: string
+          format: date
+        sisteFristForTrekk:
+          type: string
+          format: date
+        opprettetAv:
+          $ref: '#/components/schemas/OpprettetAv'
+        # Kun relevant ved korrigering eller innsending av saksbehandler
+        originalMeldekortId:
+          type: string
+        begrunnelse:
+          type: string
+        # Kun relevant ved Innsendt
+        kilde:
+          $ref: '#/components/schemas/MeldekortKilde'
+        innsendtTidspunkt:
+          type: string
+          format: date-time
+        registrertArbeidssoker:
+          type: boolean
+        meldedato:
+          type: string
+          format: date
+        migrert:
+          type: boolean
+
+    MeldekortPeriode:
+      type: object
+      required: [ fraOgMed, tilOgMed ]
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+        tilOgMed:
+          type: string
+          format: date
+
+    Dag:
+      type: object
+      required: [ dato, aktiviteter, dagIndex ]
+      properties:
+        dato:
+          type: string
+          format: date
+        aktiviteter:
+          type: array
+          items:
+            $ref: '#/components/schemas/Aktivitet'
+        dagIndex:
+          type: integer
+
+    Aktivitet:
+      type: object
+      required: [ id, type ]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [ Arbeid, Syk, Utdanning, Fravaer ]
+        timer:
+          type: string
+          nullable: true
+
+    OpprettetAv:
+      type: string
+      enum: [ Arena, Dagpenger ]
+
+    MeldekortKilde:
+      type: object
+      description: Eksempelvis Bruker eller Saksbehandler
+      required: [ rolle, ident ]
+      properties:
+        rolle:
+          type: string
+          enum: [ Bruker, Saksbehandler ]
+        ident:
+          type: string
 
     Soknad:
       type: object

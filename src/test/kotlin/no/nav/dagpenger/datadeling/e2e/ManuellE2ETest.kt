@@ -1,7 +1,5 @@
 package no.nav.dagpenger.datadeling.e2e
 
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -11,35 +9,25 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.append
-import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.datadeling.Config.defaultHttpClient
 import no.nav.dagpenger.datadeling.api.datadelingApi
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class ManuellE2ETest {
-    val client =
-        HttpClient {
-            install(ContentNegotiation) {
-                register(
-                    ContentType.Application.Json,
-                    JacksonConverter(objectMapper),
-                )
-            }
-        }
-
     data class Token(
         val access_token: String,
     )
 
     fun tokenProvider(): String =
         runBlocking {
-            client.get("https://dp-maskinporten-client.intern.dev.nav.no/token").bodyAsText().let {
+            defaultHttpClient.get("https://dp-maskinporten-client.intern.dev.nav.no/token").bodyAsText().let {
                 objectMapper.readValue(it, Token::class.java).access_token
             }
         }
@@ -53,7 +41,7 @@ class ManuellE2ETest {
             }
 
             val request =
-                DatadelingRequest(
+                DatadelingRequestDTO(
                     personIdent = "02929898071",
                     fraOgMedDato = LocalDate.of(2023, 10, 1),
                 )

@@ -26,10 +26,10 @@ internal class KafkaLogger(
     init {
         Runtime.getRuntime().addShutdownHook(
             Thread {
-                logger.info("Closing KafkaAuditLogger Kafka producer")
+                logger.info { "Closing KafkaAuditLogger Kafka producer" }
                 kafkaProducer.flush()
                 kafkaProducer.close()
-                logger.info("done! ")
+                logger.info { "done! " }
             },
         )
     }
@@ -74,6 +74,9 @@ internal class KafkaLogger(
                 is DagpengerVedtakHentetHendelse ->
                     objectMapper.writeValueAsString(hendelse.response)
 
+                is DagpengerMeldekortHentetHendelse ->
+                    objectMapper.writeValueAsString(hendelse.response)
+
                 is DagpengerPeriodeSpørringHendelse -> null
             }
         val request: String? =
@@ -91,6 +94,9 @@ internal class KafkaLogger(
                     hendelse.request
 
                 is DagpengerVedtakHentetHendelse ->
+                    hendelse.request.toString()
+
+                is DagpengerMeldekortHentetHendelse ->
                     hendelse.request.toString()
 
                 is DagpengerPeriodeSpørringHendelse -> null

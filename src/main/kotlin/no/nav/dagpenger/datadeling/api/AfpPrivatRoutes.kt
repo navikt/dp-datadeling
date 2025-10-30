@@ -18,12 +18,12 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingResponse
 import java.util.UUID
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
@@ -40,7 +40,7 @@ fun Route.afpPrivatRoutes(
             post {
                 withContext(Dispatchers.IO) {
                     try {
-                        val request = call.receive<DatadelingRequest>()
+                        val request = call.receive<DatadelingRequestDTO>()
                         val ressurs = requireNotNull(ressursService.opprett(request))
                         val ressursUrl = "${Config.dpDatadelingUrl}/dagpenger/datadeling/v1/periode/${ressurs.uuid}"
                         auditLogger.log(
@@ -52,7 +52,7 @@ fun Route.afpPrivatRoutes(
 
                         launch {
                             try {
-                                val perioder: DatadelingResponse = perioderService.hentDagpengeperioder(request)
+                                val perioder: DatadelingResponseDTO = perioderService.hentDagpengeperioder(request)
                                 ressursService.ferdigstill(ressurs.uuid, perioder)
                             } catch (e: Exception) {
                                 ressursService.markerSomFeilet(ressurs.uuid)

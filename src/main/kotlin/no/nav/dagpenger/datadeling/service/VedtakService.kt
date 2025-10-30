@@ -4,12 +4,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.model.Vedtak
-import no.nav.dagpenger.kontrakter.datadeling.DatadelingRequest
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 
 class VedtakService(
     private val proxyClient: ProxyClient,
 ) {
-    fun hentVedtak(request: DatadelingRequest): List<Vedtak> =
+    fun hentVedtak(request: DatadelingRequestDTO): List<Vedtak> =
         runBlocking {
             val proxyResponse = async { proxyClient.hentVedtak(request) }
 
