@@ -1,15 +1,22 @@
 package no.nav.dagpenger.datadeling
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
-import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
+import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
 import no.nav.dagpenger.datadeling.sporing.NoopLogger
@@ -38,7 +45,6 @@ internal object Config {
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-q1",
                 "KAFKA_RESET_POLICY" to "latest",
                 "DP_DATADELING_URL" to "http://localhost",
-                "DP_PROXY_CLIENT_MAX_RETRIES" to "5",
             ),
         )
 
@@ -87,13 +93,16 @@ internal object Config {
         properties[Key("DP_DATADELING_URL", stringType)]
     }
 
+    val dpMeldekortregisterUrl by lazy {
+        properties[Key("DP_MELDEKORTREGISTER_URL", stringType)]
+    }
+    val dpMeldekortregisterTokenProvider by lazy {
+        azureAdTokenSupplier(properties[Key("DP_MELDEKORTREGISTER_SCOPE", stringType)])
+    }
+
     val dpProxyUrl by lazy {
         properties[Key("DP_PROXY_URL", stringType)]
     }
-    val dpProxyClientMaxRetries: Int by lazy {
-        properties[Key("DP_PROXY_CLIENT_MAX_RETRIES", intType)]
-    }
-
     val dpProxyTokenProvider by lazy {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
     }
@@ -128,6 +137,22 @@ internal object Config {
     val isLocalEnvironment: Boolean by lazy {
         properties.getOrNull(Key("NAIS_CLUSTER_NAME", stringType)) == null
     }
+
+    val defaultHttpClient =
+        HttpClient {
+            install(ContentNegotiation) {
+                jackson {
+                    registerModule(JavaTimeModule())
+                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                }
+            }
+            installRetryClient(
+                maksRetries = 5,
+            )
+            install(Logging) {
+                level = LogLevel.INFO
+            }
+        }
 
     private val azureAdClient: CachedOauth2Client by lazy {
         val azureAdConfig = OAuth2Config.AzureAd(properties)

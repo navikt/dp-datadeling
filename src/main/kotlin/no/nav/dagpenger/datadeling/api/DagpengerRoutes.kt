@@ -14,13 +14,14 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.service.MeldekortService
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.service.SøknaderService
 import no.nav.dagpenger.datadeling.service.VedtakService
+import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
@@ -31,6 +32,7 @@ private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
+    meldekortService: MeldekortService,
     søknaderService: SøknaderService,
     vedtakService: VedtakService,
     auditLogger: Log = Config.logger,
@@ -67,12 +69,43 @@ fun Route.dagpengerRoutes(
                 }
             }
 
+            route("/meldekort") {
+                post {
+                    try {
+                        val request = call.receive<DatadelingRequestDTO>()
+
+                        val response = meldekortService.hentMeldekort(request)
+
+                        auditLogger.log(
+                            DagpengerMeldekortHentetHendelse(
+                                saksbehandlerNavIdent = call.clientId(),
+                                request = request,
+                                response = response,
+                            ),
+                        )
+
+                        call.respond(HttpStatusCode.OK, response)
+                    } catch (e: BadRequestException) {
+                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om meldekort. Se sikkerlogg for detaljer" }
+                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om meldekort. Detaljer:" }
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            "Kunne ikke lese innholdet i forespørselen om meldekort",
+                        )
+                    } catch (e: Exception) {
+                        defaultLogger.error { "Kunne ikke hente meldekort. Se sikkerlogg for detaljer" }
+                        sikkerlogger.error(e) { "Kunne ikke hente meldekort. Detaljer:" }
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente meldekort")
+                    }
+                }
+            }
+
             route("/soknader") {
                 post {
                     try {
                         val request = call.receive<DatadelingRequestDTO>()
 
-                        val response: List<Søknad> = søknaderService.hentSøknader(request)
+                        val response = søknaderService.hentSøknader(request)
 
                         auditLogger.log(
                             DagpengerSøknaderHentetHendelse(

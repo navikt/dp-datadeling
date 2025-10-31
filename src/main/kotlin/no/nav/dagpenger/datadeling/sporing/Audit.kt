@@ -10,6 +10,7 @@ import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import java.util.UUID
 
 sealed class AuditHendelse(
@@ -68,6 +69,20 @@ class DagpengerPerioderHentetHendelse(
         ident = request.personIdent,
         saksbehandlerNavIdent = saksbehandlerNavIdent,
         auditMelding = "Henter ut dagpenger perioder",
+        auditOperasjon = AuditOperasjon.READ,
+        aktivitetsLogg = Aktivitetslogg(),
+    ) {
+    override fun kontekst(): Map<String, String> = emptyMap()
+}
+
+class DagpengerMeldekortHentetHendelse(
+    saksbehandlerNavIdent: String,
+    val request: DatadelingRequestDTO,
+    val response: List<MeldekortDTO>,
+) : AuditHendelse(
+        ident = request.personIdent,
+        saksbehandlerNavIdent = saksbehandlerNavIdent,
+        auditMelding = "Henter ut dagpenger meldekort",
         auditOperasjon = AuditOperasjon.READ,
         aktivitetsLogg = Aktivitetslogg(),
     ) {
