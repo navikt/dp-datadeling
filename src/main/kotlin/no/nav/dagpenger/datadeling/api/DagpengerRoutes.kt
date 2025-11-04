@@ -10,7 +10,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
@@ -35,7 +34,7 @@ fun Route.dagpengerRoutes(
     meldekortService: MeldekortService,
     søknaderService: SøknaderService,
     vedtakService: VedtakService,
-    auditLogger: Log = Config.logger,
+    auditLogger: Log,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 

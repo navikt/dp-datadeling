@@ -31,7 +31,7 @@ private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 fun Route.afpPrivatRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
-    auditLogger: Log = Config.logger,
+    auditLogger: Log,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
 

@@ -30,6 +30,7 @@ import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.datadeling.testutil.januar
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -57,7 +58,7 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og poll til ressurs har status FERDIG`() =
         testApplication {
             application {
-                datadelingApi(Config.appConfig.copy(isLocal = true))
+                datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true))
             }
 
             val response =
@@ -136,7 +137,7 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og marker som FEILET ved error fra baksystem`() =
         testApplication {
             application {
-                datadelingApi(Config.appConfig.copy(isLocal = true))
+                datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true))
             }
 
             mockProxyError()

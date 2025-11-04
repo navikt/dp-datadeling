@@ -8,18 +8,14 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.datadeling.KafkaAivenCredentials.Companion.producerConfig
 import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
-import no.nav.dagpenger.datadeling.sporing.KafkaLogger
-import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 import org.apache.kafka.clients.CommonClientConfigs
@@ -31,8 +27,6 @@ import java.net.URI
 import java.net.URL
 import java.util.Properties
 import javax.sql.DataSource
-
-private val log = KotlinLogging.logger {}
 
 internal object Config {
     val IDENT_REGEX = Regex("^[0-9]{11}$")
@@ -105,37 +99,6 @@ internal object Config {
     }
     val dpProxyTokenProvider by lazy {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
-    }
-
-    val logger by lazy {
-        when (isLocalEnvironment) {
-            true -> {
-                log.info { "Using no-op audit logger" }
-                NoopLogger
-            }
-
-            else -> {
-                log.info { "Using Kafka audit logger" }
-                KafkaLogger()
-            }
-        }
-    }
-
-    val sporTopic: String by lazy {
-        properties.getOrElse(Key("KAFKA_SPOR_TOPIC", stringType)) { "public-sporingslogg-loggmeldingmottatt" }
-    }
-    val auditTopic: String = "teamdagpenger.rapid.v1"
-
-    val aivenKafkaConfig by lazy {
-        producerConfig(
-            appId = "dp-datadeling",
-            bootStapServerUrl = properties[Key("KAFKA_BROKERS", stringType)],
-            aivenCredentials = KafkaAivenCredentials(),
-        )
-    }
-
-    val isLocalEnvironment: Boolean by lazy {
-        properties.getOrNull(Key("NAIS_CLUSTER_NAME", stringType)) == null
     }
 
     val defaultHttpClient =
