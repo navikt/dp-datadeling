@@ -1,7 +1,7 @@
 
 
 val kontrakterVersion = "3.0_20240408122747_6eff346"
-val mockOauth2Version = "3.0.0"
+val mockOauth2Version = "3.0.1"
 val wiremockVersion = "3.0.1"
 
 plugins {
