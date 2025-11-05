@@ -4,26 +4,19 @@ import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.JacksonConverter
-import io.ktor.server.application.install
-import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.datadeling.Config
-import no.nav.dagpenger.datadeling.TestApplication.issueMaskinportenToken
-import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestApplication
-import no.nav.dagpenger.datadeling.api.config.konfigurerApi
+import no.nav.dagpenger.datadeling.api.TestApplication.issueMaskinportenToken
+import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
-import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
-import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.datadeling.testGet
 import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testutil.FNR
@@ -37,12 +30,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AfpPrivatRoutesTest {
-    private val ressursService: RessursService = mockk(relaxed = true)
+    private val ressursService: RessursService =
+        mockk<RessursService>(relaxed = true)
     private val perioderService: PerioderService = mockk(relaxed = true)
 
     @Test
     fun `returnerer 401 uten token`() =
-        testPerioderEndpoint {
+        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
             client.testPost("/dagpenger/datadeling/v1/periode", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -50,7 +44,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 500 hvis oppretting av ressurs feiler`() =
-        testPerioderEndpoint {
+        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
             coEvery { ressursService.opprett(any()) }.throws(Exception())
             Config.appConfig.maskinporten.also {
                 println(it)
@@ -63,7 +57,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 200 og url til ressurs`() =
-        testPerioderEndpoint {
+        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
             val ressurs = enRessurs()
             coEvery { ressursService.opprett(any()) } returns ressurs
             coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
@@ -77,7 +71,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 404 om en ressus ikke finnes`() {
-        testPerioderEndpoint {
+        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
             val uuid = UUID.randomUUID()
 
             coEvery { ressursService.hent(uuid) } returns null
@@ -92,7 +86,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer ressurs om den finnes`() =
-        testPerioderEndpoint {
+        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
             val uuid = UUID.randomUUID()
             val ressurs =
                 enRessurs(
@@ -136,7 +130,7 @@ class AfpPrivatRoutesTest {
                     hendelser.add(hendelse)
                 }
             }
-        testPerioderEndpoint(logger) {
+        testEndepunkter(auditLogger = logger, ressursService = ressursService, perioderService = perioderService) {
             val ressurs = enRessurs()
             coEvery { ressursService.opprett(any()) } returns ressurs
 
@@ -166,7 +160,7 @@ class AfpPrivatRoutesTest {
                 }
             }
         val uuid = UUID.randomUUID()
-        testPerioderEndpoint(logger) {
+        testEndepunkter(auditLogger = logger, ressursService = ressursService, perioderService = perioderService) {
             coEvery { ressursService.hent(uuid) } returns
                 enRessurs(
                     uuid = uuid,
@@ -186,21 +180,6 @@ class AfpPrivatRoutesTest {
                 it.ident() shouldBe FNR
                 // todo test ressurs
             }
-        }
-    }
-
-    private fun testPerioderEndpoint(
-        auditLogger: Log = NoopLogger,
-        block: suspend ApplicationTestBuilder.() -> Unit,
-    ) {
-        withMockAuthServerAndTestApplication(moduleFunction = {
-            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
-                register(ContentType.Application.Json, JacksonConverter(objectMapper))
-            }
-            konfigurerApi(appConfig = Config.appConfig)
-        }) {
-            routing { afpPrivatRoutes(ressursService, perioderService, auditLogger) }
-            block()
         }
     }
 }

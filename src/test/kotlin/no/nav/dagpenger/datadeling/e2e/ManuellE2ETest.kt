@@ -14,11 +14,9 @@ import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.Config.defaultHttpClient
-import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.db.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -42,7 +40,7 @@ class ManuellE2ETest {
     fun bubba() {
         testApplication {
             application {
-                datadelingApi(NoopLogger, behandlingResultatRepository = behandlingResultatRepository)
+                // datadelingApi(NoopLogger)
             }
 
             val request =

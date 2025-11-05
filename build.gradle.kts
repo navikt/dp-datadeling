@@ -48,6 +48,8 @@ dependencies {
     implementation("no.nav.dagpenger:aktivitetslogg:20251016.40.a3c526")
     // Test
     testImplementation(libs.ktor.server.test.host)
+    // Naisful test app
+    implementation("com.github.navikt.tbd-libs:naisful-test-app:2025.09.19-13.31-61342e73")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation(libs.testcontainer.postgresql)

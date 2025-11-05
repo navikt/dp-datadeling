@@ -3,17 +3,11 @@ package no.nav.dagpenger.datadeling.api
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.JacksonConverter
-import io.ktor.server.application.install
-import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.coEvery
 import io.mockk.mockk
-import no.nav.dagpenger.datadeling.Config
-import no.nav.dagpenger.datadeling.TestApplication.issueAzureToken
-import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestApplication
-import no.nav.dagpenger.datadeling.api.config.konfigurerApi
+import no.nav.dagpenger.datadeling.api.TestApplication.issueAzureToken
+import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
 import no.nav.dagpenger.datadeling.model.Søknad
 import no.nav.dagpenger.datadeling.model.Vedtak
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
@@ -32,7 +26,6 @@ import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
-import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testPostText
 import no.nav.dagpenger.datadeling.testutil.FNR
@@ -52,7 +45,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for perioder`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/perioder", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -60,7 +53,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for meldekort`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/meldekort", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -68,7 +61,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for soknader`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/soknader", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -76,7 +69,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for siste soknad`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/siste_soknad", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -84,7 +77,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 401 uten token for vedtak`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/vedtak", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -92,7 +85,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for perioder`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/perioder", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -100,7 +93,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for meldekort`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/meldekort", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -108,7 +101,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for soknader`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/soknader", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -116,7 +109,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for siste søknad`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPostText("/dagpenger/datadeling/v1/siste_soknad", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -124,7 +117,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for vedtak`() =
-        testEndpoint {
+        testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/vedtak", "", issueAzureToken()).apply {
                 assertEquals(HttpStatusCode.BadRequest, this.status)
             }
@@ -132,7 +125,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 200 og DatadelingResponse`() =
-        testEndpoint {
+        testEndepunkter(perioderService = perioderService) {
             val response =
                 enDatadelingResponse(
                     PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
@@ -152,7 +145,7 @@ class DagpengerRoutesTest {
 
     @Test
     fun `returnerer 200 og Meldekort-liste`() =
-        testEndpoint {
+        testEndepunkter {
             val response = listOf<MeldekortDTO>()
             coEvery { meldekortservice.hentMeldekort(any()) } returns response
 
@@ -188,7 +181,7 @@ class DagpengerRoutesTest {
             )
         coEvery { perioderService.hentDagpengeperioder(any()) } returns response
 
-        testEndpoint(logger) {
+        testEndepunkter(auditLogger = logger, perioderService = perioderService) {
             client.testPost(
                 "/dagpenger/datadeling/v1/perioder",
                 request,
@@ -223,7 +216,7 @@ class DagpengerRoutesTest {
         val response = listOf<MeldekortDTO>()
         coEvery { meldekortservice.hentMeldekort(any()) } returns response
 
-        testEndpoint(logger) {
+        testEndepunkter(auditLogger = logger) {
             client.testPost(
                 "/dagpenger/datadeling/v1/meldekort",
                 request,
@@ -276,7 +269,7 @@ class DagpengerRoutesTest {
             )
         coEvery { søknaderService.hentSøknader(any()) } returns response
 
-        testEndpoint(logger) {
+        testEndepunkter(auditLogger = logger, søknaderService = søknaderService) {
             client.testPost(
                 "/dagpenger/datadeling/v1/soknader",
                 request,
@@ -315,7 +308,7 @@ class DagpengerRoutesTest {
             )
         coEvery { søknaderService.hentSisteSøknad(any()) } returns response
 
-        testEndpoint(logger) {
+        testEndepunkter(auditLogger = logger, søknaderService = søknaderService) {
             client.testPostText(
                 "/dagpenger/datadeling/v1/siste_soknad",
                 FNR,
@@ -368,7 +361,7 @@ class DagpengerRoutesTest {
             )
         coEvery { vedtakService.hentVedtak(any()) } returns response
 
-        testEndpoint(logger) {
+        testEndepunkter(auditLogger = logger, vedtakService = vedtakService) {
             client.testPost(
                 "/dagpenger/datadeling/v1/vedtak",
                 request,
@@ -382,21 +375,6 @@ class DagpengerRoutesTest {
                 it.request shouldBe request
                 it.response shouldBe response
             }
-        }
-    }
-
-    private fun testEndpoint(
-        auditLogger: Log = NoopLogger,
-        block: suspend ApplicationTestBuilder.() -> Unit,
-    ) {
-        withMockAuthServerAndTestApplication(moduleFunction = {
-            konfigurerApi(appConfig = Config.appConfig)
-            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
-                register(ContentType.Application.Json, JacksonConverter(objectMapper))
-            }
-        }) {
-            routing { dagpengerRoutes(perioderService, meldekortservice, søknaderService, vedtakService, auditLogger) }
-            block()
         }
     }
 }

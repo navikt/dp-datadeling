@@ -1,8 +1,20 @@
-package no.nav.dagpenger.datadeling
+package no.nav.dagpenger.datadeling.api
 
+import com.github.navikt.tbd_libs.naisful.test.TestContext
+import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.ktor.server.application.Application
-import io.ktor.server.testing.ApplicationTestBuilder
-import io.ktor.server.testing.testApplication
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.mockk.mockk
+import no.nav.dagpenger.datadeling.Config
+import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.datadeling.service.MeldekortService
+import no.nav.dagpenger.datadeling.service.PerioderService
+import no.nav.dagpenger.datadeling.service.SøknaderService
+import no.nav.dagpenger.datadeling.service.VedtakService
+import no.nav.dagpenger.datadeling.sporing.Log
+import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
 object TestApplication {
@@ -61,11 +73,45 @@ object TestApplication {
 
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
-        test: suspend ApplicationTestBuilder.() -> Unit,
-    ) = testApplication {
-        setup()
-        application(moduleFunction)
-        test()
-        teardown()
+        test: suspend TestContext.() -> Unit,
+    ) {
+        try {
+            setup()
+            return naisfulTestApp(
+                {
+                    apply { moduleFunction() }
+                },
+                objectMapper,
+                PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            ) {
+                test()
+            }
+        } finally {
+            teardown()
+        }
+    }
+
+    internal fun testEndepunkter(
+        perioderService: PerioderService = mockk(relaxed = true),
+        meldekortService: MeldekortService = mockk(relaxed = true),
+        søknaderService: SøknaderService = mockk(relaxed = true),
+        vedtakService: VedtakService = mockk(relaxed = true),
+        ressursService: RessursService = mockk(relaxed = true),
+        auditLogger: Log = NoopLogger,
+        test: suspend TestContext.() -> Unit,
+    ) {
+        withMockAuthServerAndTestApplication(moduleFunction = {
+            datadelingApi(
+                logger = auditLogger,
+                config = Config.appConfig,
+                perioderService = perioderService,
+                meldekortService = meldekortService,
+                søknaderService = søknaderService,
+                vedtakService = vedtakService,
+                ressursService = ressursService,
+            )
+        }) {
+            test()
+        }
     }
 }
