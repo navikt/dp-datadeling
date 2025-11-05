@@ -4,6 +4,7 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import no.nav.dagpenger.datadeling.db.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.testutil.emptyResponse
@@ -17,7 +18,8 @@ import org.junit.jupiter.api.Test
 
 class PerioderServiceTest {
     private val proxyClient = mockk<ProxyClient>()
-    private val perioderService = PerioderService(proxyClient)
+    private val behandlingResultatRepository = mockk<BehandlingResultatRepository>()
+    private val perioderService = PerioderService(proxyClient, behandlingResultatRepository)
 
     @AfterEach
     fun cleanup() {
@@ -28,6 +30,7 @@ class PerioderServiceTest {
     fun `ingen perioder`() =
         runTest {
             coEvery { proxyClient.hentDagpengeperioder(any()) } returns emptyResponse()
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             val request = enDatadelingRequest(1.januar()..10.januar())
             val response = perioderService.hentDagpengeperioder(request)
@@ -42,6 +45,7 @@ class PerioderServiceTest {
             val response = enDatadelingResponse(enPeriode(1.januar()..6.januar()))
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             assertEquals(response.perioder, perioderService.hentDagpengeperioder(request).perioder)
         }
@@ -58,6 +62,7 @@ class PerioderServiceTest {
                 )
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             perioderService.hentDagpengeperioder(request).let {
                 assertEquals(1, it.perioder.size)
@@ -78,6 +83,7 @@ class PerioderServiceTest {
                 )
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             perioderService.hentDagpengeperioder(request).let {
                 assertEquals(2, it.perioder.size)
@@ -97,6 +103,7 @@ class PerioderServiceTest {
                 )
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             perioderService.hentDagpengeperioder(request).let {
                 assertEquals(2, it.perioder.size)
@@ -111,6 +118,7 @@ class PerioderServiceTest {
             val response = enDatadelingResponse(enPeriode(1.januar()..11.januar()))
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             perioderService.hentDagpengeperioder(request).let {
                 assertEquals(1, it.perioder.size)
@@ -126,6 +134,7 @@ class PerioderServiceTest {
             val response = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null))
 
             coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             perioderService.hentDagpengeperioder(request).let {
                 assertEquals(1, it.perioder.size)

@@ -3,7 +3,10 @@ package no.nav.dagpenger.datadeling.api
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.server.application.install
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -388,6 +391,9 @@ class DagpengerRoutesTest {
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
             konfigurerApi(appConfig = Config.appConfig)
+            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter(objectMapper))
+            }
         }) {
             routing { dagpengerRoutes(perioderService, meldekortservice, søknaderService, vedtakService, auditLogger) }
             block()

@@ -3,6 +3,7 @@ package no.nav.dagpenger.datadeling.api
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.server.application.Application
+import io.ktor.server.application.install
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.datadeling.AppConfig
@@ -11,6 +12,7 @@ import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.db.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.service.MeldekortService
 import no.nav.dagpenger.datadeling.service.MeldekortregisterClient
 import no.nav.dagpenger.datadeling.service.PerioderService
@@ -22,13 +24,14 @@ import no.nav.dagpenger.datadeling.sporing.Log
 fun Application.datadelingApi(
     logger: Log,
     config: AppConfig = Config.appConfig,
+    behandlingResultatRepository: BehandlingResultatRepository,
 ) {
     konfigurerApi(config)
 
     val meldekortregisterClient = MeldekortregisterClient()
     val proxyClient = ProxyClient()
 
-    val perioderService = PerioderService(proxyClient)
+    val perioderService = PerioderService(proxyClient, behandlingResultatRepository)
     val meldekortService = MeldekortService(meldekortregisterClient)
     val søknaderService = SøknaderService()
     val vedtakService = VedtakService(proxyClient)

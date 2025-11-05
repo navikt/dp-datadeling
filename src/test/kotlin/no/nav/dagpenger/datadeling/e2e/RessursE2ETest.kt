@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -14,7 +15,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.append
+import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.server.application.install
 import io.ktor.server.testing.testApplication
+import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +29,7 @@ import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.db.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
@@ -41,6 +46,7 @@ import java.util.UUID
 
 class RessursE2ETest : AbstractE2ETest() {
     private lateinit var ressursService: RessursService
+    private val behandlingResultatRepository = mockk<BehandlingResultatRepository>()
 
     val scope = CoroutineScope(Dispatchers.Default)
 
@@ -58,7 +64,10 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og poll til ressurs har status FERDIG`() =
         testApplication {
             application {
-                datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true))
+                install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    register(ContentType.Application.Json, JacksonConverter(objectMapper))
+                }
+                datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true), behandlingResultatRepository)
             }
 
             val response =
@@ -75,6 +84,7 @@ class RessursE2ETest : AbstractE2ETest() {
                 )
 
             mockProxyResponse(response, delayMs = 200)
+            coEvery { behandlingResultatRepository.hent(any()) } returns emptyList()
 
             val request =
                 DatadelingRequestDTO(
@@ -137,10 +147,11 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og marker som FEILET ved error fra baksystem`() =
         testApplication {
             application {
-                datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true))
+                install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    register(ContentType.Application.Json, JacksonConverter(objectMapper))
+                }
+                datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true), behandlingResultatRepository)
             }
-
-            mockProxyError()
 
             val request =
                 DatadelingRequestDTO(
