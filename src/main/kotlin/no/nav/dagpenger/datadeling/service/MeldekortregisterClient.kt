@@ -17,10 +17,11 @@ class MeldekortregisterClient(
     private val tokenProvider: () -> String = Config.dpMeldekortregisterTokenProvider,
 ) {
     suspend fun hentMeldekort(request: DatadelingRequestDTO) =
-        defaultHttpClient.post("$dpMeldekortregisterUrl/datadeling/meldekort") {
-            bearerAuth(tokenProvider.invoke())
-            header(HttpHeaders.Accept, ContentType.Application.Json)
-            header(HttpHeaders.ContentType, ContentType.Application.Json)
-            setBody(request)
-        }.body<List<MeldekortDTO>>()
+        defaultHttpClient
+            .post("$dpMeldekortregisterUrl/datadeling/meldekort") {
+                bearerAuth(tokenProvider.invoke())
+                header(HttpHeaders.Accept, ContentType.Application.Json)
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
+                setBody(request)
+            }.body<List<MeldekortDTO>>()
 }
