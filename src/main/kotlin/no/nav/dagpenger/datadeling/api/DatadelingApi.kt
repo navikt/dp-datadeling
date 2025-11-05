@@ -4,8 +4,6 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.server.application.Application
 import io.ktor.server.routing.routing
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.Config
@@ -25,8 +23,7 @@ fun Application.datadelingApi(
     logger: Log,
     config: AppConfig = Config.appConfig,
 ) {
-    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-    konfigurerApi(appMicrometerRegistry, config)
+    konfigurerApi(config)
 
     val meldekortregisterClient = MeldekortregisterClient()
     val proxyClient = ProxyClient()
@@ -41,7 +38,6 @@ fun Application.datadelingApi(
     val ressursService = RessursService(ressursDao, leaderElector, config.ressurs)
 
     routing {
-        livenessRoutes(appMicrometerRegistry)
         afpPrivatRoutes(ressursService, perioderService, logger)
         dagpengerRoutes(perioderService, meldekortService, søknaderService, vedtakService, logger)
     }
