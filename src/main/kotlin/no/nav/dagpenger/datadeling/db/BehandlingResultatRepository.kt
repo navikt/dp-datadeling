@@ -127,7 +127,7 @@ class BehandlingResultatRepository {
 }
 
 fun Row.toBehandlingResultat(): BehandlingResultat {
-    val jsonData = this.string("json_data")
+    val jsonData = this.binaryStream("json_data")
     val behandlingResultatNode: JsonNode = objectMapper.readTree(jsonData)
     return BehandlingResultatV1Tolker(behandlingResultatNode)
 }
