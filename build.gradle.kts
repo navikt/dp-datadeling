@@ -27,7 +27,7 @@ dependencies {
     implementation("com.github.navikt.tbd-libs:naisful-app:2025.09.19-13.31-61342e73")
 
     // Prometheus open metrics
-    implementation("io.prometheus:prometheus-metrics-core:1.3.1")
+    implementation("io.prometheus:prometheus-metrics-core:1.4.2")
 
     // Ktor Client
     implementation(libs.bundles.ktor.client)
