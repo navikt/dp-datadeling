@@ -9,6 +9,7 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
+import java.time.LocalDate
 
 class PerioderService(
     private val proxyClient: ProxyClient,
@@ -21,20 +22,20 @@ class PerioderService(
                 async {
                     val periodeDTO: List<PeriodeDTO> =
                         repository.hent(request.personIdent).flatMap { res ->
-                            res.rettighetsperioder.map { rett ->
+                            res.rettighetsperioder.map { rettighetsperiode ->
                                 val rettighetstype =
                                     res.rettighetstyper
                                         .firstOrNull { rettighetstyper ->
                                             (
-                                                rettighetstyper.fraOgMed.isBefore(rett.fraOgMed) ||
-                                                    rettighetstyper.fraOgMed.isEqual(rett.fraOgMed)
+                                                rettighetstyper.fraOgMed.isBefore(rettighetsperiode.fraOgMed) ||
+                                                    rettighetstyper.fraOgMed.isEqual(rettighetsperiode.fraOgMed)
                                             ) &&
-                                                (rettighetstyper.tilOgMed.isAfter(rett.tilOgMed))
+                                                (rettighetstyper.tilOgMed.isAfter(rettighetsperiode.tilOgMed ?: LocalDate.MAX))
                                         }?.type ?: Rettighetstype.ORDINÆR
 
                                 PeriodeDTO(
-                                    fraOgMedDato = rett.fraOgMed,
-                                    tilOgMedDato = rett.tilOgMed,
+                                    fraOgMedDato = rettighetsperiode.fraOgMed,
+                                    tilOgMedDato = rettighetsperiode.tilOgMed,
                                     ytelseType =
                                         when (rettighetstype) {
                                             Rettighetstype.ORDINÆR -> YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER
