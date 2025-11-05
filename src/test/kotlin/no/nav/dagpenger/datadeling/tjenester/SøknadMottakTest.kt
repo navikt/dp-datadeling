@@ -94,7 +94,7 @@ private const val SYNTHETIC_DELAY_SECONDS: Long = 5
 private val søknadJson =
     """
     {
-      "@event_name": "innsending_mottatt",
+      "@event_name": "innsending_ferdigstilt",
       "@opprettet": "${LocalDateTime.now()}",
       "fødselsnummer": "01020312345",
       "journalpostId": "111",
@@ -124,7 +124,7 @@ private val papirsøknadJson =
       "fødselsnummer": "01020312346",
       "aktørId": "1234455",
       "søknadsData": {},
-      "@event_name": "innsending_mottatt",
+      "@event_name": "innsending_ferdigstilt",
       "system_read_count": 0
     }
     """.trimIndent()
@@ -133,7 +133,7 @@ private val papirsøknadJson =
 private val søknadJsonFraNyQuiz =
     """
     {
-      "@event_name": "innsending_mottatt",
+      "@event_name": "innsending_ferdigstilt",
       "@opprettet": "${LocalDateTime.now()}",
       "fødselsnummer": "01020312347",
       "journalpostId": "333",

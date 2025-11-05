@@ -28,7 +28,7 @@ internal class SøknadMottak(
     init {
         River(rapidsConnection)
             .apply {
-                precondition { it.requireValue("@event_name", "innsending_mottatt") }
+                precondition { it.requireValue("@event_name", "innsending_ferdigstilt") }
                 validate {
                     it.requireKey(
                         "fødselsnummer",
