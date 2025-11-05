@@ -24,7 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
 
     // Naisful app
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.09.19-13.31-61342e73")
+    implementation("com.github.navikt.tbd-libs:naisful-app:2025.11.04-10.54-c831038e")
 
     // Prometheus open metrics
     implementation("io.prometheus:prometheus-metrics-core:1.4.2")
