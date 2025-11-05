@@ -12,7 +12,6 @@ import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
 import no.nav.dagpenger.datadeling.tjenester.SøknadMottak
-import no.nav.dagpenger.datadeling.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.LoggerFactory
 
@@ -53,7 +52,6 @@ internal class ApplicationBuilder(
                 },
             ).apply {
                 SøknadMottak(this)
-                VedtakMottak(this)
             }
 
     init {

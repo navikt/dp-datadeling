@@ -36,7 +36,7 @@ internal object Config {
             mapOf(
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-datadeling-v1",
                 "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-                "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-q1",
+                "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1",
                 "KAFKA_RESET_POLICY" to "latest",
                 "DP_DATADELING_URL" to "http://localhost",
             ),
@@ -44,7 +44,7 @@ internal object Config {
 
     private val prodProperties =
         ConfigurationMap(
-            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-p",
+            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1",
         )
 
     val datasource: DataSource by lazy { dataSource }
