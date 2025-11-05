@@ -44,6 +44,7 @@ spec:
     outbound:
       rules:
         - application: dp-meldekortregister
+        - application: dp-saksbehandling
       external:
         - host: "{{ dpProxyHost }}"
   leaderElection: true
@@ -62,6 +63,8 @@ spec:
       value: https://{{ dpDatadelingHost }}
     - name: KAFKA_SPOR_TOPIC
       value: "{{ kafkaSporTopic }}"
+    - name: DP_SAKSBEHANDLING_SCOPE
+      value: "{{ dp-saksbehandling.scope }}"
 
   azure:
     application:
