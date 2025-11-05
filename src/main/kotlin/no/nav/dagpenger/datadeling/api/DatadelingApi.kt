@@ -3,6 +3,7 @@ package no.nav.dagpenger.datadeling.api
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.server.application.Application
+import io.ktor.server.application.install
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.datadeling.AppConfig

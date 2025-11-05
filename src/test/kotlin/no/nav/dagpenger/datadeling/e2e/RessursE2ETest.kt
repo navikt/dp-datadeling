@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -14,6 +15,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.append
+import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.server.application.install
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +61,9 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og poll til ressurs har status FERDIG`() =
         testApplication {
             application {
+                install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    register(ContentType.Application.Json, JacksonConverter(objectMapper))
+                }
                 datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true))
             }
 
@@ -137,10 +143,11 @@ class RessursE2ETest : AbstractE2ETest() {
     fun `opprett ressurs og marker som FEILET ved error fra baksystem`() =
         testApplication {
             application {
+                install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    register(ContentType.Application.Json, JacksonConverter(objectMapper))
+                }
                 datadelingApi(NoopLogger, Config.appConfig.copy(isLocal = true))
             }
-
-            mockProxyError()
 
             val request =
                 DatadelingRequestDTO(

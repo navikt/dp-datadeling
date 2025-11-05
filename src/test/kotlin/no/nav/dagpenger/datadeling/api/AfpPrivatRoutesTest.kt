@@ -4,7 +4,10 @@ import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.server.application.install
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -14,6 +17,7 @@ import no.nav.dagpenger.datadeling.TestApplication.withMockAuthServerAndTestAppl
 import no.nav.dagpenger.datadeling.api.config.konfigurerApi
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.service.PerioderService
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
@@ -190,6 +194,9 @@ class AfpPrivatRoutesTest {
         block: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
+            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter(objectMapper))
+            }
             konfigurerApi(appConfig = Config.appConfig)
         }) {
             routing { afpPrivatRoutes(ressursService, perioderService, auditLogger) }
