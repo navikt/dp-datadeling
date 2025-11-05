@@ -10,7 +10,9 @@ import io.prometheus.metrics.model.registry.PrometheusRegistry
 import io.prometheus.metrics.tracer.initializer.SpanContextSupplier
 import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.datadeling.service.SakIdHenter
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
+import no.nav.dagpenger.datadeling.tjenester.BehandlingResultatMottak
 import no.nav.dagpenger.datadeling.tjenester.SøknadMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.LoggerFactory
@@ -47,11 +49,17 @@ internal class ApplicationBuilder(
                             datadelingApi(KafkaLogger(rapid))
                         }
                     }
-                    withKtorModule {
-                    }
                 },
             ).apply {
                 SøknadMottak(this)
+                BehandlingResultatMottak(
+                    rapidsConnection = this,
+                    sakIdHenter =
+                        SakIdHenter(
+                            baseUrl = Config.sakApiBaseUrl,
+                            tokenProvider = Config.sakApiToken,
+                        ),
+                )
             }
 
     init {

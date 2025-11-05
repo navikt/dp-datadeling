@@ -39,6 +39,7 @@ internal object Config {
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1",
                 "KAFKA_RESET_POLICY" to "latest",
                 "DP_DATADELING_URL" to "http://localhost",
+                "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling/",
             ),
         )
 
@@ -99,6 +100,20 @@ internal object Config {
     }
     val dpProxyTokenProvider by lazy {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
+    }
+
+    val sakApiBaseUrl by lazy {
+        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
+    }
+    val sakApiToken: () -> String by lazy {
+        azureAdTokenSupplier(
+            properties[
+                Key(
+                    "DP_SAKSBEHANDLING_SCOPE",
+                    stringType,
+                ),
+            ],
+        )
     }
 
     val defaultHttpClient =
