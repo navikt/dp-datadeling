@@ -9,6 +9,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.prometheus.metrics.model.registry.PrometheusRegistry
 import io.prometheus.metrics.tracer.initializer.SpanContextSupplier
 import no.nav.dagpenger.datadeling.api.datadelingApi
+import no.nav.dagpenger.datadeling.db.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.datadeling.service.SakIdHenter
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
@@ -30,6 +31,7 @@ internal class ApplicationBuilder(
             SpanContextSupplier.getSpanContext(),
         )
 
+    private val behandlingResultatRepository = BehandlingResultatRepository()
     private val rapidsConnection =
         RapidApplication
             .create(
@@ -46,7 +48,7 @@ internal class ApplicationBuilder(
                             readyCheck = rapid::isReady,
                             preStopHook = preStopHook::handlePreStopRequest,
                         ) {
-                            datadelingApi(KafkaLogger(rapid))
+                            datadelingApi(KafkaLogger(rapid), behandlingResultatRepository = behandlingResultatRepository)
                         }
                     }
                 },
@@ -59,6 +61,7 @@ internal class ApplicationBuilder(
                             baseUrl = Config.sakApiBaseUrl,
                             tokenProvider = Config.sakApiToken,
                         ),
+                    behandlingResultatRepository = behandlingResultatRepository,
                 )
             }
 

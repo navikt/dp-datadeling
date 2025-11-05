@@ -148,7 +148,7 @@ interface Rettighetsperiode {
 interface Rettighetstyper {
     val type: Rettighetstype
     val fraOgMed: LocalDate
-    val tilOgMed: LocalDate?
+    val tilOgMed: LocalDate
 }
 
 enum class Rettighetstype {

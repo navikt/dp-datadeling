@@ -10,10 +10,12 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.append
 import io.ktor.server.testing.testApplication
+import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.Config.defaultHttpClient
 import no.nav.dagpenger.datadeling.api.datadelingApi
+import no.nav.dagpenger.datadeling.db.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.sporing.NoopLogger
@@ -25,6 +27,8 @@ class ManuellE2ETest {
     data class Token(
         val access_token: String,
     )
+
+    private val behandlingResultatRepository = mockk<BehandlingResultatRepository>()
 
     fun tokenProvider(): String =
         runBlocking {
@@ -38,7 +42,7 @@ class ManuellE2ETest {
     fun bubba() {
         testApplication {
             application {
-                datadelingApi(NoopLogger)
+                datadelingApi(NoopLogger, behandlingResultatRepository = behandlingResultatRepository)
             }
 
             val request =

@@ -45,7 +45,7 @@ data class BehandlingResultatV1Tolker(
                                     Opplysningstyper.FISK -> Rettighetstype.FISK
                                 }
                             override val fraOgMed: LocalDate = periode["gyldigFraOgMed"]?.asOptionalLocalDate() ?: LocalDate.MIN
-                            override val tilOgMed: LocalDate? = periode["gyldigTilOgMed"]?.asOptionalLocalDate()
+                            override val tilOgMed: LocalDate = periode["gyldigTilOgMed"]?.asOptionalLocalDate() ?: LocalDate.MAX
                         }
                     } ?: emptyList()
             }
