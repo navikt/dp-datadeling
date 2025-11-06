@@ -17,13 +17,15 @@ data class BehandlingResultatV1Tolker(
     override val ident: String = jsonNode["ident"].asText()
     override val behandlingId: UUID = UUID.fromString(jsonNode["behandlingId"].asText())
     override val rettighetsperioder: List<Rettighetsperiode> =
-        jsonNode["rettighetsperioder"].map {
-            object : Rettighetsperiode {
-                override val fraOgMed: LocalDate = it["fraOgMed"].asLocalDate()
-                override val tilOgMed: LocalDate? = it["tilOgMed"]?.asOptionalLocalDate()
-                override val harRett: Boolean = it["harRett"].asBoolean()
+        jsonNode["rettighetsperioder"]
+            .filter { it["harRett"].asBoolean() }
+            .map {
+                object : Rettighetsperiode {
+                    override val fraOgMed: LocalDate = it["fraOgMed"].asLocalDate()
+                    override val tilOgMed: LocalDate? = it["tilOgMed"]?.asOptionalLocalDate()
+                    override val harRett: Boolean = it["harRett"].asBoolean()
+                }
             }
-        }
     override val rettighetstyper: List<Rettighetstyper> =
         jsonNode["opplysninger"]
             .filter {
