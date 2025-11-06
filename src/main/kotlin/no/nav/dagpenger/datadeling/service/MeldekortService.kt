@@ -2,7 +2,9 @@ package no.nav.dagpenger.datadeling.service
 
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 
-class MeldekortService(private val meldekortregisterClient: MeldekortregisterClient) {
+class MeldekortService(
+    private val meldekortregisterClient: MeldekortregisterClient,
+) {
     suspend fun hentMeldekort(request: DatadelingRequestDTO) =
         // dp-meldekortregister returnerer alle meldekort (både fra meldekortregister og Arena) for personId
         meldekortregisterClient.hentMeldekort(request)

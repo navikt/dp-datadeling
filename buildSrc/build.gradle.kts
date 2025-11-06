@@ -10,5 +10,5 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin"))
-    implementation("org.jlleitschuh.gradle:ktlint-gradle:12.1.0")
+    implementation("org.jlleitschuh.gradle:ktlint-gradle:13.1.0")
 }
