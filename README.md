@@ -4,15 +4,6 @@ Rest-API for deling av dagpengerelaterte data til interne og eksterne aktører.
 
 ## Bygging
 
-For å få tilgang til [dp-kontrakter](https://github.com/navikt/dp-kontrakter), må man opprette en fil som heter gradle.properties i GRADLE_USER_HOME (som by
-default er %user_home%/.gradle)  
-Filen må inneholde:
-
-```
-githubUser=x-access-token
-githubPassword=%YOUR_GITHUB_TOKEN%
-```
-
 Bygg ved å kjøre `./gradlew build`
 
 ### Linting
