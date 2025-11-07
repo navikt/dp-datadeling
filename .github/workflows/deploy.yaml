@@ -36,8 +36,8 @@ jobs:
           team: teamdagpenger
           push_image: true # optional, default true
           tag: ${{ github.sha }}
-          dockerfile: Dockerfile # optional, default Dockerfile
-          docker_context: . # optional, default .
+          docker_context: datadeling-api # optional, default .
+          dockerfile: datadeling-api/Dockerfile # optional, default Dockerfile
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
