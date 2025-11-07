@@ -15,7 +15,7 @@ Hvert subdomene har egen modul for å gjøre det enklere å finne frem i koden.
 - `soknad` - Inneholder domenemodeller og logikk knyttet til søknader om dagpenger
 - `behandling` - Inneholder logikk knyttet til behandling om dagpenger og vedtak
 - `meldekort` - Inneholder domenemodeller og logikk knyttet til meldekort om dagpenger
-- `periode` - Inneholder domenemodeller og logikk knyttet til perioder med dagpengerettigheter
+- `datadeling-api` - Inneholder REST-API for datadeling, konfigurering av sikkerhet, migreringsskripter og hovedapplikasjonen
 
 ### Linting
 
