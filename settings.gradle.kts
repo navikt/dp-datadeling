@@ -12,3 +12,5 @@ dependencyResolutionManagement {
         }
     }
 }
+
+include("meldekort", "soknad", "dato", "behandling", "datadeling-api")
