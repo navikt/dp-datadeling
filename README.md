@@ -17,6 +17,11 @@ Hvert subdomene har egen modul for å gjøre det enklere å finne frem i koden.
 - `meldekort` - Inneholder domenemodeller og logikk knyttet til meldekort om dagpenger
 - `datadeling-api` - Inneholder REST-API for datadeling, konfigurering av sikkerhet, migreringsskripter og hovedapplikasjonen
 
+
+Andre moduler:
+- `ktor-client` - Default Ktor HTTP-klient 
+- `dato` - Felles dato brukt for testing (kan lage 1.januar(2020) osv)
+
 ### Linting
 
 Prosjektet bruker [ktlint](https://ktlint.github.io/) for å sikre enhetlig kodeformat. Hvis du bruker IntelliJ, anbefales det å installere ktlint-plugin for automatisk formatering av koden.

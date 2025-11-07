@@ -1,4 +1,4 @@
-package no.nav.dagpenger.datadeling.teknisk
+package no.nav.dagpenger.ktor.client
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpSend
@@ -10,7 +10,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
-import no.nav.dagpenger.datadeling.api.installRetryClient
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

@@ -4,8 +4,8 @@ import io.ktor.client.request.request
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.AppConfig
-import no.nav.dagpenger.datadeling.Config.defaultHttpClient
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.ktor.client.defaultHttpClient
 import java.net.InetAddress.getLocalHost
 
 class LeaderElector(

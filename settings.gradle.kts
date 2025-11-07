@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("meldekort", "soknad", "dato", "behandling", "datadeling-api")
+include("meldekort", "soknad", "dato", "behandling", "datadeling-api", "ktor-client")

@@ -13,10 +13,10 @@ import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.datadeling.Config.defaultHttpClient
 import no.nav.dagpenger.datadeling.db.BehandlingResultatRepositoryPostgresql
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.ktor.client.defaultHttpClient
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

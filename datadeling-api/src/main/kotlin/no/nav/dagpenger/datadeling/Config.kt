@@ -1,20 +1,12 @@
 package no.nav.dagpenger.datadeling
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.datadeling.api.installRetryClient
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
@@ -115,22 +107,6 @@ internal object Config {
             ],
         )
     }
-
-    val defaultHttpClient =
-        HttpClient {
-            install(ContentNegotiation) {
-                jackson {
-                    registerModule(JavaTimeModule())
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                }
-            }
-            installRetryClient(
-                maksRetries = 5,
-            )
-            install(Logging) {
-                level = LogLevel.INFO
-            }
-        }
 
     private val azureAdClient: CachedOauth2Client by lazy {
         val azureAdConfig = OAuth2Config.AzureAd(properties)
