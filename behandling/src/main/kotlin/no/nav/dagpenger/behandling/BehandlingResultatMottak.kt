@@ -51,6 +51,9 @@ class BehandlingResultatMottak(
             "behandlingId" to behandlingId.toString(),
         ) {
             logg.info { "Mottok nytt behandling resultat." }
+            if (behandlingId == UUID.fromString("019956ca-82af-7b6d-8235-453d0234b34e")) {
+                return@withLoggingContext
+            }
             val json = packet.toJson()
             val ident = packet["ident"].asText()
             val opprettetTidspunkt = packet["@opprettet"].asLocalDateTime()
