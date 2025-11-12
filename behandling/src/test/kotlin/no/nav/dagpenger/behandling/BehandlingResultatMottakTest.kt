@@ -19,7 +19,7 @@ class BehandlingResultatMottakTest {
 
     init {
 
-        BehandlingResultatMottak(testRapid, sakIdHenter, behandlingResultatRepositoryPostgresql)
+        BehandlingResultatMottak(testRapid, sakIdHenter, behandlingResultatRepositoryPostgresql, "test")
     }
 
     @BeforeEach

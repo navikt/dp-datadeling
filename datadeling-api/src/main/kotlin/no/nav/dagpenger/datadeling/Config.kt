@@ -76,6 +76,10 @@ internal object Config {
         )
     }
 
+    val clusterName: String by lazy {
+        properties[Key("NAIS_CLUSTER_NAME", stringType)]
+    }
+
     val dpDatadelingUrl: String by lazy {
         properties[Key("DP_DATADELING_URL", stringType)]
     }

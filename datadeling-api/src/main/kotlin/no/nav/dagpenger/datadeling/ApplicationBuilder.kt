@@ -98,6 +98,7 @@ internal class ApplicationBuilder(
                             tokenProvider = Config.sakApiToken,
                         ),
                     behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
+                    environment = Config.clusterName,
                 )
             }
 

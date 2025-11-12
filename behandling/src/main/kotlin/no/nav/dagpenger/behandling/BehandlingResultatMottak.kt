@@ -22,6 +22,7 @@ class BehandlingResultatMottak(
     rapidsConnection: RapidsConnection,
     private val sakIdHenter: SakIdHenter,
     private val behandlingResultatRepository: BehandlingResultatRepository,
+    private val environment: String,
 ) : River.PacketListener {
     init {
         River(rapidsConnection)
@@ -73,7 +74,13 @@ class BehandlingResultatMottak(
                 return@withLoggingContext
             }
 
-            val sakId: UUID = runBlocking { sakIdHenter.hentSakId(behandlingId) }
+            val sakId: UUID =
+                try {
+                    runBlocking { sakIdHenter.hentSakId(behandlingId) }
+                } catch (e: Exception) {
+                    logg.error(e) { "Klarte ikke hente sakId for behandling=$behandlingId" }
+                    if (environment == "prod-gcp") throw e else return@withLoggingContext
+                }
 
             behandlingResultatRepository.lagre(
                 ident = ident,
