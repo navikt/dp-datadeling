@@ -7,6 +7,8 @@ updates:
       interval: "daily"
       time: "10:05"
       timezone: "Europe/Oslo"
+    cooldown:
+      default-days: 7
   # Maintain dependencies for gradle
   - package-ecosystem: "gradle"
     directory: "/"
@@ -14,6 +16,8 @@ updates:
       interval: "daily"
       time: "10:05"
       timezone: "Europe/Oslo"
+    cooldown:
+      default-days: 7
   # Maintain dependencies for docker
   - package-ecosystem: "docker"
     directory: "/"
@@ -21,6 +25,8 @@ updates:
       interval: "daily"
       time: "10:05"
       timezone: "Europe/Oslo"
+    cooldown:
+      default-days: 7
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
     directory: "/"
@@ -28,3 +34,5 @@ updates:
       interval: "daily"
       time: "10:05"
       timezone: "Europe/Oslo"
+    cooldown:
+      default-days: 7
