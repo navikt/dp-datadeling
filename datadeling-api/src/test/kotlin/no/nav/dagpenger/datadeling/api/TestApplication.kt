@@ -43,8 +43,13 @@ object TestApplication {
                     ),
             ).serialize()
 
-    internal fun issueAzureToken(): String =
-        mockOAuth2Server.issueToken(issuerId = AZURE_ISSUER_ID, audience = AZURE_APP_CLIENT_ID).serialize()
+    internal fun issueAzureToken(azpName: String? = null): String =
+        mockOAuth2Server
+            .issueToken(
+                issuerId = AZURE_ISSUER_ID,
+                audience = AZURE_APP_CLIENT_ID,
+                claims = azpName?.let { mapOf("azp_name" to it) } ?: emptyMap(),
+            ).serialize()
 
     fun setup() {
         System.setProperty("MASKINPORTEN_JWKS_URI", mockOAuth2Server.jwksUrl(MASKINPORTEN_ISSUER_ID).toString())

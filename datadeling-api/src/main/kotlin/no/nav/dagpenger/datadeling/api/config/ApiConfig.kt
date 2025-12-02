@@ -5,7 +5,7 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import no.nav.dagpenger.datadeling.AppConfig
 
-fun Application.konfigurerApi(appConfig: AppConfig) {
+fun Application.authentication(appConfig: AppConfig) {
     install(Authentication) {
         jwtAuth(name = "afpPrivat", config = appConfig.maskinporten)
         jwtAuth(name = "azure", config = appConfig.azure)

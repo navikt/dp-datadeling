@@ -39,6 +39,8 @@ internal fun String.parseISO6523ToOrgnummer(): String {
     return muligOrgnummer
 }
 
+fun ApplicationCall.applikasjon(): String = principal<JWTPrincipal>()?.let { it.payload.claims["azp_name"]?.asString() } ?: "ukjent"
+
 fun ApplicationCall.clientId(): String =
     principal<JWTPrincipal>()
         ?.payload

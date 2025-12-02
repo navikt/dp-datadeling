@@ -98,6 +98,8 @@ internal object Config {
         azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
     }
 
+    fun electorPathUrl(): String = properties[Key("ELECTOR_GET_URL", stringType)]
+
     val sakApiBaseUrl by lazy {
         properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
     }
