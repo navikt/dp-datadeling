@@ -8,7 +8,7 @@ import io.ktor.server.request.path
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
-import no.nav.dagpenger.datadeling.api.config.applikasjon
+import no.nav.dagpenger.datadeling.api.config.konsument
 import no.nav.dagpenger.datadeling.api.metrics.ApiMetrics
 
 internal val OtelTraceIdPlugin =
@@ -64,7 +64,7 @@ internal val KonsumentMetricsPlugin =
 private fun konsument(call: PipelineCall): String {
     val konsument =
         try {
-            call.applikasjon()
+            call.konsument()
         } catch (e: Exception) {
             "ukjent"
         }
