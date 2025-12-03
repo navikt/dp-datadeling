@@ -6,6 +6,8 @@ import io.ktor.server.application.PipelineCall
 import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.install
 import io.ktor.server.request.path
+import io.ktor.server.routing.RoutingRoot
+import io.ktor.server.routing.path
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
@@ -23,11 +25,17 @@ internal val OtelTraceIdPlugin =
     }
 
 private val startTimeKey = io.ktor.util.AttributeKey<Long>("MetricsStartTime")
+private val routeKey = io.ktor.util.AttributeKey<String>("MetricsRoute")
 
 internal val KonsumentMetricsPlugin =
     createApplicationPlugin(
         name = "KonsumentMetricsPlugin",
     ) {
+
+        application.monitor.subscribe(RoutingRoot.RoutingCallStarted) { call ->
+            call.attributes.put(routeKey, call.route.path)
+        }
+
         onCall { call ->
             call.attributes.put(startTimeKey, System.currentTimeMillis())
         }
@@ -36,7 +44,7 @@ internal val KonsumentMetricsPlugin =
             val startTime = call.attributes.getOrNull(startTimeKey) ?: return@onCallRespond
             val duration = System.currentTimeMillis() - startTime
             val konsument = konsument(call)
-            val path = call.request.path()
+            val path = call.attributes.getOrNull(routeKey) ?: call.request.path()
             val attributes =
                 Attributes.of(
                     AttributeKey.stringKey("konsument"),
