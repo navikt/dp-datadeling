@@ -30,19 +30,6 @@ internal val KonsumentMetricsPlugin =
     ) {
         onCall { call ->
             call.attributes.put(startTimeKey, System.currentTimeMillis())
-            val konsument = konsument(call)
-            val path = call.request.path()
-            val attributes =
-                Attributes.of(
-                    AttributeKey.stringKey("konsument"),
-                    konsument,
-                    AttributeKey.stringKey("path"),
-                    path,
-                    AttributeKey.stringKey("method"),
-                    call.request.local.method.value,
-                )
-
-            ApiMetrics.konsumentKallCounter.add(1, attributes)
         }
 
         onCallRespond { call, _ ->
@@ -61,6 +48,7 @@ internal val KonsumentMetricsPlugin =
                 )
 
             ApiMetrics.konsumentKallDuration.record(duration.toDouble(), attributes)
+            ApiMetrics.konsumentKallCounter.add(1, attributes)
         }
     }
 
