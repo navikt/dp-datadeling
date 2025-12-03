@@ -3,11 +3,11 @@ package no.nav.dagpenger.datadeling
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder
 import org.flywaydb.core.internal.configuration.ConfigUtils
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 
 internal object Postgres {
     val instance by lazy {
-        PostgreSQLContainer<Nothing>("postgres:15").apply {
+        PostgreSQLContainer("postgres:15").apply {
             start()
         }
     }
