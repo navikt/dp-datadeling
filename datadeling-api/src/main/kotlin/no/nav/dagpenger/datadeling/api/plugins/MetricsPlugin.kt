@@ -1,5 +1,6 @@
 package no.nav.dagpenger.datadeling.api.plugins
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.Application
 import io.ktor.server.application.PipelineCall
 import io.ktor.server.application.createApplicationPlugin
@@ -10,6 +11,8 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import no.nav.dagpenger.datadeling.api.config.konsument
 import no.nav.dagpenger.datadeling.api.metrics.ApiMetrics
+
+private val logger = KotlinLogging.logger { }
 
 internal val OtelTraceIdPlugin =
     createApplicationPlugin("OtelTraceIdPlugin") {
@@ -66,6 +69,7 @@ private fun konsument(call: PipelineCall): String {
         try {
             call.konsument()
         } catch (e: Exception) {
+            logger.warn { "Kunne ikke hente konsument fra kall: ${e.message}" }
             "ukjent"
         }
     return konsument
