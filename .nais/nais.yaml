@@ -45,6 +45,8 @@ spec:
       rules:
         - application: dp-meldekortregister
         - application: dp-saksbehandling
+        - application: logging
+          namespace: nais-system
       external:
         - host: "{{ dpProxyHost }}"
   leaderElection: true
