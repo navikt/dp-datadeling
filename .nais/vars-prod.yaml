@@ -25,3 +25,6 @@ inbounds:
   - application: arena
     namespace: teamarenanais
     cluster: prod-fss
+  - application: nav-persondata-api
+    namespace: holmes
+    cluster: prod-gcp

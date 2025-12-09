@@ -25,6 +25,9 @@ inbounds:
   - application: arena
     namespace: teamarenanais
     cluster: dev-fss
+  - application: nav-persondata-api
+    namespace: holmes
+    cluster: dev-gcp
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
