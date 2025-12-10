@@ -53,7 +53,7 @@ spec:
     enabled: true
   env:
     - name: DP_MELDEKORTREGISTER_URL
-      value: https://{{ dpMeldekortregisterHost }}
+      value: http://{{ dpMeldekortregisterHost }}
     - name: DP_MELDEKORTREGISTER_SCOPE
       value: "{{ dpMeldekortregisterScope }}"
     - name: DP_PROXY_URL
