@@ -100,7 +100,7 @@ class MeldekortServiceTest {
             id = UUID.randomUUID().toString(),
             ident = "01020312345",
             status = MeldekortDTO.Status.Innsendt,
-            type = MeldekortDTO.Type.Original,
+            type = MeldekortDTO.Type.Ordinaert,
             periode =
                 MeldekortPeriodeDTO(
                     fraOgMed = fraOgMed,

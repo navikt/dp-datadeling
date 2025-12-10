@@ -294,7 +294,7 @@ components:
           enum: [ TilUtfylling, Innsendt ]
         type:
           type: string
-          enum: [ Original, Korrigert ]
+          enum: [ Ordinaert, Korrigert, Etterregistrert ]
         periode:
           $ref: '#/components/schemas/MeldekortPeriode'
         dager:
