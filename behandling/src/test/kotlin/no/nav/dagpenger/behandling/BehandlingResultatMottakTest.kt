@@ -2,7 +2,6 @@ package no.nav.dagpenger.behandling
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -15,11 +14,9 @@ import kotlin.test.Test
 class BehandlingResultatMottakTest {
     private val testRapid = TestRapid()
     private val behandlingResultatRepositoryPostgresql = mockk<BehandlingResultatRepository>()
-    private val sakIdHenter = mockk<SakIdHenter>()
 
     init {
-
-        BehandlingResultatMottak(testRapid, sakIdHenter, behandlingResultatRepositoryPostgresql, "test")
+        BehandlingResultatMottak(testRapid, behandlingResultatRepositoryPostgresql, "test")
     }
 
     @BeforeEach
@@ -36,7 +33,6 @@ class BehandlingResultatMottakTest {
         val json = slot<String>()
         val opprettetTidspunkt = slot<LocalDateTime>()
 
-        coEvery { sakIdHenter.hentSakId(any()) } returns UUID.fromString("123e4567-e89b-12d3-a456-426614174000")
         every {
             behandlingResultatRepositoryPostgresql.lagre(
                 ident = capture(ident),
@@ -62,7 +58,7 @@ class BehandlingResultatMottakTest {
         behandlingId.captured shouldBe UUID.fromString("019a496c-15f0-7c2f-a645-4bca140706c0")
         basertPåId.captured shouldBe null
         ident.captured shouldBe "16261111906"
-        sakId.captured shouldBe UUID.fromString("123e4567-e89b-12d3-a456-426614174000")
+        sakId.captured shouldBe UUID.fromString("019a496c-15f0-7c2f-a645-4bca140706c0")
         opprettetTidspunkt.captured shouldBe LocalDateTime.of(2025, 11, 3, 12, 13, 40, 100308000)
     }
 }

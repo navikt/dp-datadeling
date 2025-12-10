@@ -13,7 +13,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.behandling.BehandlingResultatMottak
 import no.nav.dagpenger.behandling.PerioderService
-import no.nav.dagpenger.behandling.SakIdHenter
 import no.nav.dagpenger.behandling.arena.ProxyClient
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.api.datadelingApi
@@ -92,11 +91,6 @@ internal class ApplicationBuilder(
                 SøknadMottak(this, søknadRepository)
                 BehandlingResultatMottak(
                     rapidsConnection = this,
-                    sakIdHenter =
-                        SakIdHenter(
-                            baseUrl = Config.sakApiBaseUrl,
-                            tokenProvider = Config.sakApiToken,
-                        ),
                     behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
                     environment = Config.clusterName,
                 )

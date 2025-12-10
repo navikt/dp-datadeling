@@ -44,7 +44,6 @@ spec:
     outbound:
       rules:
         - application: dp-meldekortregister
-        - application: dp-saksbehandling
         - application: logging
           namespace: nais-system
       external:
@@ -65,8 +64,6 @@ spec:
       value: https://{{ dpDatadelingHost }}
     - name: KAFKA_SPOR_TOPIC
       value: "{{ kafkaSporTopic }}"
-    - name: DP_SAKSBEHANDLING_SCOPE
-      value: "{{ dp-saksbehandling.scope }}"
 
   azure:
     application:

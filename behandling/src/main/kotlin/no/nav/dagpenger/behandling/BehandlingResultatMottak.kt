@@ -11,16 +11,13 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.util.UUID
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.BehandlingResultatMottak")
 
 class BehandlingResultatMottak(
     rapidsConnection: RapidsConnection,
-    private val sakIdHenter: SakIdHenter,
     private val behandlingResultatRepository: BehandlingResultatRepository,
     private val environment: String,
 ) : River.PacketListener {
@@ -33,6 +30,7 @@ class BehandlingResultatMottak(
                         "behandlingId",
                         "rettighetsperioder",
                         "ident",
+                        "behandlingskjedeId",
                         "@opprettet",
                     )
                     it.interestedIn("basertPå")
@@ -52,9 +50,6 @@ class BehandlingResultatMottak(
             "behandlingId" to behandlingId.toString(),
         ) {
             logg.info { "Mottok nytt behandling resultat." }
-            if (behandlingId == UUID.fromString("019956ca-82af-7b6d-8235-453d0234b34e")) {
-                return@withLoggingContext
-            }
             val json = packet.toJson()
             val ident = packet["ident"].asText()
             val opprettetTidspunkt = packet["@opprettet"].asLocalDateTime()
@@ -74,14 +69,7 @@ class BehandlingResultatMottak(
                 return@withLoggingContext
             }
 
-            val sakId: UUID =
-                try {
-                    runBlocking { sakIdHenter.hentSakId(behandlingId) }
-                } catch (e: Exception) {
-                    logg.error(e) { "Klarte ikke hente sakId for behandling=$behandlingId" }
-                    if (environment == "prod-gcp") throw e else return@withLoggingContext
-                }
-
+            val sakId: UUID = packet["behandlingskjedeId"].asText().let { UUID.fromString(it) }
             behandlingResultatRepository.lagre(
                 ident = ident,
                 behandlingId = behandlingId,

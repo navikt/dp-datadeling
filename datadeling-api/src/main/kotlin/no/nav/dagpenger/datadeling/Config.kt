@@ -31,7 +31,6 @@ internal object Config {
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1",
                 "KAFKA_RESET_POLICY" to "latest",
                 "DP_DATADELING_URL" to "http://localhost",
-                "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling/",
             ),
         )
 
