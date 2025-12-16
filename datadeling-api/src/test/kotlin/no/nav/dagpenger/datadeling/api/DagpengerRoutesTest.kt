@@ -60,6 +60,17 @@ class DagpengerRoutesTest {
         }
 
     @Test
+    fun `returnerer 401 når Meldekort-liste hentes uten riktig rolle`() =
+        testEndepunkter {
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/meldekort",
+                    enDatadelingRequest(),
+                    issueAzureToken(azpRoles = listOf("ROLE")),
+                ).status shouldBe HttpStatusCode.Unauthorized
+        }
+
+    @Test
     fun `returnerer 401 uten token for soknader`() =
         testEndepunkter {
             client.testPost("/dagpenger/datadeling/v1/soknader", enDatadelingRequest(), token = null).apply {
@@ -94,9 +105,14 @@ class DagpengerRoutesTest {
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for meldekort`() =
         testEndepunkter {
-            client.testPost("/dagpenger/datadeling/v1/meldekort", "", issueAzureToken()).apply {
-                assertEquals(HttpStatusCode.BadRequest, this.status)
-            }
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/meldekort",
+                    "",
+                    issueAzureToken(azpRoles = listOf("meldekort")),
+                ).apply {
+                    assertEquals(HttpStatusCode.BadRequest, this.status)
+                }
         }
 
     @Test
@@ -128,7 +144,10 @@ class DagpengerRoutesTest {
         testEndepunkter(perioderService = perioderService) {
             val response =
                 enDatadelingResponse(
-                    PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                    PeriodeDTO(
+                        fraOgMedDato = LocalDate.now(),
+                        ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                    ),
                     PeriodeDTO(
                         fraOgMedDato = LocalDate.now().minusDays(100),
                         tilOgMedDato = LocalDate.now().minusDays(1),
@@ -150,8 +169,11 @@ class DagpengerRoutesTest {
             coEvery { meldekortservice.hentMeldekort(any()) } returns response
 
             client
-                .testPost("/dagpenger/datadeling/v1/meldekort", enDatadelingRequest(), issueAzureToken())
-                .bodyAsText()
+                .testPost(
+                    "/dagpenger/datadeling/v1/meldekort",
+                    enDatadelingRequest(),
+                    issueAzureToken(azpRoles = listOf("meldekort")),
+                ).bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
         }
 
@@ -220,7 +242,7 @@ class DagpengerRoutesTest {
             client.testPost(
                 "/dagpenger/datadeling/v1/meldekort",
                 request,
-                issueAzureToken(),
+                issueAzureToken(azpRoles = listOf("meldekort")),
             )
 
             logger.hendelser.size shouldBe 1

@@ -26,3 +26,6 @@ inbounds:
   - application: nav-persondata-api
     namespace: holmes
     cluster: prod-gcp
+    permissions:
+      roles:
+        - "meldekort"
