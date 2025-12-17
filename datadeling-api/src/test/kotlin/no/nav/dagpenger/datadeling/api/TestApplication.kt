@@ -43,12 +43,21 @@ object TestApplication {
                     ),
             ).serialize()
 
-    internal fun issueAzureToken(azpName: String? = null): String =
+    internal fun issueAzureToken(
+        azpName: String? = null,
+        azpId: String? = null,
+        azpRoles: List<String> = emptyList(),
+    ): String =
         mockOAuth2Server
             .issueToken(
                 issuerId = AZURE_ISSUER_ID,
                 audience = AZURE_APP_CLIENT_ID,
-                claims = azpName?.let { mapOf("azp_name" to it) } ?: emptyMap(),
+                claims =
+                    listOfNotNull(
+                        azpName?.let { "azp_name" to it },
+                        azpId?.let { "azp" to it },
+                        azpRoles.let { "roles" to it },
+                    ).toMap(),
             ).serialize()
 
     fun setup() {

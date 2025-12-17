@@ -14,8 +14,10 @@ import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.Vedtak
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
+import no.nav.dagpenger.datadeling.UnauthorizedException
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.håndhevTilgangTil
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
@@ -71,6 +73,7 @@ fun Route.dagpengerRoutes(
             route("/meldekort") {
                 post {
                     try {
+                        call.håndhevTilgangTil(påkrevdRolle = "meldekort")
                         val request = call.receive<DatadelingRequestDTO>()
 
                         val response = meldekortService.hentMeldekort(request)
@@ -84,6 +87,9 @@ fun Route.dagpengerRoutes(
                         )
 
                         call.respond(HttpStatusCode.OK, response)
+                    } catch (e: UnauthorizedException) {
+                        defaultLogger.error { "Kunne ikke hente meldekort. " + e.message.orEmpty() }
+                        call.respond(HttpStatusCode.Unauthorized)
                     } catch (e: BadRequestException) {
                         defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om meldekort. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om meldekort. Detaljer:" }

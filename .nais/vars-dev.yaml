@@ -26,6 +26,9 @@ inbounds:
   - application: nav-persondata-api
     namespace: holmes
     cluster: dev-gcp
+    permissions:
+      roles:
+        - "meldekort"
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
