@@ -40,7 +40,14 @@ spec:
         - application: "{{application}}"
           namespace: "{{namespace}}"
           cluster: "{{cluster}}"
-        {{/each }}
+          {{#if permissions}}
+          permissions:
+            roles:
+              {{#each permissions.roles as |role|}}
+              - {{ role }}
+              {{/each}}
+          {{/if}}
+        {{/each}}
     outbound:
       rules:
         - application: dp-meldekortregister
