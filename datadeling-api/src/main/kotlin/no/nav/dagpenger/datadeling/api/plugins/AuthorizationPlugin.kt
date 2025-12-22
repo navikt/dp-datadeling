@@ -10,6 +10,7 @@ import no.nav.dagpenger.datadeling.api.config.applikasjonsroller
 import no.nav.dagpenger.datadeling.api.config.konsument
 
 private val sikkerlogger = KotlinLogging.logger("AuthorizationPlugin.tjenestekall")
+private val logger = KotlinLogging.logger {}
 
 val AuthorizationPlugin =
     createRouteScopedPlugin(
@@ -27,6 +28,9 @@ val AuthorizationPlugin =
                             "'",
                             "'",
                         )}"
+                    }
+                    logger.warn {
+                        "Avslår kall fra ${call.konsument()} uten nødvendig tilgang (se sikkerlogg for detaljer)"
                     }
                     call.respond(HttpStatusCode.Forbidden)
                 }
