@@ -75,7 +75,6 @@ fun Route.dagpengerRoutes(
                 kreverTilgangerTil(Tilgangsrolle.Meldekort)
                 post {
                     try {
-                        //  call.håndhevTilgangTil(påkrevdRolle = "meldekort")
                         val request = call.receive<DatadelingRequestDTO>()
 
                         val response = meldekortService.hentMeldekort(request)
