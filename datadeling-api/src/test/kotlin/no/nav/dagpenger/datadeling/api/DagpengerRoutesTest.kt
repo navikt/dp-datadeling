@@ -11,6 +11,7 @@ import no.nav.dagpenger.behandling.arena.Vedtak
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.api.TestApplication.issueAzureToken
 import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
+import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
 import no.nav.dagpenger.datadeling.models.StonadTypeDTO
@@ -67,7 +68,7 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/meldekort",
                     enDatadelingRequest(),
                     issueAzureToken(azpRoles = listOf("ROLE")),
-                ).status shouldBe HttpStatusCode.Unauthorized
+                ).status shouldBe HttpStatusCode.Forbidden
         }
 
     @Test
@@ -97,9 +98,16 @@ class DagpengerRoutesTest {
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for perioder`() =
         testEndepunkter {
-            client.testPost("/dagpenger/datadeling/v1/perioder", "", issueAzureToken()).apply {
-                assertEquals(HttpStatusCode.BadRequest, this.status)
-            }
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/perioder",
+                    "",
+                    issueAzureToken(
+                        azpRoles = listOf(Tilgangsrolle.Rettighetsperioder.name),
+                    ),
+                ).apply {
+                    assertEquals(HttpStatusCode.BadRequest, this.status)
+                }
         }
 
     @Test
@@ -109,7 +117,7 @@ class DagpengerRoutesTest {
                 .testPost(
                     "/dagpenger/datadeling/v1/meldekort",
                     "",
-                    issueAzureToken(azpRoles = listOf("meldekort")),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.Meldekort.name)),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
                 }
@@ -118,25 +126,46 @@ class DagpengerRoutesTest {
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for soknader`() =
         testEndepunkter {
-            client.testPost("/dagpenger/datadeling/v1/soknader", "", issueAzureToken()).apply {
-                assertEquals(HttpStatusCode.BadRequest, this.status)
-            }
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/soknader",
+                    "",
+                    issueAzureToken(
+                        azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                    ),
+                ).apply {
+                    assertEquals(HttpStatusCode.BadRequest, this.status)
+                }
         }
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for siste søknad`() =
         testEndepunkter {
-            client.testPostText("/dagpenger/datadeling/v1/siste_soknad", "", issueAzureToken()).apply {
-                assertEquals(HttpStatusCode.BadRequest, this.status)
-            }
+            client
+                .testPostText(
+                    "/dagpenger/datadeling/v1/siste_soknad",
+                    "",
+                    issueAzureToken(
+                        azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                    ),
+                ).apply {
+                    assertEquals(HttpStatusCode.BadRequest, this.status)
+                }
         }
 
     @Test
     fun `returnerer 400 hvis ikke kan prosessere request for vedtak`() =
         testEndepunkter {
-            client.testPost("/dagpenger/datadeling/v1/vedtak", "", issueAzureToken()).apply {
-                assertEquals(HttpStatusCode.BadRequest, this.status)
-            }
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/vedtak",
+                    "",
+                    issueAzureToken(
+                        azpRoles = listOf(Tilgangsrolle.Vedtak.name),
+                    ),
+                ).apply {
+                    assertEquals(HttpStatusCode.BadRequest, this.status)
+                }
         }
 
     @Test
@@ -157,8 +186,13 @@ class DagpengerRoutesTest {
             coEvery { perioderService.hentDagpengeperioder(any()) } returns response
 
             client
-                .testPost("/dagpenger/datadeling/v1/perioder", enDatadelingRequest(), issueAzureToken())
-                .bodyAsText()
+                .testPost(
+                    "/dagpenger/datadeling/v1/perioder",
+                    enDatadelingRequest(),
+                    issueAzureToken(
+                        azpRoles = listOf(Tilgangsrolle.Rettighetsperioder.name),
+                    ),
+                ).bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
         }
 
@@ -172,7 +206,7 @@ class DagpengerRoutesTest {
                 .testPost(
                     "/dagpenger/datadeling/v1/meldekort",
                     enDatadelingRequest(),
-                    issueAzureToken(azpRoles = listOf("meldekort")),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.Meldekort.name)),
                 ).bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
         }
@@ -207,7 +241,9 @@ class DagpengerRoutesTest {
             client.testPost(
                 "/dagpenger/datadeling/v1/perioder",
                 request,
-                issueAzureToken(),
+                issueAzureToken(
+                    azpRoles = listOf(Tilgangsrolle.Rettighetsperioder.name),
+                ),
             )
 
             logger.hendelser.size shouldBe 1
@@ -242,7 +278,7 @@ class DagpengerRoutesTest {
             client.testPost(
                 "/dagpenger/datadeling/v1/meldekort",
                 request,
-                issueAzureToken(azpRoles = listOf("meldekort")),
+                issueAzureToken(azpRoles = listOf(Tilgangsrolle.Meldekort.name)),
             )
 
             logger.hendelser.size shouldBe 1
@@ -295,7 +331,9 @@ class DagpengerRoutesTest {
             client.testPost(
                 "/dagpenger/datadeling/v1/soknader",
                 request,
-                issueAzureToken(),
+                issueAzureToken(
+                    azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                ),
             )
 
             logger.hendelser.size shouldBe 1
@@ -334,7 +372,9 @@ class DagpengerRoutesTest {
             client.testPostText(
                 "/dagpenger/datadeling/v1/siste_soknad",
                 FNR,
-                issueAzureToken(),
+                issueAzureToken(
+                    azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                ),
             )
 
             logger.hendelser.size shouldBe 1
@@ -387,7 +427,9 @@ class DagpengerRoutesTest {
             client.testPost(
                 "/dagpenger/datadeling/v1/vedtak",
                 request,
-                issueAzureToken(),
+                issueAzureToken(
+                    azpRoles = listOf(Tilgangsrolle.Vedtak.name),
+                ),
             )
 
             logger.hendelser.size shouldBe 1

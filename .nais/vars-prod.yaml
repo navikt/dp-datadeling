@@ -17,15 +17,24 @@ inbounds:
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: prod-gcp
+    permissions:
+      roles:
+        - "Rettighetsperioder"
   - application: saas-proxy
     namespace: teamcrm
     cluster: prod-gcp
+    permissions:
+      roles:
+        - "Rettighetsperioder"
   - application: arena
     namespace: teamarenanais
     cluster: prod-fss
+    permissions:
+      roles:
+        - "Rettighetsperioder"
   - application: nav-persondata-api
     namespace: holmes
     cluster: prod-gcp
     permissions:
       roles:
-        - "meldekort"
+        - "Meldekort"

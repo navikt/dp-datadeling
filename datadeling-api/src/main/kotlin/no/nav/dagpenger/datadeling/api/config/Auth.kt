@@ -43,6 +43,22 @@ fun ApplicationCall.konsument(): String =
     principal<JWTPrincipal>()?.let { it.payload.claims["azp_name"]?.asString() }
         ?: runCatching { "orgnr-" + orgNummer() }.getOrElse { "ukjent" }
 
+val ApplicationCall.applikasjonsroller
+    get() =
+        this
+            .principal<JWTPrincipal>()
+            ?.getListClaim("roles", String::class)
+            ?.toSet()
+            ?: emptySet()
+
+val ApplicationCall.applicationId
+    get() =
+        this
+            .principal<JWTPrincipal>()
+            ?.getClaim("azp", String::class)
+            .takeUnless { it.isNullOrBlank() }
+            ?: "n/a"
+
 fun ApplicationCall.clientId(): String =
     principal<JWTPrincipal>()
         ?.payload

@@ -17,18 +17,27 @@ inbounds:
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: dev-gcp
+    permissions:
+      roles:
+        - "Rettighetsperioder"
   - application: saas-proxy
     namespace: teamcrm
     cluster: dev-gcp
+    permissions:
+      roles:
+        - "Rettighetsperioder"
   - application: arena
     namespace: teamarenanais
     cluster: dev-fss
+    permissions:
+      roles:
+        - "Rettighetsperioder"
   - application: nav-persondata-api
     namespace: holmes
     cluster: dev-gcp
     permissions:
       roles:
-        - "meldekort"
+        - "Meldekort"
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp

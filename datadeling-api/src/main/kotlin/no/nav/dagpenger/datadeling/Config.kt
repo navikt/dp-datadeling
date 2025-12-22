@@ -99,20 +99,6 @@ internal object Config {
 
     fun electorPathUrl(): String = properties[Key("ELECTOR_GET_URL", stringType)]
 
-    val sakApiBaseUrl by lazy {
-        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
-    }
-    val sakApiToken: () -> String by lazy {
-        azureAdTokenSupplier(
-            properties[
-                Key(
-                    "DP_SAKSBEHANDLING_SCOPE",
-                    stringType,
-                ),
-            ],
-        )
-    }
-
     private val azureAdClient: CachedOauth2Client by lazy {
         val azureAdConfig = OAuth2Config.AzureAd(properties)
         CachedOauth2Client(
