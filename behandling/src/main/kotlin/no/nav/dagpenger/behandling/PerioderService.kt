@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 class PerioderService(
     private val proxyClient: ProxyClient,
-    private val repository: BehandlingResultatRepository,
+    private val repository: BehandlingResultatRepositoryMedTolker,
 ) {
     fun hentDagpengeperioder(request: DatadelingRequestDTO) =
         runBlocking {
@@ -37,11 +37,21 @@ class PerioderService(
                                     tilOgMedDato = rettighetsperiode.tilOgMed,
                                     ytelseType =
                                         when (rettighetstype) {
-                                            Rettighetstype.ORDINÆR -> YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER
-                                            Rettighetstype.PERMITTERING -> YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER
-                                            Rettighetstype.LØNNSGARANTI ->
+                                            Rettighetstype.ORDINÆR -> {
+                                                YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER
+                                            }
+
+                                            Rettighetstype.PERMITTERING -> {
+                                                YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER
+                                            }
+
+                                            Rettighetstype.LØNNSGARANTI -> {
                                                 throw IllegalArgumentException("Lønngaranti ikke støttet i datadeling")
-                                            Rettighetstype.FISK -> YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
+                                            }
+
+                                            Rettighetstype.FISK -> {
+                                                YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
+                                            }
                                         },
                                 )
                             }

@@ -1,6 +1,7 @@
 package no.nav.dagpenger.datadeling.db
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.datadeling.Postgres.withMigratedDb
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -8,6 +9,7 @@ import java.util.UUID
 
 class BehandlingResultatRepositoryTest {
     private val repository = BehandlingResultatRepositoryPostgresql()
+    private val tolker = BehandlingResultatRepositoryMedTolker(repository)
 
     @Test
     fun `skal lagre og hente behandlingresultat`() {
@@ -31,7 +33,7 @@ class BehandlingResultatRepositoryTest {
                 opprettetTidspunkt = opprettetTidspunkt,
             )
 
-            val hentet = repository.hent(ident)
+            val hentet = tolker.hent(ident)
             hentet.size shouldBe 1
             hentet.first().behandlingId shouldBe behandlingId
         }
@@ -68,7 +70,7 @@ class BehandlingResultatRepositoryTest {
                 opprettetTidspunkt = opprettetTidspunkt,
             )
 
-            val hentet = repository.hent(ident)
+            val hentet = tolker.hent(ident)
             hentet.size shouldBe 1
             hentet.first().behandlingId shouldBe behandlingId
 
@@ -89,7 +91,7 @@ class BehandlingResultatRepositoryTest {
                 opprettetTidspunkt = opprettetTidspunkt2,
             )
 
-            val hentBasertPå = repository.hent(ident)
+            val hentBasertPå = tolker.hent(ident)
             hentBasertPå.size shouldBe 1
             hentBasertPå.first().behandlingId shouldBe behandlingId2
         }
@@ -117,7 +119,7 @@ class BehandlingResultatRepositoryTest {
                 opprettetTidspunkt = opprettetTidspunkt,
             )
 
-            val hentet = repository.hent(ident)
+            val hentet = tolker.hent(ident)
             hentet.size shouldBe 1
             hentet.first().behandlingId shouldBe behandlingId
 
@@ -138,7 +140,7 @@ class BehandlingResultatRepositoryTest {
                 opprettetTidspunkt = opprettetTidspunkt2,
             )
 
-            val hentet2 = repository.hent(ident).sortedBy { it.behandlingId }
+            val hentet2 = tolker.hent(ident).sortedBy { it.behandlingId }
             hentet2.size shouldBe 2
             hentet2.first().let { behandling ->
                 behandling.ident shouldBe ident

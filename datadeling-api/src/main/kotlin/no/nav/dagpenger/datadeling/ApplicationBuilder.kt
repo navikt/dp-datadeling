@@ -12,6 +12,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.behandling.BehandlingResultatMottak
+import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.ProxyClient
 import no.nav.dagpenger.behandling.arena.VedtakService
@@ -49,7 +50,8 @@ internal class ApplicationBuilder(
     private val meldekortregisterClient = MeldekortregisterClient(Config.dpMeldekortregisterUrl, Config.dpMeldekortregisterTokenProvider)
     private val proxyClient = ProxyClient(Config.dpProxyUrl, Config.dpProxyTokenProvider)
 
-    private val perioderService = PerioderService(proxyClient, behandlingResultatRepositoryPostgresql)
+    private val perioderService =
+        PerioderService(proxyClient, BehandlingResultatRepositoryMedTolker(behandlingResultatRepositoryPostgresql))
     private val meldekortService = MeldekortService(meldekortregisterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val søknaderService = SøknadService(søknadRepository)

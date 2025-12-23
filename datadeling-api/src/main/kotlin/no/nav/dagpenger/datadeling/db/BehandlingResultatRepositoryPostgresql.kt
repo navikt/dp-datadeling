@@ -1,13 +1,10 @@
 package no.nav.dagpenger.datadeling.db
 
 import com.fasterxml.jackson.databind.JsonNode
-import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import no.nav.dagpenger.behandling.BehandlingResultat
 import no.nav.dagpenger.behandling.BehandlingResultatRepository
-import no.nav.dagpenger.behandling.BehandlingResultatV1Tolker
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.objectMapper
 import java.time.LocalDateTime
@@ -107,7 +104,7 @@ class BehandlingResultatRepositoryPostgresql : BehandlingResultatRepository {
         }
     }
 
-    override fun hent(ident: String): List<BehandlingResultat> =
+    override fun hent(ident: String): List<JsonNode> =
         using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(
@@ -121,14 +118,8 @@ class BehandlingResultatRepositoryPostgresql : BehandlingResultatRepository {
                         "ident" to ident,
                     ),
                 ).map { row ->
-                    row.toBehandlingResultat()
+                    row.binaryStream("json_data").let { objectMapper.readTree(it) }
                 }.asList,
             )
         }
-}
-
-fun Row.toBehandlingResultat(): BehandlingResultat {
-    val jsonData = this.binaryStream("json_data")
-    val behandlingResultatNode: JsonNode = objectMapper.readTree(jsonData)
-    return BehandlingResultatV1Tolker(behandlingResultatNode)
 }

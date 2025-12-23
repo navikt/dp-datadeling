@@ -17,7 +17,7 @@ import java.time.LocalDate
 class PerioderServiceTest {
     private val ident = "01020312345"
     private val proxyClient = mockk<ProxyClient>()
-    private val behandlingResultatRepositoryPostgresql = mockk<BehandlingResultatRepository>()
+    private val behandlingResultatRepositoryPostgresql = mockk<BehandlingResultatRepositoryMedTolker>()
     private val perioderService = PerioderService(proxyClient, behandlingResultatRepositoryPostgresql)
 
     @AfterEach
