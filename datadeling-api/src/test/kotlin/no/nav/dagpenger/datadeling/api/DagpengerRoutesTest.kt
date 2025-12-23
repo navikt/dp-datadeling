@@ -103,7 +103,7 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/perioder",
                     "",
                     issueAzureToken(
-                        azpRoles = listOf(Tilgangsrolle.Rettighetsperioder.name),
+                        azpRoles = listOf(Tilgangsrolle.rettighetsperioder.name),
                     ),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
@@ -117,7 +117,7 @@ class DagpengerRoutesTest {
                 .testPost(
                     "/dagpenger/datadeling/v1/meldekort",
                     "",
-                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.Meldekort.name)),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.meldekort.name)),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
                 }
@@ -131,7 +131,7 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/soknader",
                     "",
                     issueAzureToken(
-                        azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                        azpRoles = listOf(Tilgangsrolle.soknad.name),
                     ),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
@@ -146,7 +146,7 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/siste_soknad",
                     "",
                     issueAzureToken(
-                        azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                        azpRoles = listOf(Tilgangsrolle.soknad.name),
                     ),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
@@ -161,7 +161,7 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/vedtak",
                     "",
                     issueAzureToken(
-                        azpRoles = listOf(Tilgangsrolle.Vedtak.name),
+                        azpRoles = listOf(Tilgangsrolle.vedtak.name),
                     ),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
@@ -190,7 +190,7 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/perioder",
                     enDatadelingRequest(),
                     issueAzureToken(
-                        azpRoles = listOf(Tilgangsrolle.Rettighetsperioder.name),
+                        azpRoles = listOf(Tilgangsrolle.rettighetsperioder.name),
                     ),
                 ).bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
@@ -206,7 +206,7 @@ class DagpengerRoutesTest {
                 .testPost(
                     "/dagpenger/datadeling/v1/meldekort",
                     enDatadelingRequest(),
-                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.Meldekort.name)),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.meldekort.name)),
                 ).bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
         }
@@ -242,7 +242,7 @@ class DagpengerRoutesTest {
                 "/dagpenger/datadeling/v1/perioder",
                 request,
                 issueAzureToken(
-                    azpRoles = listOf(Tilgangsrolle.Rettighetsperioder.name),
+                    azpRoles = listOf(Tilgangsrolle.rettighetsperioder.name),
                 ),
             )
 
@@ -278,7 +278,7 @@ class DagpengerRoutesTest {
             client.testPost(
                 "/dagpenger/datadeling/v1/meldekort",
                 request,
-                issueAzureToken(azpRoles = listOf(Tilgangsrolle.Meldekort.name)),
+                issueAzureToken(azpRoles = listOf(Tilgangsrolle.meldekort.name)),
             )
 
             logger.hendelser.size shouldBe 1
@@ -332,7 +332,7 @@ class DagpengerRoutesTest {
                 "/dagpenger/datadeling/v1/soknader",
                 request,
                 issueAzureToken(
-                    azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                    azpRoles = listOf(Tilgangsrolle.soknad.name),
                 ),
             )
 
@@ -373,7 +373,7 @@ class DagpengerRoutesTest {
                 "/dagpenger/datadeling/v1/siste_soknad",
                 FNR,
                 issueAzureToken(
-                    azpRoles = listOf(Tilgangsrolle.Soknad.name),
+                    azpRoles = listOf(Tilgangsrolle.soknad.name),
                 ),
             )
 
@@ -428,7 +428,7 @@ class DagpengerRoutesTest {
                 "/dagpenger/datadeling/v1/vedtak",
                 request,
                 issueAzureToken(
-                    azpRoles = listOf(Tilgangsrolle.Vedtak.name),
+                    azpRoles = listOf(Tilgangsrolle.vedtak.name),
                 ),
             )
 

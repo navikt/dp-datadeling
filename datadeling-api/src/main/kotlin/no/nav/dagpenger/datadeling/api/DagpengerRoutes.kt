@@ -43,7 +43,7 @@ fun Route.dagpengerRoutes(
     authenticate("azure") {
         route("/dagpenger/datadeling/v1") {
             route("/perioder") {
-                kreverTilgangerTil(Tilgangsrolle.Rettighetsperioder)
+                kreverTilgangerTil(Tilgangsrolle.rettighetsperioder)
                 post {
                     try {
                         val request = call.receive<DatadelingRequestDTO>()
@@ -72,7 +72,7 @@ fun Route.dagpengerRoutes(
             }
 
             route("/meldekort") {
-                kreverTilgangerTil(Tilgangsrolle.Meldekort)
+                kreverTilgangerTil(Tilgangsrolle.meldekort)
                 post {
                     try {
                         val request = call.receive<DatadelingRequestDTO>()
@@ -104,7 +104,7 @@ fun Route.dagpengerRoutes(
             }
 
             route("/soknader") {
-                kreverTilgangerTil(Tilgangsrolle.Soknad)
+                kreverTilgangerTil(Tilgangsrolle.soknad)
                 post {
                     try {
                         val request = call.receive<DatadelingRequestDTO>()
@@ -133,7 +133,7 @@ fun Route.dagpengerRoutes(
             }
 
             route("/siste_soknad") {
-                kreverTilgangerTil(Tilgangsrolle.Soknad)
+                kreverTilgangerTil(Tilgangsrolle.soknad)
                 post {
                     try {
                         val ident = call.receive<String>()
@@ -172,7 +172,7 @@ fun Route.dagpengerRoutes(
             }
 
             route("/vedtak") {
-                kreverTilgangerTil(Tilgangsrolle.Vedtak)
+                kreverTilgangerTil(Tilgangsrolle.vedtak)
                 post {
                     try {
                         val request = call.receive<DatadelingRequestDTO>()

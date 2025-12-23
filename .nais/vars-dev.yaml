@@ -18,25 +18,25 @@ inbounds:
     cluster: dev-gcp
     permissions:
       roles:
-        - "Rettighetsperioder"
+        - "rettighetsperioder"
   - application: saas-proxy
     namespace: teamcrm
     cluster: dev-gcp
     permissions:
       roles:
-        - "Rettighetsperioder"
+        - "rettighetsperioder"
   - application: arena
     namespace: teamarenanais
     cluster: dev-fss
     permissions:
       roles:
-        - "Rettighetsperioder"
+        - "rettighetsperioder"
   - application: nav-persondata-api
     namespace: holmes
     cluster: dev-gcp
     permissions:
       roles:
-        - "Meldekort"
+        - "meldekort"
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp

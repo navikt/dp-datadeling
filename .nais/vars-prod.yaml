@@ -18,22 +18,22 @@ inbounds:
     cluster: prod-gcp
     permissions:
       roles:
-        - "Rettighetsperioder"
+        - "rettighetsperioder"
   - application: saas-proxy
     namespace: teamcrm
     cluster: prod-gcp
     permissions:
       roles:
-        - "Rettighetsperioder"
+        - "rettighetsperioder"
   - application: arena
     namespace: teamarenanais
     cluster: prod-fss
     permissions:
       roles:
-        - "Rettighetsperioder"
+        - "rettighetsperioder"
   - application: nav-persondata-api
     namespace: holmes
     cluster: prod-gcp
     permissions:
       roles:
-        - "Meldekort"
+        - "meldekort"
