@@ -8,6 +8,7 @@ interface BehandlingResultat {
     val behandlingId: UUID
     val rettighetsperioder: List<Rettighetsperiode>
     val rettighetstyper: List<Rettighetstyper>
+    val utbetalinger: List<Utbetaling>
 }
 
 interface Rettighetsperiode {
@@ -20,6 +21,12 @@ interface Rettighetstyper {
     val type: Rettighetstype
     val fraOgMed: LocalDate
     val tilOgMed: LocalDate
+}
+
+interface Utbetaling {
+    val dato: LocalDate
+    val sats: Int
+    val utbetaling: Int
 }
 
 enum class Rettighetstype {

@@ -1,5 +1,6 @@
 plugins {
     id("common")
+    `java-test-fixtures`
 }
 dependencies {
     implementation(project(path = ":openapi"))

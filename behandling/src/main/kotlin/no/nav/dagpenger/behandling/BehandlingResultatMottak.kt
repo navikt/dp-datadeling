@@ -19,7 +19,6 @@ private val logg = KotlinLogging.logger {}
 class BehandlingResultatMottak(
     rapidsConnection: RapidsConnection,
     private val behandlingResultatRepository: BehandlingResultatRepository,
-    private val environment: String,
 ) : River.PacketListener {
     init {
         River(rapidsConnection)

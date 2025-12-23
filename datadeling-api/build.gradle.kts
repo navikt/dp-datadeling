@@ -1,5 +1,3 @@
-
-
 val mockOauth2Version = "3.0.1"
 
 plugins {
@@ -63,13 +61,7 @@ dependencies {
     testImplementation(libs.kotest.assertions.json)
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
-    testImplementation(project(":behandling"))
-}
-
-sourceSets {
-    test {
-        resources.srcDir(project(":behandling").projectDir.resolve("src/test/resources"))
-    }
+    testImplementation(testFixtures(project(":behandling")))
 }
 
 application {

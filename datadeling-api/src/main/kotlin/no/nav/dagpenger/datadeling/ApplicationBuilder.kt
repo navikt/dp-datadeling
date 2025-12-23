@@ -94,7 +94,6 @@ internal class ApplicationBuilder(
                 BehandlingResultatMottak(
                     rapidsConnection = this,
                     behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
-                    environment = Config.clusterName,
                 )
             }
 

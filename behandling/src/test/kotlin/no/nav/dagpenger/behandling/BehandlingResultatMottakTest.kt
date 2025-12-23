@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.innvilgelse_v1
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
 import java.util.UUID
@@ -16,7 +17,7 @@ class BehandlingResultatMottakTest {
     private val behandlingResultatRepositoryPostgresql = mockk<BehandlingResultatRepository>()
 
     init {
-        BehandlingResultatMottak(testRapid, behandlingResultatRepositoryPostgresql, "test")
+        BehandlingResultatMottak(testRapid, behandlingResultatRepositoryPostgresql)
     }
 
     @BeforeEach
@@ -44,21 +45,16 @@ class BehandlingResultatMottakTest {
             )
         } returns Unit
 
-        val jsonMelding =
-            this.javaClass
-                .getResourceAsStream("/testdata/behandlingresultat.json")!!
-                .reader()
-                .readText()
-        testRapid.sendTestMessage(jsonMelding)
+        testRapid.sendTestMessage(innvilgelse_v1)
 
         verify {
             behandlingResultatRepositoryPostgresql.lagre(any(), any(), any(), any(), any(), any())
         }
 
-        behandlingId.captured shouldBe UUID.fromString("019a496c-15f0-7c2f-a645-4bca140706c0")
+        behandlingId.captured shouldBe UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d03")
         basertPåId.captured shouldBe null
-        ident.captured shouldBe "16261111906"
-        sakId.captured shouldBe UUID.fromString("019a496c-15f0-7c2f-a645-4bca140706c0")
-        opprettetTidspunkt.captured shouldBe LocalDateTime.of(2025, 11, 3, 12, 13, 40, 100308000)
+        ident.captured shouldBe "17373649758"
+        sakId.captured shouldBe UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d03")
+        opprettetTidspunkt.captured shouldBe LocalDateTime.parse("2025-12-23T09:26:50.618236")
     }
 }

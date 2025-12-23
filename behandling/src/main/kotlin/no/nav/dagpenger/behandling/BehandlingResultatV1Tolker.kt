@@ -49,6 +49,17 @@ data class BehandlingResultatV1Tolker(
                     } ?: emptyList()
             }
 
+    override val utbetalinger: List<Utbetaling> by lazy {
+        jsonNode["utbetalinger"]
+            .map {
+                object : Utbetaling {
+                    override val dato: LocalDate = it["dato"].asLocalDate()
+                    override val sats: Int = it["sats"].asInt()
+                    override val utbetaling: Int = it["utbetaling"].asInt()
+                }
+            }
+    }
+
     private enum class Opplysningstyper(
         val opplysningTypeId: UUID,
     ) {
