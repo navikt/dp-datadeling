@@ -14,11 +14,11 @@ fun interface BehandlingResultatTolkerFactory {
 val standardTolkerFactory =
     BehandlingResultatTolkerFactory { json ->
         val versjon = utledVersjon(json)
-        logger.debug { "Bruker BehandlingResultatTolker versjon $versjon" }
+        logger.debug { "Bruker BehandlingResultatTolker versjon $versjon (Fabrikt-generert)" }
 
         when (versjon) {
-            TolkerVersjon.V1 -> BehandlingResultatV1Tolker(json)
-            // TolkerVersjon.V2 -> BehandlingResultatV2Tolker(json)
+            TolkerVersjon.V1 -> BehandlingResultatV1Tolker.fra(json)
+            // TolkerVersjon.V2 -> BehandlingResultatV2Tolker.fra(json)
         }
     }
 
@@ -28,14 +28,7 @@ private fun utledVersjon(json: JsonNode): TolkerVersjon {
     if (opprettet != null && opprettet.isBefore(TolkerVersjon.V1.gyldigTil)) {
         return TolkerVersjon.V1
     }
-
-    // Strategi 2: Eksplisitt versjonsfelt fra produsent (fremtidig)
-    val kontraktVersjon = json["kontraktVersjon"]?.asText()
-    if (kontraktVersjon != null) {
-        return TolkerVersjon.entries.find { it.name == kontraktVersjon } ?: TolkerVersjon.V1
-    }
-
-    // Strategi 3: Fallback til nyeste versjon
+    // Strategi 2: Fallback til nyeste versjon
     return TolkerVersjon.entries.last()
 }
 

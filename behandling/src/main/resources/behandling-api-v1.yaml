@@ -1,0 +1,1855 @@
+openapi: 3.0.0
+info:
+  title: Behandling API
+  version: 1.0.3
+  description: API for å hente alle behandlinger.
+  contact:
+    name: '#team-dagpenger'
+servers:
+  - url: https://dp-behandling.intern.dev.nav.no
+    description: dev
+  - url: https://dp-behandling.intern.nav.no
+    description: prod
+tags:
+  - name: Opplysningstype
+    description: Operasjoner på opplysningstyper.
+  - name: Person
+    description: Operasjoner på person.
+  - name: Behandling
+    description: Operasjoner på behandlinger.
+  - name: Avklaring
+    description: Operasjoner på avklaringer.
+  - name: Vedtak
+    description: Drodling rundt hvordan vi tror vedtak, eller resultat på behandlinger, skal se ut.
+  - name: Dataprodukt
+    description: Operasjoner for produksjon av data til dataprodukter.
+
+paths:
+  /opplysningstyper:
+    get:
+      description: Lister ut alle registrerte opplysningstyper
+      tags:
+        - Opplysningstype
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Opplysningstype'
+
+  /person/rettighetsstatus:
+    post:
+      description: Rettighetsstatus på bruker
+      security:
+        - azureAd: [ ]
+      tags:
+        - Person
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rettighetsstatus'
+        default:
+          description: Feil ved oppretting av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /person/behandling:
+    post:
+      description: Opprett ny behandling for en person
+      security:
+        - azureAd: [ ]
+      tags:
+        - Person
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NyBehandling'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Behandling'
+        default:
+          description: Feil ved oppretting av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+  /behandling:
+    post:
+      description: Hent alle behandlinger for en gitt person
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Behandling'
+        default:
+          description: Feil ved henting av behandlinger
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    get:
+      summary: Hent en spesifikk behandling
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Behandling'
+          description: OK
+        default:
+          description: Feil ved henting av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/vurderinger:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    get:
+      summary: Hent en oppsummering av saksbehandlers vurderinger
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaksbehandlersVurderinger'
+          description: OK
+        default:
+          description: Feil ved henting av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/vurderinger/{opplysningId}:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+      - name: opplysningId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Opplysningens ID
+    put:
+      summary: Lagre saksbehandlers begrunnelse for endringen av opplysningen
+      operationId: lagreOpplysningBegrunnelse
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Saksbehandlerbegrunnelse'
+      responses:
+        204:
+          description: Endringen ble lagret
+        400:
+          description: Feil ved lagring av begrunnelse
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/avbryt:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Avbryt en behandling
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        201:
+          description: OK
+          content: { }
+        default:
+          description: Feil ved avbryt av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/godkjenn:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Send behandlingen til beslutter eller vedtak om det ikke kreves totrinnskontroll
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        201:
+          description: OK
+          content: { }
+        default:
+          description: Feil ved godkjenn av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/beslutt:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Beslutt en behandling
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        201:
+          description: OK
+          content: { }
+        default:
+          description: Feil ved beslutt av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/send-tilbake:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Send behandlingen tilbake til saksbehandler
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        201:
+          description: OK
+          content: { }
+        default:
+          description: Feil ved send tilbake behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/rekjor:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Rekjør en behandling med gjeldende regelverk
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rekjoring'
+      responses:
+        201:
+          description: OK
+          content: { }
+        default:
+          description: Feil ved rekjøring av behandlinger
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/opplysning/{opplysningId}:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+      - name: opplysningId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Opplysningens id
+    delete:
+      summary: Fjern en opplysning
+      operationId: fjernOpplysning
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kvittering'
+          description: OK
+        default:
+          description: Feil ved fjerning av opplysning
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/opplysning/:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Legg til en opplysning
+      operationId: leggTilOpplysning
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NyOpplysning'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kvittering'
+          description: OK
+        default:
+          description: Feil ved redigering av opplysninger
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/avklaring:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    get:
+      security:
+        - azureAd: [ ]
+      description: Hent avklaringer for en behandling
+      operationId: hentAvklaringer
+      tags:
+        - Behandling
+        - Avklaring
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Avklaring'
+          description: OK
+
+  /behandling/{behandlingId}/avklaring/{avklaringId}:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+      - name: avklaringId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Avklaringens id
+    put:
+      security:
+        - azureAd: [ ]
+      description: Kvittér ut en avklaring
+      operationId: kvitterAvklaring
+      tags:
+        - Behandling
+        - Avklaring
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvklaringKvittering'
+      responses:
+        204:
+          description: No Content
+        400:
+          description: Avklaringen kan ikke kvitteres ut
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+        403:
+          description: Du har ikke tilgang til å kvittere ut denne avklaringen
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /behandling/{behandlingId}/behandlingsresultat:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      description: Viser et vedtak / resultat av en behandling
+      security:
+        - azureAd: [ ]
+      tags:
+        - Vedtak
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Behandlingsresultat'
+        default:
+          description: Feil ved uthenting av vedtak
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /dataprodukt/behandling:
+    parameters:
+      - name: fraOgMed
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: tilOgMed
+        in: query
+        schema:
+          type: string
+          format: date
+          default: Dagens dato
+      - name: dryRun
+        in: query
+        schema:
+          type: boolean
+          default: false
+        description: Om dataproduktet skal produseres som en dry-run uten publisering til destinasjon
+    post:
+      description: Produserer behandlingsresultater for alle behandlinger i en gitt periode
+      security:
+        - azureAd: [ ]
+      tags:
+        - Dataprodukt
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatalastKvittering'
+        default:
+          description: Feil ved produksjon av dataprodukt
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+components:
+  schemas:
+
+
+    Rekjoring:
+      type: object
+      required:
+        - ident
+      properties:
+        ident:
+          $ref: '#/components/schemas/Personident'
+        opplysninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpplysningsId'
+
+    IdentForesporsel:
+      type: object
+      required:
+        - ident
+      properties:
+        ident:
+          $ref: '#/components/schemas/Personident'
+
+    NyBehandling:
+      type: object
+      required:
+        - ident
+      properties:
+        ident:
+          $ref: '#/components/schemas/Personident'
+        hendelse:
+          $ref: '#/components/schemas/Hendelse'
+        prøvingsdato:
+          type: string
+          format: date
+        begrunnelse:
+          type: string
+
+    NyOpplysning:
+      type: object
+      required:
+        - opplysningstype
+        - verdi
+        - begrunnelse
+      properties:
+        opplysningstype:
+          $ref: '#/components/schemas/OpplysningTypeId'
+        verdi:
+          type: string
+        begrunnelse:
+          type: string
+        gyldigFraOgMed:
+          type: string
+          format: date
+        gyldigTilOgMed:
+          type: string
+          format: date
+
+    OppdaterOpplysning:
+      type: object
+      required:
+        - verdi
+        - begrunnelse
+      properties:
+        verdi:
+          type: string
+        begrunnelse:
+          type: string
+        gyldigFraOgMed:
+          type: string
+          format: date
+        gyldigTilOgMed:
+          type: string
+          format: date
+
+    AvklaringKvittering:
+      type: object
+      required:
+        - begrunnelse
+      properties:
+        begrunnelse:
+          type: string
+
+    Personident:
+      type: string
+      pattern: '^[0-9]{11}$'
+
+    BehandlingId:
+      type: string
+      format: uuid
+
+    Behandlingskonvolutt:
+      type: object
+      required:
+        - behandlingId
+        - behandletHendelse
+        - behandlingskjedeId
+        - automatisk
+        - ident
+        - rettighetsperioder
+        - opprettet
+        - sistEndret
+      properties:
+        behandlingId:
+          $ref: '#/components/schemas/BehandlingId'
+        behandletHendelse:
+          description: Hvilken hendelse som utløste behandlingen
+          $ref: '#/components/schemas/Hendelse'
+        behandlingskjedeId:
+          $ref: '#/components/schemas/BehandlingId'
+          description: Hvilken behandlingskjede denne behandlingen tilhører. Dette tilsvarer en sammenhengende rettighetsperiode eller sak om du vil.
+        basertPå:
+          $ref: '#/components/schemas/BehandlingId'
+          description: Hvilken behandling denne behandlingen er basert på, hvis noen
+        automatisk:
+          description: Om behandlingen har blitt behandlet automatisk uten en saksbehandler
+          type: boolean
+        ident:
+          $ref: '#/components/schemas/Personident'
+        rettighetsperioder:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rettighetsperiode'
+        opprettet:
+          type: string
+          format: date-time
+        sistEndret:
+          type: string
+          format: date-time
+
+    Behandlingsresultat:
+      allOf:
+        - $ref: '#/components/schemas/Behandlingskonvolutt'
+        - type: object
+          required:
+            - opplysninger
+            - utbetalinger
+            - behandletAv
+            - førteTil
+          properties:
+            opplysninger:
+              description: Alle opplysninger som har vært til stede under behandlingen, også historiske
+              type: array
+              items:
+                $ref: '#/components/schemas/Opplysninger'
+            utbetalinger:
+              description: Alle utbetalinger som er beregnet i behandlingskjeden
+              type: array
+              items:
+                $ref: '#/components/schemas/Utbetaling'
+            behandletAv:
+              description: Hvilke saksbehandlere har vært involvert i behandlingen
+              type: array
+              items:
+                $ref: '#/components/schemas/BehandletAv'
+            førteTil:
+              $ref: '#/components/schemas/Avgjørelse'
+              description: Hvilken avgjørelse behandlingen førte til
+
+    Behandling:
+      allOf:
+        - $ref: '#/components/schemas/Behandlingskonvolutt'
+        - type: object
+          required:
+            - kreverTotrinnskontroll
+            - tilstand
+            - avklaringer
+            - vilkår
+            - fastsettelser
+            - opplysninger
+            - forslagOm
+          properties:
+            kreverTotrinnskontroll:
+              type: boolean
+            tilstand:
+              $ref: '#/components/schemas/BehandlingTilstand'
+            avklaringer:
+              type: array
+              items:
+                $ref: '#/components/schemas/Avklaring'
+            vilkår:
+              type: array
+              items:
+                $ref: '#/components/schemas/Regelsett'
+            fastsettelser:
+              type: array
+              items:
+                $ref: '#/components/schemas/Regelsett'
+            opplysninger:
+              description: Alle opplysninger som har vært til stede under behandlingen, også historiske
+              type: array
+              items:
+                $ref: '#/components/schemas/RedigerbareOpplysninger'
+            forslagOm:
+              $ref: '#/components/schemas/Avgjørelse'
+              description: Hvilken avgjørelse behandlingen foreslår
+
+    Avgjørelse:
+      type: string
+      enum:
+        - Innvilgelse
+        - Avslag
+        - Stans
+        - Gjenopptak
+        - Endring
+
+    BehandlingTilstand:
+      type: string
+      enum: [ "UnderOpprettelse", "UnderBehandling", "Redigert", "ForslagTilVedtak", "Låst", "Avbrutt", "Ferdig", "TilGodkjenning", "TilBeslutning" ]
+
+    RegelsettType:
+      type: string
+      enum: [ "Vilkår", "Fastsettelse" ]
+
+    RegelsettMeta:
+      type: object
+      required:
+        - id
+        - navn
+        - hjemmel
+        - type
+      properties:
+        id:
+          description: Unik identifikator for dette regelsettet
+          type: string
+        navn:
+          description: Kort navn som beskriver regelsettet
+          type: string
+        hjemmel:
+          description: Hvilken hjemmel er regelsettet basert på
+          $ref: '#/components/schemas/Hjemmel'
+        type:
+          $ref: '#/components/schemas/RegelsettType'
+
+    Regelsett:
+      allOf:
+        - $ref: '#/components/schemas/RegelsettMeta'
+        - type: object
+          required:
+            - relevantForResultat
+            - opplysninger
+          properties:
+            relevantForResultat:
+              description: Om innholdet i regelsettet påvirker resultatet av behandlingen
+              type: boolean
+            opplysningTypeId:
+              $ref: '#/components/schemas/OpplysningTypeId'
+            opplysninger:
+              type: array
+              items:
+                $ref: '#/components/schemas/OpplysningTypeId'
+
+    RedigerbareOpplysninger:
+      allOf:
+        - $ref: '#/components/schemas/Opplysninger'
+        - type: object
+          required:
+            - synlig
+            - redigerbar
+            - redigertAvSaksbehandler
+            - formål
+          properties:
+            synlig:
+              type: boolean
+            redigerbar:
+              type: boolean
+            redigertAvSaksbehandler:
+              type: boolean
+            formål:
+              $ref: '#/components/schemas/Formål'
+
+    SaksbehandlersVurderinger:
+      type: object
+      required:
+        - behandlingId
+        - opplysninger
+      properties:
+        behandlingId:
+          type: string
+          format: uuid
+        opplysninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opplysninger'
+
+    Avklaring:
+      type: object
+      required:
+        - id
+        - kode
+        - tittel
+        - beskrivelse
+        - kanKvitteres
+        - status
+        - maskinelt
+        - sistEndret
+        - regelsett
+      properties:
+        id:
+          type: string
+          format: uuid
+        kode:
+          $ref: '#/components/schemas/AvklaringKode'
+        tittel:
+          type: string
+        beskrivelse:
+          type: string
+        kanKvitteres:
+          type: boolean
+        status:
+          type: string
+          enum: [ "Åpen", "Avbrutt", "Avklart" ]
+        maskinelt:
+          type: boolean
+        begrunnelse:
+          type: string
+        sistEndret:
+          type: string
+          format: date-time
+        avklartAv:
+          $ref: '#/components/schemas/Saksbehandler'
+        regelsett:
+          description: Hvilke regelsett avklaringen påvirker
+          type: array
+          items:
+            $ref: '#/components/schemas/RegelsettMeta'
+
+    Opplysningstype:
+      type: object
+      required:
+        - opplysningTypeId
+        - behovId
+        - navn
+        - datatype
+      properties:
+        opplysningTypeId:
+          '$ref': '#/components/schemas/OpplysningTypeId'
+        behovId:
+          type: string
+        navn:
+          type: string
+        datatype:
+          $ref: '#/components/schemas/DataType'
+
+    OpplysningsId:
+      type: string
+      format: uuid
+
+    OpplysningTypeId:
+      type: string
+      format: uuid
+
+    AvklaringKode:
+      type: string
+
+    Hjemmel:
+      type: object
+      required:
+        - kilde
+        - kapittel
+        - paragraf
+        - tittel
+      properties:
+        kilde:
+          description: Lov, forskrift, eller rundskriv
+          $ref: '#/components/schemas/Lovkilde'
+        kapittel:
+          type: string
+        paragraf:
+          type: string
+        tittel:
+          type: string
+        url:
+          type: string
+          format: uri
+
+    Lovkilde:
+      type: object
+      required:
+        - navn
+        - kortnavn
+      properties:
+        navn:
+          type: string
+        kortnavn:
+          type: string
+
+    Opplysningsgruppe:
+      type: object
+      required:
+        - opplysningTypeId
+        - navn
+        - datatype
+        - synlig
+        - formål
+        - kanOppfriskes
+        - opplysninger
+      properties:
+        opplysningTypeId:
+          $ref: '#/components/schemas/OpplysningTypeId'
+        navn:
+          type: string
+        datatype:
+          $ref: '#/components/schemas/DataType'
+        synlig:
+          type: boolean
+        redigerbar:
+          type: boolean
+        redigertAvSaksbehandler:
+          type: boolean
+        formål:
+          $ref: '#/components/schemas/Formål'
+        kanOppfriskes:
+          type: boolean
+          description: Indikerer om opplysningen kan oppfriskes (enten hentes inn eller utledes på nytt)
+        opplysninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opplysning'
+
+    Opplysninger:
+      type: object
+      required:
+        - opplysningTypeId
+        - navn
+        - datatype
+        - perioder
+      properties:
+        opplysningTypeId:
+          $ref: '#/components/schemas/OpplysningTypeId'
+        navn:
+          type: string
+        datatype:
+          $ref: '#/components/schemas/DataType'
+        perioder:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opplysningsperiode'
+
+    Opplysningsperiode:
+      type: object
+      required:
+        - id
+        - opprettet
+        - opprinnelse
+        - verdi
+      properties:
+        id:
+          $ref: '#/components/schemas/OpplysningsId'
+        opprettet:
+          type: string
+          format: date-time
+        opprinnelse:
+          $ref: '#/components/schemas/Opprinnelse'
+        gyldigFraOgMed:
+          type: string
+          format: date
+          description: Om opplysningen er gyldig fra en bestemt dato. Mangler feltet, er den gyldig fra tidens morgen.
+        gyldigTilOgMed:
+          type: string
+          format: date
+          description: Om opplysningen er gyldig fra en bestemt dato. Mangler feltet, er den gyldig til evig tid.
+        verdi:
+          $ref: '#/components/schemas/Opplysningsverdi'
+        kilde:
+          $ref: '#/components/schemas/Opplysningskilde'
+        utledetAv:
+          $ref: '#/components/schemas/Utledning'
+
+    Opplysning:
+      type: object
+      required:
+        - id
+        - opplysningTypeId
+        - navn
+        - verdi
+        - datatype
+        - status
+        - redigerbar
+        - synlig
+        - formål
+      properties:
+        id:
+          $ref: '#/components/schemas/OpplysningsId'
+        opplysningTypeId:
+          $ref: '#/components/schemas/OpplysningTypeId'
+        navn:
+          type: string
+        verdien:
+          $ref: '#/components/schemas/Opplysningsverdi'
+        verdi:
+          type: string
+        status:
+          type: string
+          enum: [ "Hypotese", "Faktum" ]
+        gyldigFraOgMed:
+          type: string
+          format: date
+          nullable: true
+          description: Om opplysningen er gyldig fra en bestemt dato. Er den null, er den gyldig fra tidens morgen.
+        gyldigTilOgMed:
+          type: string
+          format: date
+          nullable: true
+          description: Om opplysningen er gyldig fra en bestemt dato. Er den null, er den gyldig til evig tid.
+        datatype:
+          $ref: '#/components/schemas/DataType'
+        redigerbar:
+          type: boolean
+          description: Indikerer om opplysningen kan redigeres
+        kanOppfriskes:
+          type: boolean
+          description: Indikerer om opplysningen kan oppfriskes (enten hentes inn eller utledes på nytt)
+        kilde:
+          $ref: '#/components/schemas/Opplysningskilde'
+        utledetAv:
+          $ref: '#/components/schemas/Utledning'
+        synlig:
+          type: boolean
+          description: Indikerer om opplysningen skal vises i grensesnittet
+        formål:
+          $ref: '#/components/schemas/Formål'
+
+    Formål:
+      type: string
+      enum: [ "Legacy", "Bruker", "Register", "Regel" ]
+
+    Opprinnelse:
+      description: Om opplysningen ble opprettet i denne behandlingen eller arvet fra tidligere behandlinger
+      type: string
+      enum: [ "Ny", "Arvet" ]
+
+    Enhet:
+      type: string
+      enum: [ "timer", "prosent", "G", "dager", "uker" , "måneder", "år" ]
+      description: Enhet for opplysningen, f.eks. timer, prosent, dager, etc.
+
+    Opplysningsverdi:
+      description: |
+        Verdi for opplysningen. Kan være en av flere datatyper, se datatype for å se hvilken datatype opplysningen har
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/TekstVerdi'
+        - $ref: '#/components/schemas/DatoVerdi'
+        - $ref: '#/components/schemas/HeltallVerdi'
+        - $ref: '#/components/schemas/DesimaltallVerdi'
+        - $ref: '#/components/schemas/PengeVerdi'
+        - $ref: '#/components/schemas/UlidVerdi'
+        - $ref: '#/components/schemas/BoolskVerdi'
+        - $ref: '#/components/schemas/PeriodeVerdi'
+        - $ref: '#/components/schemas/Barneliste'
+      discriminator:
+        propertyName: datatype
+        mapping:
+          tekst: '#/components/schemas/TekstVerdi'
+          barn: '#/components/schemas/Barneliste'
+          inntekt: '#/components/schemas/TekstVerdi'
+          dato: '#/components/schemas/DatoVerdi'
+          heltall: '#/components/schemas/HeltallVerdi'
+          desimaltall: '#/components/schemas/DesimaltallVerdi'
+          penger: '#/components/schemas/PengeVerdi'
+          ulid: '#/components/schemas/UlidVerdi'
+          boolsk: '#/components/schemas/BoolskVerdi'
+          periode: '#/components/schemas/PeriodeVerdi'
+
+    PengeVerdi:
+      type: object
+      properties:
+        verdi:
+          type: number
+          format: bigdecimal
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - verdi
+        - valuta
+        - datatype
+
+    TekstVerdi:
+      type: object
+      properties:
+        verdi:
+          type: string
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - verdi
+        - datatype
+
+    DatoVerdi:
+      type: object
+      properties:
+        verdi:
+          type: string
+          format: date
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - verdi
+        - datatype
+
+    HeltallVerdi:
+      type: object
+      properties:
+        verdi:
+          type: integer
+          format: int32
+        datatype:
+          $ref: '#/components/schemas/DataType'
+        enhet:
+          $ref: '#/components/schemas/Enhet'
+      required:
+        - verdi
+        - datatype
+
+    UlidVerdi:
+      type: object
+      properties:
+        verdi:
+          type: string
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - verdi
+        - datatype
+
+    DesimaltallVerdi:
+      type: object
+      properties:
+        verdi:
+          type: number
+          format: double
+        datatype:
+          $ref: '#/components/schemas/DataType'
+        enhet:
+          $ref: '#/components/schemas/Enhet'
+      required:
+        - verdi
+        - datatype
+
+    BoolskVerdi:
+      type: object
+      properties:
+        verdi:
+          type: boolean
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - verdi
+        - datatype
+
+    PeriodeVerdi:
+      type: object
+      properties:
+        fom:
+          type: string
+          format: date
+        tom:
+          type: string
+          format: date
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - fom
+        - tom
+        - datatype
+
+    Barneliste:
+      type: object
+      properties:
+        søknadBarnId:
+          type: string
+          format: uuid
+        verdi:
+          type: array
+          items:
+            $ref: '#/components/schemas/BarnVerdi'
+        datatype:
+          $ref: '#/components/schemas/DataType'
+      required:
+        - verdi
+        - datatype
+
+    BarnVerdi:
+      type: object
+      properties:
+        fødselsdato:
+          type: string
+          format: date
+        fornavnOgMellomnavn:
+          type: string
+        etternavn:
+          type: string
+        statsborgerskap:
+          type: string
+        kvalifiserer:
+          type: boolean
+      required:
+        - fødselsdato
+        - kvalifiserer
+
+    Opplysningskilde:
+      type: object
+      description: |
+        Kilde for opplysningen
+      required:
+        - type
+        - registrert
+      properties:
+        type:
+          type: string
+          enum: [ "Saksbehandler", "System" ]
+        registrert:
+          type: string
+          format: date-time
+        ident:
+          type: string
+          nullable: true
+        begrunnelse:
+          $ref: '#/components/schemas/Begrunnelse'
+        meldingId:
+          type: string
+          format: uuid
+          nullable: true
+
+    Begrunnelse:
+      type: object
+      required:
+        - verdi
+        - sistEndret
+      properties:
+        verdi:
+          type: string
+        sistEndret:
+          type: string
+          format: date-time
+
+    Utledning:
+      type: object
+      required:
+        - regel
+        - opplysninger
+      properties:
+        regel:
+          $ref: '#/components/schemas/Regel'
+        opplysninger:
+          type: array
+          items:
+            type: string
+            format: uuid
+        versjon:
+          type: string
+
+    Regel:
+      type: object
+      required:
+        - navn
+      properties:
+        navn:
+          type: string
+
+    Bekreftelse:
+      type: object
+      required:
+        - bekreftelseId
+        - bekreftet
+      properties:
+        bekreftelseId:
+          type: string
+          format: uuid
+        utført:
+          type: string
+          format: date-time
+        saksbehandler:
+          $ref: "#/components/schemas/Saksbehandler"
+        bekreftet:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpplysningsId'
+
+    Saksbehandler:
+      type: object
+      required:
+        - ident
+      properties:
+        ident:
+          type: string
+
+    DataType:
+      type: string
+      enum: [ "dato", "desimaltall", "heltall", "boolsk", "ulid", "penger", "inntekt", "tekst", "barn", "periode" ]
+      description: |
+        Hvilken datatype opplysningen har, for å kunne validere at verdi er riktig format
+    
+    Kvittering:
+      type: object
+      required:
+        - behandlingId
+        - opplysningsType
+      properties:
+        behandlingId:
+          type: string
+          format: uuid
+
+    Saksbehandlerbegrunnelse:
+      type: object
+      required:
+        - begrunnelse
+      properties:
+        begrunnelse:
+          type: string
+
+    HttpProblem:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference [RFC3986] that identifies the problem type. This specification encourages that, when dereferenced, it provide human-readable documentation for the problem type
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type. It SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization
+        status:
+          type: integer
+          description: The HTTP status code ([RFC7231], Section 6) generated by the origin server for this occurrence of the problem
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced
+
+    Vedtak:
+      type: object
+      required:
+        - behandlingId
+        - fagsakId
+        - ident
+        - behandletHendelse
+        - vedtakstidspunkt
+        - virkningsdato
+        - fattet
+        - fastsatt
+        - behandletAv
+        - vilkår
+        - utbetalinger
+        - opplysninger
+      properties:
+        behandlingId:
+          type: string
+          format: uuid
+        basertPåBehandlinger:
+          deprecated: true
+          type: array
+          items:
+            type: string
+            format: uuid
+        basertPåBehandling:
+          type: string
+          format: uuid
+          nullable: true
+        fagsakId:
+          type: string
+        automatisk:
+          type: boolean
+        ident:
+          description: Person vedtak gjelder for
+          $ref: '#/components/schemas/Personident'
+        vedtakstidspunkt:
+          description: Når vedtaket ble fattet
+          type: string
+          format: date-time
+        virkningsdato:
+          description: Hvilken dato vedtaket har virkning fra
+          type: string
+          format: date
+        behandletAv:
+          description: Hvilke saksbehandlere har vært involvert i behandlingen
+          type: array
+          items:
+            $ref: '#/components/schemas/BehandletAv'
+        behandletHendelse:
+          description: Hvilken hendelse som utløste behandlingen
+          $ref: '#/components/schemas/Hendelse'
+        vilkår:
+          description: En liste over vilkår som er vurdert i behandlingen
+          type: array
+          items:
+            $ref: '#/components/schemas/Vilkaar'
+          example:
+            - navn: "Opphold i Norge"
+              hjemmel: "Folketrygdloven § 4-2"
+              status: "Oppfylt"
+              virkningsdato: "2021-01-01T12:00:00Z"
+            - navn: "Krav til minsteinntekt"
+              hjemmel: "Folketrygdloven § 4-4"
+              status: "IkkeOppfylt"
+              virkningsdato: "2021-01-01T12:00:00Z"
+
+        fastsatt:
+          description: Hvilke rettigheter som er fastsatt i vedtaket
+          type: object
+          required:
+            - utfall
+          properties:
+            utfall:
+              type: boolean
+            status:
+              type: string
+              enum: [ "Innvilget", "Avslått", "Stanset", "Avsluttet" ]
+            grunnlag:
+              type: object
+              required:
+                - grunnlag
+              properties:
+                grunnlag:
+                  type: integer
+                begrunnelse:
+                  $ref: '#/components/schemas/Forklaring'
+            fastsattVanligArbeidstid:
+              type: object
+              required:
+                - vanligArbeidstidPerUke
+                - nyArbeidstidPerUke
+              properties:
+                vanligArbeidstidPerUke:
+                  type: number
+                nyArbeidstidPerUke:
+                  type: number
+                begrunnelse:
+                  $ref: '#/components/schemas/Forklaring'
+            sats:
+              type: object
+              required:
+                - dagsatsMedBarnetillegg
+              properties:
+                dagsats:
+                  type: integer
+                dagsatsMedBarnetillegg:
+                  type: integer
+                begrunnelse:
+                  $ref: '#/components/schemas/Forklaring'
+                barn:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Barn'
+            samordning:
+              type: array
+              items:
+                $ref: '#/components/schemas/Samordning'
+
+            kvoter:
+              type: array
+              items:
+                $ref: '#/components/schemas/Kvote'
+              example:
+                - navn: "Dagpengeperiode"
+                  type: "uker"
+                  verdi: 52
+                - navn: "Permitteringsperiode"
+                  type: "uker"
+                  verdi: 26
+                - navn: "Egenandel"
+                  type: "beløp"
+                  verdi: 3000
+        gjenstående:
+          type: object
+          properties:
+            kvoter:
+              type: array
+              items:
+                $ref: '#/components/schemas/Kvote'
+          example:
+            kvoter:
+              - navn: "Dagpengeperiode"
+                type: "dager"
+                verdi: 230
+              - navn: "Permitteringsperiode"
+                type: "dager"
+                verdi: 130
+              - navn: "Egenandel"
+                type: "beløp"
+                verdi: 0
+        utbetalinger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Utbetaling'
+          example:
+            - dato: "2021-01-01"
+              sats: 1000
+              gradertSats: 500
+              utbetaling: 300
+            - dato: "2021-01-15"
+              sats: 1000
+              gradertSats: 500
+              utbetaling: 500
+        opplysninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opplysning'
+
+    Samordning:
+      type: object
+      required:
+        - type
+        - beløp
+        - grad
+      properties:
+        type:
+          type: string
+        beløp:
+          type: number
+        grad:
+          type: number
+      example:
+        - type: "Sykepenger"
+          beløp: 100
+          grad: 20
+        - type: "Pensjon fra en offentlig tjenestepensjonsordning beløp"
+          beløp: 100
+          grad: 0
+
+    Forklaring:
+      description: En tynn versjon av regeltre og data som førte til resultatet
+      type: object
+
+    Vilkaar:
+      type: object
+      required:
+        - navn
+        - status
+        - vurderingstidspunkt
+        - fraOgMed
+        - id
+      properties:
+        navn:
+          $ref: '#/components/schemas/VilkaarNavn'
+        hjemmel:
+          type: string
+        status:
+          type: string
+          enum: [ "Oppfylt", "IkkeOppfylt" ]
+        vurderingstidspunkt:
+          type: string
+          format: date-time
+        periode:
+          $ref: '#/components/schemas/Periode'
+
+    Barn:
+      type: object
+      properties:
+        fødselsdato:
+          type: string
+          format: date
+        kvalifiserer:
+          type: boolean
+
+    Kvote:
+      type: object
+      properties:
+        navn:
+          type: string
+        type:
+          type: string
+          enum: [ "dager", "uker", "beløp" ]
+        verdi:
+          type: number
+
+    Periode:
+      type: object
+      required:
+        - fraOgMed
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+        tilOgMed:
+          type: string
+          format: date
+
+    Rettighetsperiode:
+      description: En periode hvor brukeren har fått vurdert sin rett på dagpenger og utfallet av vurderingen
+      type: object
+      required:
+        - fraOgMed
+        - harRett
+      properties:
+        fraOgMed:
+          description: Fra og med dato for rettighetsperioden
+          type: string
+          format: date
+        tilOgMed:
+          description: Til og med dato for rettighetsperioden
+          type: string
+          format: date
+        harRett:
+          description: Om brukeren har rett på dagpenger i denne perioden
+          type: boolean
+        opprinnelse:
+          $ref: '#/components/schemas/Opprinnelse'
+
+    Utbetaling:
+      type: object
+      required:
+        - meldeperiode
+        - dato
+        - sats
+        - utbetaling
+      properties:
+        meldeperiode:
+          type: string
+        dato:
+          type: string
+          format: date
+        sats:
+          type: integer
+        utbetaling:
+          type: integer
+
+    BehandletAv:
+      type: object
+      required:
+        - rolle
+      properties:
+        rolle:
+          type: string
+          enum: [ "saksbehandler", "beslutter" ]
+        behandler:
+          $ref: '#/components/schemas/Saksbehandler'
+
+    Tidslinjehendelse:
+      type: object
+      required:
+        - dato
+        - hendelse
+      properties:
+        dato:
+          type: string
+          format: date
+        hendelse:
+          type: string
+
+    Hendelse:
+      type: object
+      required:
+        - datatype
+        - id
+        - type
+        - skjedde
+      properties:
+        datatype:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+          enum: [ "Søknad", "Meldekort" ,"Manuell" ]
+        skjedde:
+          type: string
+          format: date
+          description: Når hendelsen skjedde på utsiden av vårt system
+
+    DatalastKvittering:
+      type: object
+      required:
+        - id
+        - fraOgMed
+        - tilOgMed
+        - behandlinger
+      properties:
+        id:
+          type: string
+          format: uuid
+        fraOgMed:
+          type: string
+          format: date
+        tilOgMed:
+          type: string
+          format: date
+        behandlinger:
+          type: integer
+        tidBrukt:
+          type: string
+
+    Person:
+      type: object
+      required:
+        - rettighetsstatus
+      properties:
+        rettighetsstatus:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rettighetsperiode'
+
+    Rettighetsstatus:
+      description: En periode hvor brukeren har fått vurdert sin rett på dagpenger og utfallet av vurderingen
+      type: object
+      required:
+        - virkningsdato
+        - harRett
+        - behandlingId
+        - behandlingskjedeId
+      properties:
+        virkningsdato:
+          description: Fra og med dato denne status har effekt
+          type: string
+          format: date
+        harRett:
+          description: Om brukeren har rett på dagpenger
+          type: boolean
+        behandlingId:
+          $ref: '#/components/schemas/BehandlingId'
+        behandlingskjedeId:
+          $ref: '#/components/schemas/BehandlingId'
+
+    VilkaarNavn:
+      type: string
+      enum:
+        - Er medlemmet ikke påvirket av streik eller lock-out?
+        - Krav til arbeidssøker
+        - Krav til tap av arbeidsinntekt
+        - Krav til tap av arbeidsinntekt og arbeidstid
+        - Krav til utdanning eller opplæring
+        - Mottar ikke andre fulle ytelser
+        - Oppfyller krav til ikke utestengt
+        - Oppfyller kravet til alder
+        - Oppfyller kravet til heltid- og deltidsarbeid
+        - Oppfyller kravet til medlemskap
+        - Oppfyller kravet til minsteinntekt
+        - Oppfyller kravet til mobilitet
+        - Oppfyller kravet til opphold i Norge
+        - Oppfyller kravet til opphold i Norge eller unntak
+        - Oppfyller kravet til permittering
+        - Oppfyller kravet til permittering i fiskeindustrien
+        - Oppfyller kravet til verneplikt
+        - Oppfyller kravet til å ta ethvert arbeid
+        - Oppfyller kravet til å være arbeidsfør
+        - Registrert som arbeidssøker på søknadstidspunktet
+        - Tap av arbeidstid er minst terskel
+        - Utfall etter samordning
+
+  securitySchemes:
+    azureAd:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bruker [AzureAD](https://docs.nais.io/security/auth/azure-ad) til autentisering. 
+        Token må ha `audience` satt til `[cluster].teamdagpenger.dp-behandling`.
+        
+        For å teste APIet kan du lage et gyldig OBO-token ved å bruke wonderwalled:
+        - [dev-gcp](https://azure-token-generator.intern.dev.nav.no/api/obo?aud=dev-gcp.teamdagpenger.dp-behandling)
