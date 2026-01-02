@@ -56,8 +56,6 @@ spec:
       external:
         - host: "{{ dpProxyHost }}"
   leaderElection: true
-  secureLogs:
-    enabled: true
   env:
     - name: DP_MELDEKORTREGISTER_URL
       value: http://{{ dpMeldekortregisterHost }}

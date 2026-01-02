@@ -9,7 +9,7 @@ import no.nav.dagpenger.datadeling.api.config.applicationId
 import no.nav.dagpenger.datadeling.api.config.applikasjonsroller
 import no.nav.dagpenger.datadeling.api.config.konsument
 
-private val sikkerlogger = KotlinLogging.logger("AuthorizationPlugin.tjenestekall")
+private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 private val logger = KotlinLogging.logger {}
 
 val AuthorizationPlugin =
