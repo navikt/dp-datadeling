@@ -31,6 +31,7 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "vedtak"
   - application: nav-persondata-api
     namespace: holmes
     cluster: dev-gcp
@@ -40,3 +41,8 @@ inbounds:
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
+        - "meldekort"
+        - "vedtak"
