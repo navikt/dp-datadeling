@@ -3,7 +3,7 @@ package no.nav.dagpenger.behandling
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.behandling.arena.ProxyClient
+import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
@@ -11,16 +11,17 @@ import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import java.time.LocalDate
 
 class PerioderService(
-    private val proxyClient: ProxyClient,
+    private val proxyClient: ProxyClientArena,
     private val repository: BehandlingResultatRepositoryMedTolker,
 ) {
     fun hentDagpengeperioder(request: DatadelingRequestDTO) =
         runBlocking {
-            val proxyResponse = async { proxyClient.hentDagpengeperioder(request) }
+            val proxyResponse = async { proxyClient.hentDagpengeperioder(request) } // arena
             val behandlingResultat =
                 async {
                     val periodeDTO: List<PeriodeDTO> =
                         repository.hent(request.personIdent).flatMap { res ->
+                            // dp-sak
                             res.rettighetsperioder.map { rettighetsperiode ->
                                 val rettighetstype =
                                     res.rettighetstyper
@@ -53,6 +54,7 @@ class PerioderService(
                                                 YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
                                             }
                                         },
+                                    kilde = PeriodeDTO.Kilde.DP_SAK,
                                 )
                             }
                         }

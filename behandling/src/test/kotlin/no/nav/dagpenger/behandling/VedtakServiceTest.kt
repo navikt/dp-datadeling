@@ -3,7 +3,7 @@ package no.nav.dagpenger.behandling
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
-import no.nav.dagpenger.behandling.arena.ProxyClient
+import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.behandling.arena.Vedtak
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
@@ -16,7 +16,7 @@ import java.time.LocalDate
 
 class VedtakServiceTest {
     private val ident = "01020312345"
-    private val proxyClient = mockk<ProxyClient>()
+    private val proxyClient = mockk<ProxyClientArena>()
     private val vedtakService = VedtakService(proxyClient)
 
     @AfterEach

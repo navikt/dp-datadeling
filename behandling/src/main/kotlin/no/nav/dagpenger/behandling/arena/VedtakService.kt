@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 
 class VedtakService(
-    private val proxyClient: ProxyClient,
+    private val proxyClient: ProxyClientArena,
 ) {
     fun hentVedtak(request: DatadelingRequestDTO): List<Vedtak> =
         runBlocking {

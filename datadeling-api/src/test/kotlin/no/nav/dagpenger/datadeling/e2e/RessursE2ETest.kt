@@ -58,6 +58,7 @@ class RessursE2ETest {
                                         fraOgMedDato = 10.januar(),
                                         tilOgMedDato = 25.januar(),
                                         ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                                        kilde = PeriodeDTO.Kilde.ARENA,
                                     ),
                                 ),
                         )
@@ -72,6 +73,7 @@ class RessursE2ETest {
                                 fraOgMedDato = 10.januar(),
                                 tilOgMedDato = 25.januar(),
                                 ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                                kilde = PeriodeDTO.Kilde.ARENA,
                             ),
                         ),
                 )
@@ -97,6 +99,7 @@ class RessursE2ETest {
                                     fraOgMedDato = 10.januar(),
                                     tilOgMedDato = 25.januar(),
                                     ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                                    kilde = PeriodeDTO.Kilde.ARENA,
                                 ),
                             ),
                     )

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.datadeling.RessursConfig
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.UUID
@@ -27,7 +27,7 @@ class RessursService(
 
     fun ferdigstill(
         uuid: UUID,
-        response: DatadelingResponseDTO,
+        response: DatadelingResponseAfpDTO,
     ) = ressursDao.ferdigstill(uuid, response)
 
     fun markerSomFeilet(uuid: UUID) = ressursDao.markerSomFeilet(uuid)

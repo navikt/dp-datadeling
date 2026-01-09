@@ -6,7 +6,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import org.intellij.lang.annotations.Language
 import java.time.LocalDateTime
@@ -36,7 +36,7 @@ class RessursDao(
 
     fun ferdigstill(
         uuid: UUID,
-        data: DatadelingResponseDTO,
+        data: DatadelingResponseAfpDTO,
     ) = sessionOf(dataSource).use { session ->
         session.run(
             asQuery(
@@ -92,14 +92,23 @@ private fun mapRessurs(row: Row): Ressurs =
         uuid = row.uuid("uuid"),
         status = row.string("status").tilRessursStatus(),
         request = row.string("request").let { objectMapper.readValue<DatadelingRequestDTO>(it) },
-        response = row.stringOrNull("response")?.let { objectMapper.readValue<DatadelingResponseDTO>(it) },
+        response = row.stringOrNull("response")?.let { objectMapper.readValue<DatadelingResponseAfpDTO>(it) },
     )
 
 private fun String.tilRessursStatus(): RessursStatus =
     when (this) {
-        "opprettet" -> RessursStatus.OPPRETTET
-        "ferdig" -> RessursStatus.FERDIG
-        "feilet" -> RessursStatus.FEILET
+        "opprettet" -> {
+            RessursStatus.OPPRETTET
+        }
+
+        "ferdig" -> {
+            RessursStatus.FERDIG
+        }
+
+        "feilet" -> {
+            RessursStatus.FEILET
+        }
+
         else -> {
             throw Exception("Prøvde å deserialisere ukjent ressursstatus: $this")
         }

@@ -13,6 +13,9 @@ import no.nav.dagpenger.datadeling.api.TestApplication.issueMaskinportenToken
 import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
+import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
+import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
@@ -20,9 +23,9 @@ import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.datadeling.testGet
 import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testutil.FNR
+import no.nav.dagpenger.datadeling.testutil.enDatadelingAfpResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
-import no.nav.dagpenger.datadeling.testutil.enPeriode
 import no.nav.dagpenger.datadeling.testutil.enRessurs
 import no.nav.dagpenger.datadeling.testutil.januar
 import java.util.UUID
@@ -92,7 +95,16 @@ class AfpPrivatRoutesTest {
                 enRessurs(
                     uuid = uuid,
                     status = RessursStatus.FERDIG,
-                    data = enDatadelingResponse(enPeriode(fraOgMed = 1.januar(), tilOgMed = null)),
+                    data =
+                        DatadelingResponseAfpDTO(
+                            personIdent = FNR,
+                            listOf(
+                                PeriodeAfpDTO(
+                                    fraOgMedDato = 1.januar(),
+                                    ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                                ),
+                            ),
+                        ),
                 )
 
             coEvery { ressursService.hent(uuid) } returns ressurs
@@ -166,7 +178,7 @@ class AfpPrivatRoutesTest {
                     uuid = uuid,
                     status = RessursStatus.FERDIG,
                     request = enDatadelingRequest(fnr = FNR),
-                    data = enDatadelingResponse(),
+                    data = enDatadelingAfpResponse(),
                 )
 
             client.testGet(

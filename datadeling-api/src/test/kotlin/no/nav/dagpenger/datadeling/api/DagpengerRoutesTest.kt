@@ -176,11 +176,13 @@ class DagpengerRoutesTest {
                     PeriodeDTO(
                         fraOgMedDato = LocalDate.now(),
                         ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                        kilde = PeriodeDTO.Kilde.ARENA,
                     ),
                     PeriodeDTO(
                         fraOgMedDato = LocalDate.now().minusDays(100),
                         tilOgMedDato = LocalDate.now().minusDays(1),
                         ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
+                        kilde = PeriodeDTO.Kilde.ARENA,
                     ),
                 )
             coEvery { perioderService.hentDagpengeperioder(any()) } returns response
@@ -228,11 +230,16 @@ class DagpengerRoutesTest {
 
         val response =
             enDatadelingResponse(
-                PeriodeDTO(fraOgMedDato = LocalDate.now(), ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER),
+                PeriodeDTO(
+                    fraOgMedDato = LocalDate.now(),
+                    ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+                    kilde = PeriodeDTO.Kilde.ARENA,
+                ),
                 PeriodeDTO(
                     fraOgMedDato = LocalDate.now().minusDays(100),
                     tilOgMedDato = LocalDate.now().minusDays(1),
                     ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
+                    kilde = PeriodeDTO.Kilde.ARENA,
                 ),
             )
         coEvery { perioderService.hentDagpengeperioder(any()) } returns response

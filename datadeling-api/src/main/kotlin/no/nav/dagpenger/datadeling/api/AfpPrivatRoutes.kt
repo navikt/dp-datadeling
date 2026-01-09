@@ -20,7 +20,8 @@ import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
+import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
@@ -52,7 +53,20 @@ fun Route.afpPrivatRoutes(
 
                         launch {
                             try {
-                                val perioder: DatadelingResponseDTO = perioderService.hentDagpengeperioder(request)
+                                val perioder: DatadelingResponseAfpDTO =
+                                    perioderService.hentDagpengeperioder(request).let {
+                                        DatadelingResponseAfpDTO(
+                                            personIdent = it.personIdent,
+                                            perioder =
+                                                it.perioder.map { periode ->
+                                                    PeriodeAfpDTO(
+                                                        fraOgMedDato = periode.fraOgMedDato,
+                                                        tilOgMedDato = periode.tilOgMedDato,
+                                                        ytelseType = periode.ytelseType,
+                                                    )
+                                                },
+                                        )
+                                    }
                                 ressursService.ferdigstill(ressurs.uuid, perioder)
                             } catch (e: Exception) {
                                 ressursService.markerSomFeilet(ressurs.uuid)

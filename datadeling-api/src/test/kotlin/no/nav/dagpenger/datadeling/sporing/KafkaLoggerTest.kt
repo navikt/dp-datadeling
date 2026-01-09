@@ -3,9 +3,9 @@ package no.nav.dagpenger.datadeling.sporing
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.datadeling.testutil.FNR
+import no.nav.dagpenger.datadeling.testutil.enAfpPeriode
+import no.nav.dagpenger.datadeling.testutil.enDatadelingAfpResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
-import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
-import no.nav.dagpenger.datadeling.testutil.enPeriode
 import no.nav.dagpenger.datadeling.testutil.enRessurs
 import no.nav.dagpenger.datadeling.testutil.januar
 import org.junit.jupiter.api.Test
@@ -31,9 +31,9 @@ class KafkaLoggerTest {
                                     fraOgMed = 1.januar(),
                                 ),
                             data =
-                                enDatadelingResponse(
-                                    enPeriode(periode = 1.januar(2021)..1.januar(2022)),
-                                    enPeriode(periode = 1.januar(2022)..1.januar(2023)),
+                                enDatadelingAfpResponse(
+                                    enAfpPeriode(periode = 1.januar(2021)..1.januar(2022)),
+                                    enAfpPeriode(periode = 1.januar(2022)..1.januar(2023)),
                                 ),
                         ),
                 ),

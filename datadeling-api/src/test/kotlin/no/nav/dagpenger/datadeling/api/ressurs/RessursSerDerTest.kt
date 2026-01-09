@@ -4,8 +4,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.assertions.json.shouldEqualSpecifiedJsonIgnoringOrder
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.datadeling.objectMapper
+import no.nav.dagpenger.datadeling.testutil.enDatadelingAfpResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
-import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enRessurs
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -17,7 +17,7 @@ class RessursSerDerTest {
             enRessurs(
                 request = enDatadelingRequest(),
                 uuid = UUID.fromString("db5338cd-fbf6-44b7-bca8-0312868c2b32"),
-                data = enDatadelingResponse(),
+                data = enDatadelingAfpResponse(),
             ),
         ) shouldEqualSpecifiedJsonIgnoringOrder
             """
@@ -53,7 +53,7 @@ class RessursSerDerTest {
             enRessurs(
                 uuid = UUID.fromString("db5338cd-fbf6-44b7-bca8-0312868c2b32"),
                 request = enDatadelingRequest(),
-                data = enDatadelingResponse(),
+                data = enDatadelingAfpResponse(),
             )
     }
 }

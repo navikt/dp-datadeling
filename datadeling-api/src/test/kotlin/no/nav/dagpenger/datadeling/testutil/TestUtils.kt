@@ -3,7 +3,9 @@ package no.nav.dagpenger.datadeling.testutil
 import no.nav.dagpenger.datadeling.api.ressurs.Ressurs
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import java.time.LocalDate
@@ -34,12 +36,20 @@ internal fun enRessurs(
     uuid: UUID = UUID.randomUUID(),
     status: RessursStatus = RessursStatus.OPPRETTET,
     request: DatadelingRequestDTO = enDatadelingRequest(),
-    data: DatadelingResponseDTO? = null,
+    data: DatadelingResponseAfpDTO? = null,
 ) = Ressurs(
     uuid = uuid,
     status = status,
     request = request,
     response = data,
+)
+
+internal fun enDatadelingAfpResponse(
+    vararg perioder: PeriodeAfpDTO,
+    fnr: String = FNR,
+) = DatadelingResponseAfpDTO(
+    personIdent = fnr,
+    perioder = perioder.asList(),
 )
 
 internal fun enDatadelingResponse(
@@ -50,14 +60,23 @@ internal fun enDatadelingResponse(
     perioder = perioder.asList(),
 )
 
-internal fun emptyResponse() = DatadelingResponseDTO(FNR, emptyList())
-
-internal fun enPeriode(
+internal fun enAfpPeriode(
     periode: ClosedRange<LocalDate>,
     ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-) = enPeriode(
+) = enAfpPeriode(
     fraOgMed = periode.start,
     tilOgMed = periode.endInclusive,
+    ytelseType = ytelseType,
+)
+
+internal fun enAfpPeriode(
+    fraOgMed: LocalDate,
+    tilOgMed: LocalDate?,
+    ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+    kilde: PeriodeDTO.Kilde = PeriodeDTO.Kilde.ARENA,
+) = PeriodeAfpDTO(
+    fraOgMedDato = fraOgMed,
+    tilOgMedDato = tilOgMed,
     ytelseType = ytelseType,
 )
 
@@ -65,10 +84,12 @@ internal fun enPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
     ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
+    kilde: PeriodeDTO.Kilde = PeriodeDTO.Kilde.ARENA,
 ) = PeriodeDTO(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
     ytelseType = ytelseType,
+    kilde = kilde,
 )
 
 internal fun Int.januar(year: Int = 2023) = LocalDate.of(year, 1, this)

@@ -219,7 +219,7 @@ components:
         status:
           $ref: '#/components/schemas/RessursStatus'
         response:
-          $ref: '#/components/schemas/DatadelingResponse'
+          $ref: '#/components/schemas/DatadelingResponseAfp'
 
     RessursStatus:
       type: string
@@ -227,6 +227,22 @@ components:
         - OPPRETTET
         - FERDIG
         - FEILET
+
+
+    DatadelingResponseAfp:
+      type: object
+      required:
+        - personIdent
+        - perioder
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        perioder:
+          type: array
+          description: Liste med perioder bruker har hatt retten til dagpenger. Kan være en tom liste.
+          items:
+            $ref: '#/components/schemas/PeriodeAfp'
 
     DatadelingResponse:
       type: object
@@ -243,7 +259,7 @@ components:
           items:
             $ref: '#/components/schemas/Periode'
 
-    Periode:
+    PeriodeAfp:
       type: object
       required:
         - fraOgMedDato
@@ -257,6 +273,32 @@ components:
           type: string
           format: date
           description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv. Dersom det er gitt en tilOgMedDato i request og ytelsen varer lenger enn tilOgMedDatoen, vil requestens tilOgMedDato benyttes.
+        ytelseType:
+          $ref: '#/components/schemas/YtelseType'
+
+    Periode:
+      type: object
+      required:
+        - fraOgMedDato
+        - ytelseType
+        - kilde
+      properties:
+        fraOgMedDato:
+          type: string
+          format: date
+          description: Første dato ytelsen gjelder. Dersom ytelsen startet tidligere enn requestens fraOgMedDato, vil requestens fraOgMedDato benyttes.
+        tilOgMedDato:
+          type: string
+          format: date
+          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv. Dersom det er gitt en tilOgMedDato i request og ytelsen varer lenger enn tilOgMedDatoen, vil requestens tilOgMedDato benyttes.
+
+        kilde:
+          type: string
+          description: Kildesystem for perioden
+          enum:
+            - ARENA
+            - DP_SAK
+
         ytelseType:
           $ref: '#/components/schemas/YtelseType'
 

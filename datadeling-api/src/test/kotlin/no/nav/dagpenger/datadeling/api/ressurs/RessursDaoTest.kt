@@ -7,6 +7,7 @@ import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.FEILET
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.FERDIG
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus.OPPRETTET
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
@@ -44,7 +45,7 @@ class RessursDaoTest {
             assertEquals(OPPRETTET, opprettet!!.status)
 
             val response =
-                DatadelingResponseDTO(
+                DatadelingResponseAfpDTO(
                     personIdent = "EN-IDENT",
                     perioder = emptyList(),
                 )
@@ -140,7 +141,7 @@ class RessursDaoTest {
                             response =
                                 row
                                     .stringOrNull("response")
-                                    ?.let { objectMapper.readValue(it, DatadelingResponseDTO::class.java) },
+                                    ?.let { objectMapper.readValue(it, DatadelingResponseAfpDTO::class.java) },
                         )
                     }.asList,
             )
