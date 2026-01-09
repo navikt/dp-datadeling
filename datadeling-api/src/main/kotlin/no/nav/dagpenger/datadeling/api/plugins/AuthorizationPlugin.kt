@@ -20,17 +20,24 @@ val AuthorizationPlugin =
         val tilganger = pluginConfig.tilganger
         pluginConfig.apply {
             on(AuthenticationChecked) { call ->
+                val konsument = call.konsument()
+
+                // azure-token-generator har ikke roller, men skal ha tilgang til alt for testing
+                if (konsument == "dev-gcp:nais:azure-token-generator") {
+                    return@on
+                }
+
                 val roller: Set<String> = call.applikasjonsroller
                 if (roller.none { it in tilganger }) {
                     sikkerlogger.warn {
-                        "${call.konsument()} (${call.applicationId}) mangler tilgang til ${tilganger.joinToString(
+                        "$konsument (${call.applicationId}) mangler tilgang til ${tilganger.joinToString(
                             ", " ,
                             "'",
                             "'",
                         )}"
                     }
                     logger.warn {
-                        "Avslår kall fra ${call.konsument()} uten nødvendig tilgang (se sikkerlogg for detaljer)"
+                        "Avslår kall fra $konsument uten nødvendig tilgang (se sikkerlogg for detaljer)"
                     }
                     call.respond(HttpStatusCode.Forbidden)
                 }

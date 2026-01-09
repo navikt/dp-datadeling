@@ -41,9 +41,4 @@ inbounds:
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
-    permissions:
-      roles:
-        - "rettighetsperioder"
-        - "meldekort"
-        - "vedtak"
-        - "soknad"
+    # azure-token-generator kan ikke ha permissions.roles, men får tilgang via whitelist i AuthorizationPlugin
