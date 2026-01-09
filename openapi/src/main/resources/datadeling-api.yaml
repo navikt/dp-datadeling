@@ -104,6 +104,30 @@ paths:
                 $ref: '#/components/schemas/DatadelingResponse'
       security:
         - azure: [ ]
+
+  /dagpenger/datadeling/v1/utbetaling:
+    post:
+      description: |-
+        Returnerer brutto utbetalinger basert på beregnede meldeperioder
+          **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Utbetalingsdag'
+      security:
+        - azure: [ ]
+
   /dagpenger/datadeling/v1/meldekort:
     post:
       description: |-
@@ -537,6 +561,45 @@ components:
       description: Liste med vedtak bruker har. Kan være en tom liste.
       items:
         $ref: '#/components/schemas/Vedtak'
+
+    Utbetaling:
+      type: object
+      required:
+        - sakId
+        - vedtakstidspunktet
+        - behandlingId
+        - ident
+        - utbetalinger
+      properties:
+        sakId:
+          type: string
+        behandlingId:
+          type: string
+        ident:
+          type: string
+        vedtakstidspunktet:
+          type: string
+          format: date-time
+        utbetalinger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Utbetalingsdag'
+    Utbetalingsdag:
+      type: object
+      required:
+        - dato
+        - sats
+        - utbetaltBeløp
+      properties:
+        dato:
+          type: string
+          format: date
+        sats:
+          type: integer
+          format: int32
+        utbetaltBeløp:
+          type: integer
+          format: int32
 
   securitySchemes:
     maskinporten:
