@@ -6,6 +6,7 @@ import io.ktor.server.application.Application
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
+import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.Config
@@ -111,6 +112,7 @@ object TestApplication {
         søknadService: SøknadService = mockk(relaxed = true),
         vedtakService: VedtakService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
+        behandlingRepository: BehandlingResultatRepositoryMedTolker = mockk(relaxed = true),
         auditLogger: Log = NoopLogger,
         test: suspend TestContext.() -> Unit,
     ) {
@@ -123,6 +125,7 @@ object TestApplication {
                 søknaderService = søknadService,
                 vedtakService = vedtakService,
                 ressursService = ressursService,
+                behandlingRepository = behandlingRepository,
             )
         }) {
             test()

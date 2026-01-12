@@ -2,6 +2,7 @@ package no.nav.dagpenger.datadeling.api
 
 import io.ktor.server.application.Application
 import io.ktor.server.routing.routing
+import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.AppConfig
@@ -21,11 +22,12 @@ fun Application.datadelingApi(
     søknaderService: SøknadService,
     vedtakService: VedtakService,
     ressursService: RessursService,
+    behandlingRepository: BehandlingResultatRepositoryMedTolker,
 ) {
     authentication(config)
     configureMetrics()
     routing {
         afpPrivatRoutes(ressursService, perioderService, logger)
-        dagpengerRoutes(perioderService, meldekortService, søknaderService, vedtakService, logger)
+        dagpengerRoutes(perioderService, meldekortService, søknaderService, vedtakService, behandlingRepository, logger)
     }
 }

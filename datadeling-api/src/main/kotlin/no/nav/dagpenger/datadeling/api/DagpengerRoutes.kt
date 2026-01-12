@@ -10,6 +10,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import no.nav.dagpenger.behandling.BehandlingResultat
+import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.Vedtak
 import no.nav.dagpenger.behandling.arena.VedtakService
@@ -20,6 +22,7 @@ import no.nav.dagpenger.datadeling.api.plugins.AuthorizationPlugin
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.UtbetalingsdagDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
@@ -36,6 +39,7 @@ fun Route.dagpengerRoutes(
     meldekortService: MeldekortService,
     søknadService: SøknadService,
     vedtakService: VedtakService,
+    behandlingRepository: BehandlingResultatRepositoryMedTolker,
     auditLogger: Log,
 ) {
     swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
@@ -196,6 +200,36 @@ fun Route.dagpengerRoutes(
                         defaultLogger.error { "Kunne ikke hente vedtak. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke hente vedtak. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente vedtak")
+                    }
+                }
+            }
+            route("/utbetaling") {
+                kreverTilgangerTil(Tilgangsrolle.utbetaling)
+                post {
+                    try {
+                        val request = call.receive<DatadelingRequestDTO>()
+                        val utbetalinger: List<BehandlingResultat> = behandlingRepository.hent(request.personIdent)
+
+                        val response =
+                            utbetalinger.flatMap { behandling ->
+                                behandling.utbetalinger.map {
+                                    UtbetalingsdagDTO(
+                                        dato = it.dato,
+                                        sats = it.sats,
+                                        utbetaltBeløp = it.utbetaling,
+                                    )
+                                }
+                            }
+
+                        call.respond(HttpStatusCode.OK, response)
+                    } catch (e: BadRequestException) {
+                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om utbetaling. Se sikkerlogg for detaljer" }
+                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om utbetaling. Detaljer:" }
+                        call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om utbetaling")
+                    } catch (e: Exception) {
+                        defaultLogger.error { "Kunne ikke hente utbetaling. Se sikkerlogg for detaljer" }
+                        sikkerlogger.error(e) { "Kunne ikke hente utbetaling. Detaljer:" }
+                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente utbetaling")
                     }
                 }
             }

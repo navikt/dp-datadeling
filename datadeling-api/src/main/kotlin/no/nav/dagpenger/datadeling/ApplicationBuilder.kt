@@ -50,8 +50,10 @@ internal class ApplicationBuilder(
     private val meldekortregisterClient = MeldekortregisterClient(Config.dpMeldekortregisterUrl, Config.dpMeldekortregisterTokenProvider)
     private val proxyClient = ProxyClientArena(Config.dpProxyUrl, Config.dpProxyTokenProvider)
 
+    private val tolker = BehandlingResultatRepositoryMedTolker(behandlingResultatRepositoryPostgresql)
+
     private val perioderService =
-        PerioderService(proxyClient, BehandlingResultatRepositoryMedTolker(behandlingResultatRepositoryPostgresql))
+        PerioderService(proxyClient, tolker)
     private val meldekortService = MeldekortService(meldekortregisterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val søknaderService = SøknadService(søknadRepository)
@@ -85,6 +87,7 @@ internal class ApplicationBuilder(
                                 søknaderService = søknaderService,
                                 vedtakService = vedtakService,
                                 ressursService = ressursService,
+                                behandlingRepository = tolker,
                             )
                         }
                     }

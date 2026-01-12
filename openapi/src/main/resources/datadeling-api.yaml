@@ -562,28 +562,6 @@ components:
       items:
         $ref: '#/components/schemas/Vedtak'
 
-    Utbetaling:
-      type: object
-      required:
-        - sakId
-        - vedtakstidspunktet
-        - behandlingId
-        - ident
-        - utbetalinger
-      properties:
-        sakId:
-          type: string
-        behandlingId:
-          type: string
-        ident:
-          type: string
-        vedtakstidspunktet:
-          type: string
-          format: date-time
-        utbetalinger:
-          type: array
-          items:
-            $ref: '#/components/schemas/Utbetalingsdag'
     Utbetalingsdag:
       type: object
       required:
