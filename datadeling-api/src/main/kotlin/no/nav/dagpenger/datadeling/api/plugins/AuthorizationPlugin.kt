@@ -23,6 +23,7 @@ val AuthorizationPlugin =
                 val konsument = call.konsument()
 
                 // azure-token-generator har ikke roller, men skal ha tilgang til alt for testing
+                // todo: Bør styres av konfigurasjon i fremtiden?
                 if (konsument == "dev-gcp:nais:azure-token-generator") {
                     return@on
                 }
