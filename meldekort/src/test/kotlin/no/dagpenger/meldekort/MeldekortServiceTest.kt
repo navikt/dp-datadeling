@@ -1,11 +1,16 @@
 package no.dagpenger.meldekort
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
+import no.nav.dagpenger.datadeling.models.MeldekortDTOStatusDTO
+import no.nav.dagpenger.datadeling.models.MeldekortDTOTypeDTO
 import no.nav.dagpenger.datadeling.models.MeldekortKildeDTO
+import no.nav.dagpenger.datadeling.models.MeldekortKildeDTORolleDTO
 import no.nav.dagpenger.datadeling.models.MeldekortPeriodeDTO
 import no.nav.dagpenger.datadeling.models.OpprettetAvDTO
 import no.nav.dagpenger.dato.januar
@@ -99,8 +104,8 @@ class MeldekortServiceTest {
         MeldekortDTO(
             id = UUID.randomUUID().toString(),
             ident = "01020312345",
-            status = MeldekortDTO.Status.Innsendt,
-            type = MeldekortDTO.Type.Ordinaert,
+            status = MeldekortDTOStatusDTO.INNSENDT,
+            type = MeldekortDTOTypeDTO.ORDINAERT,
             periode =
                 MeldekortPeriodeDTO(
                     fraOgMed = fraOgMed,
@@ -111,16 +116,16 @@ class MeldekortServiceTest {
             kanEndres = true,
             kanSendesFra = fraOgMed.plusDays(11),
             sisteFristForTrekk = fraOgMed.plusDays(20),
-            opprettetAv = OpprettetAvDTO.Dagpenger,
+            opprettetAv = OpprettetAvDTO.DAGPENGER,
             migrert = false,
             originalMeldekortId = null,
             begrunnelse = null,
             kilde =
                 MeldekortKildeDTO(
-                    rolle = MeldekortKildeDTO.Rolle.Bruker,
+                    rolle = MeldekortKildeDTORolleDTO.BRUKER,
                     ident = "01020312345",
                 ),
-            innsendtTidspunkt = fraOgMed.plusDays(14).toString(),
+            innsendtTidspunkt = fraOgMed.plusDays(14).atStartOfDay(),
             registrertArbeidssoker = true,
             meldedato = fraOgMed.plusDays(14),
         )
@@ -132,7 +137,16 @@ class MeldekortServiceTest {
         proxyMockServer.stubFor(
             WireMock
                 .post(WireMock.urlEqualTo("/datadeling/meldekort"))
-                .willReturn(WireMock.jsonResponse(response, 200).withFixedDelay(delayMs)),
+                .willReturn(
+                    WireMock
+                        .jsonResponse(
+                            jacksonObjectMapper()
+                                .apply {
+                                    registerModule(JavaTimeModule())
+                                }.writeValueAsString(response),
+                            200,
+                        ).withFixedDelay(delayMs),
+                ),
         )
     }
 

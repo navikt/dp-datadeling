@@ -7,6 +7,7 @@ import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.dato.januar
 import org.junit.jupiter.api.AfterEach
@@ -52,7 +53,7 @@ class PerioderServiceTest {
                             fraOgMedDato = 1.januar(2025),
                             tilOgMedDato = 6.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                     ),
             )
@@ -75,13 +76,13 @@ class PerioderServiceTest {
                             fraOgMedDato = 1.januar(2025),
                             tilOgMedDato = 6.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                         PeriodeDTO(
                             fraOgMedDato = 7.januar(2025),
                             tilOgMedDato = 11.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                     ),
             )
@@ -107,13 +108,13 @@ class PerioderServiceTest {
                             fraOgMedDato = 1.januar(2025),
                             tilOgMedDato = 5.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                         PeriodeDTO(
                             fraOgMedDato = 7.januar(2025),
                             tilOgMedDato = 11.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                     ),
             )
@@ -139,13 +140,13 @@ class PerioderServiceTest {
                             fraOgMedDato = 1.januar(2025),
                             tilOgMedDato = 6.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                         PeriodeDTO(
                             fraOgMedDato = 7.januar(2025),
                             tilOgMedDato = 11.januar(2025),
                             ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                            kilde = PeriodeDTO.Kilde.ARENA,
+                            kilde = PeriodeDTOKildeDTO.ARENA,
                         ),
                     ),
             )
@@ -170,7 +171,7 @@ class PerioderServiceTest {
                         fraOgMedDato = 1.januar(2025),
                         tilOgMedDato = 11.januar(2025),
                         ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                        kilde = PeriodeDTO.Kilde.ARENA,
+                        kilde = PeriodeDTOKildeDTO.ARENA,
                     ),
                 ),
             )
@@ -196,7 +197,7 @@ class PerioderServiceTest {
                         fraOgMedDato = 1.januar(2025),
                         tilOgMedDato = null,
                         ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                        kilde = PeriodeDTO.Kilde.ARENA,
+                        kilde = PeriodeDTOKildeDTO.ARENA,
                     ),
                 ),
             )

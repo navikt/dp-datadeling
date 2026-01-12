@@ -7,6 +7,7 @@ import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import java.time.LocalDate
 
@@ -54,7 +55,7 @@ class PerioderService(
                                                 YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
                                             }
                                         },
-                                    kilde = PeriodeDTO.Kilde.DP_SAK,
+                                    kilde = PeriodeDTOKildeDTO.DP_SAK,
                                 )
                             }
                         }

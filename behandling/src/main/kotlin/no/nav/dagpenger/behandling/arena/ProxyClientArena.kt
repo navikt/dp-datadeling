@@ -9,6 +9,9 @@ import io.ktor.http.HttpHeaders
 import no.nav.dagpenger.behandling.PerioderClient
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO.ARENA
+import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.ktor.client.defaultHttpClient
 import java.time.LocalDate
 
@@ -69,24 +72,24 @@ class ProxyClientArena(
                         personIdent = it.personIdent,
                         perioder =
                             it.perioder.map { periode ->
-                                no.nav.dagpenger.datadeling.models.PeriodeDTO(
+                                PeriodeDTO(
                                     fraOgMedDato = periode.fraOgMedDato,
                                     tilOgMedDato = periode.tilOgMedDato,
                                     ytelseType =
                                         when (periode.ytelseType) {
                                             ArenaYtelseType.DAGPENGER_ARBEIDSSOKER_ORDINAER -> {
-                                                no.nav.dagpenger.datadeling.models.YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER
+                                                YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER
                                             }
 
                                             ArenaYtelseType.DAGPENGER_PERMITTERING_ORDINAER -> {
-                                                no.nav.dagpenger.datadeling.models.YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER
+                                                YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER
                                             }
 
                                             ArenaYtelseType.DAGPENGER_PERMITTERING_FISKEINDUSTRI -> {
-                                                no.nav.dagpenger.datadeling.models.YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
+                                                YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
                                             }
                                         },
-                                    kilde = no.nav.dagpenger.datadeling.models.PeriodeDTO.Kilde.ARENA,
+                                    kilde = ARENA,
                                 )
                             },
                     )

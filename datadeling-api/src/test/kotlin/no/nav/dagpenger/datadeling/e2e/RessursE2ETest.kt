@@ -29,6 +29,7 @@ import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.testutil.januar
@@ -58,7 +59,7 @@ class RessursE2ETest {
                                         fraOgMedDato = 10.januar(),
                                         tilOgMedDato = 25.januar(),
                                         ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                                        kilde = PeriodeDTO.Kilde.ARENA,
+                                        kilde = PeriodeDTOKildeDTO.ARENA,
                                     ),
                                 ),
                         )
@@ -73,7 +74,7 @@ class RessursE2ETest {
                                 fraOgMedDato = 10.januar(),
                                 tilOgMedDato = 25.januar(),
                                 ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                                kilde = PeriodeDTO.Kilde.ARENA,
+                                kilde = PeriodeDTOKildeDTO.ARENA,
                             ),
                         ),
                 )
@@ -99,7 +100,7 @@ class RessursE2ETest {
                                     fraOgMedDato = 10.januar(),
                                     tilOgMedDato = 25.januar(),
                                     ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                                    kilde = PeriodeDTO.Kilde.ARENA,
+                                    kilde = PeriodeDTOKildeDTO.ARENA,
                                 ),
                             ),
                     )

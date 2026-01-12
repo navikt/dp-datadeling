@@ -7,6 +7,7 @@ import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import java.time.LocalDate
 import java.util.UUID
@@ -73,7 +74,7 @@ internal fun enAfpPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
     ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-    kilde: PeriodeDTO.Kilde = PeriodeDTO.Kilde.ARENA,
+    kilde: PeriodeDTOKildeDTO = PeriodeDTOKildeDTO.ARENA,
 ) = PeriodeAfpDTO(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
@@ -84,7 +85,7 @@ internal fun enPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
     ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-    kilde: PeriodeDTO.Kilde = PeriodeDTO.Kilde.ARENA,
+    kilde: PeriodeDTOKildeDTO = PeriodeDTOKildeDTO.ARENA,
 ) = PeriodeDTO(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,

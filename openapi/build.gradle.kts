@@ -1,65 +1,61 @@
+import org.gradle.internal.impldep.com.amazonaws.util.json.Jackson
+
 plugins {
-    id("org.openapi.generator") version "7.18.0"
+    id("ch.acanda.gradle.fabrikt") version "1.25.0"
     id("common")
     `java-library`
 }
 
+tasks {
+    compileKotlin {
+        dependsOn("fabriktGenerate")
+    }
+}
+
 tasks.named("runKtlintCheckOverMainSourceSet").configure {
-    dependsOn("openApiGenerate")
+    dependsOn("fabriktGenerate")
 }
 
 tasks.named("runKtlintFormatOverMainSourceSet").configure {
-    dependsOn("openApiGenerate")
+    dependsOn("fabriktGenerate")
 }
 
 sourceSets {
     main {
         java {
-            setSrcDirs(
-                listOf(
-                    "src/main/kotlin",
-                    layout.buildDirectory
-                        .dir("generated/src/main/kotlin")
-                        .get()
-                        .asFile
-                        .path,
-                ),
-            )
+            setSrcDirs(listOf("src/main/kotlin", "${layout.buildDirectory.get()}/generated/src/main/kotlin"))
         }
     }
 }
 
 ktlint {
     filter {
-        exclude { element -> element.file.path.contains("generated/") }
+        exclude { element -> element.file.path.contains("generated") }
     }
 }
+
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(libs.jackson.annotation)
 }
 
-openApiGenerate {
-    generatorName.set("kotlin-server")
-    inputSpec.set("$projectDir/src/main/resources/datadeling-api.yaml")
-    outputDir.set(
-        layout.buildDirectory
-            .dir("generated/")
-            .get()
-            .asFile
-            .path,
-    )
-    packageName.set("no.nav.dagpenger.datadeling")
-    globalProperties.set(
-        mapOf(
-            "apis" to "none",
-            "models" to "",
-        ),
-    )
-    modelNameSuffix.set("DTO")
-    configOptions.set(
-        mapOf(
-            "serializationLibrary" to "jackson",
-            "enumPropertyNaming" to "original",
-        ),
-    )
+fabrikt {
+    generate("datadeling") {
+        apiFile = file("$projectDir/src/main/resources/datadeling-api.yaml")
+        basePackage = "no.nav.dagpenger.datadeling"
+        skip = false
+        quarkusReflectionConfig = disabled
+        typeOverrides {
+            datetime = LocalDateTime
+        }
+        model {
+            generate = enabled
+            validationLibrary = NoValidation
+            extensibleEnums = disabled
+            sealedInterfacesForOneOf = enabled
+            ignoreUnknownProperties = disabled
+            nonNullMapValues = enabled
+            serializationLibrary = Jackson
+            suffix = "DTO"
+        }
+    }
 }

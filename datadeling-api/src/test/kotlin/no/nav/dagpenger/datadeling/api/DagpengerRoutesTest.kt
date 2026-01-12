@@ -14,6 +14,7 @@ import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
+import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.StonadTypeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
@@ -176,13 +177,13 @@ class DagpengerRoutesTest {
                     PeriodeDTO(
                         fraOgMedDato = LocalDate.now(),
                         ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                        kilde = PeriodeDTO.Kilde.ARENA,
+                        kilde = PeriodeDTOKildeDTO.ARENA,
                     ),
                     PeriodeDTO(
                         fraOgMedDato = LocalDate.now().minusDays(100),
                         tilOgMedDato = LocalDate.now().minusDays(1),
                         ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                        kilde = PeriodeDTO.Kilde.ARENA,
+                        kilde = PeriodeDTOKildeDTO.ARENA,
                     ),
                 )
             coEvery { perioderService.hentDagpengeperioder(any()) } returns response
@@ -233,13 +234,13 @@ class DagpengerRoutesTest {
                 PeriodeDTO(
                     fraOgMedDato = LocalDate.now(),
                     ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                    kilde = PeriodeDTO.Kilde.ARENA,
+                    kilde = PeriodeDTOKildeDTO.ARENA,
                 ),
                 PeriodeDTO(
                     fraOgMedDato = LocalDate.now().minusDays(100),
                     tilOgMedDato = LocalDate.now().minusDays(1),
                     ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                    kilde = PeriodeDTO.Kilde.ARENA,
+                    kilde = PeriodeDTOKildeDTO.ARENA,
                 ),
             )
         coEvery { perioderService.hentDagpengeperioder(any()) } returns response
