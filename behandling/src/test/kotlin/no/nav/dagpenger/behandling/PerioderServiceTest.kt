@@ -1,14 +1,15 @@
 package no.nav.dagpenger.behandling
 
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
+import io.ktor.client.request.request
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
-import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
-import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
+import no.nav.dagpenger.dato.februar
 import no.nav.dagpenger.dato.januar
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,12 +29,8 @@ class PerioderServiceTest {
 
     @Test
     fun `ingen perioder`() {
-        coEvery { proxyClient.hentDagpengeperioder(any()) } returns
-            DatadelingResponseDTO(
-                personIdent = ident,
-                perioder = emptyList(),
-            )
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
+        coEvery { proxyClient.hentDagpengeperioder(any()) } returns emptyList()
+        coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
         val request = enDatadelingRequest(1.januar(2025)..10.januar(2025))
         val response = perioderService.hentDagpengeperioder(request)
@@ -45,170 +42,67 @@ class PerioderServiceTest {
     fun `én periode`() {
         val request = enDatadelingRequest(1.januar(2025)..6.januar(2025))
         val response =
-            DatadelingResponseDTO(
-                personIdent = ident,
-                perioder =
-                    listOf(
-                        PeriodeDTO(
-                            fraOgMedDato = 1.januar(2025),
-                            tilOgMedDato = 6.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                    ),
-            )
-
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
-
-        assertEquals(response.perioder, perioderService.hentDagpengeperioder(request).perioder)
-    }
-
-    @Test
-    fun `slår sammen perioder uten gap`() {
-        val request = enDatadelingRequest(1.januar(2025)..11.januar(2025))
-        val response =
-            DatadelingResponseDTO(
-                personIdent = ident,
-                perioder =
-                    listOf(
-                        PeriodeDTO(
-                            fraOgMedDato = 1.januar(2025),
-                            tilOgMedDato = 6.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                        PeriodeDTO(
-                            fraOgMedDato = 7.januar(2025),
-                            tilOgMedDato = 11.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                    ),
-            )
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
-
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
-        }
-    }
-
-    @Test
-    fun `slår ikke sammen perioder med gap`() {
-        val request = enDatadelingRequest(1.januar(2025)..11.januar(2025))
-        val response =
-            DatadelingResponseDTO(
-                personIdent = ident,
-                perioder =
-                    listOf(
-                        PeriodeDTO(
-                            fraOgMedDato = 1.januar(2025),
-                            tilOgMedDato = 5.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                        PeriodeDTO(
-                            fraOgMedDato = 7.januar(2025),
-                            tilOgMedDato = 11.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                    ),
-            )
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
-
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(2, it.perioder.size)
-            assertEquals(response.perioder, it.perioder)
-        }
-    }
-
-    @Test
-    fun `slår ikke sammen perioder med forskjellige ytelsestyper`() {
-        val request = enDatadelingRequest(1.januar(2025)..11.januar(2025))
-
-        val response =
-            DatadelingResponseDTO(
-                personIdent = ident,
-                perioder =
-                    listOf(
-                        PeriodeDTO(
-                            fraOgMedDato = 1.januar(2025),
-                            tilOgMedDato = 6.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                        PeriodeDTO(
-                            fraOgMedDato = 7.januar(2025),
-                            tilOgMedDato = 11.januar(2025),
-                            ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                            kilde = PeriodeDTOKildeDTO.ARENA,
-                        ),
-                    ),
-            )
-
-        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
-
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(2, it.perioder.size)
-            assertEquals(response.perioder, it.perioder)
-        }
-    }
-
-    @Test
-    fun `avkorter perioden mot forespørsel`() {
-        val request = enDatadelingRequest(3.januar(2025)..8.januar(2025))
-        val response =
-            DatadelingResponseDTO(
-                personIdent = ident,
-                listOf(
-                    PeriodeDTO(
-                        fraOgMedDato = 1.januar(2025),
-                        tilOgMedDato = 11.januar(2025),
-                        ytelseType = YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                        kilde = PeriodeDTOKildeDTO.ARENA,
-                    ),
+            listOf(
+                Periode(
+                    fraOgMed = 1.januar(2025),
+                    tilOgMed = 6.januar(2025),
+                    ytelseType = YtelseType.Permittering,
+                    kilde = Fagsystem.ARENA,
                 ),
             )
 
         coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
+        coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
-        perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
-        }
+        perioderService.hentDagpengeperioder(request).perioder shouldHaveSize 1
     }
 
     @Test
-    fun `avkorter perioder uten avsluttet ytelse`() {
-        val request = enDatadelingRequest(3.januar(2025)..8.januar(2025))
+    fun `inkluderer kun perioder som ligger innenfor ønsket vindu`() {
         val response =
-            DatadelingResponseDTO(
-                personIdent = ident,
-                listOf(
-                    PeriodeDTO(
-                        fraOgMedDato = 1.januar(2025),
-                        tilOgMedDato = null,
-                        ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                        kilde = PeriodeDTOKildeDTO.ARENA,
-                    ),
+            listOf(
+                Periode(
+                    fraOgMed = 1.januar(2025),
+                    tilOgMed = 5.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 6.januar(2025),
+                    tilOgMed = 10.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 15.januar(2025),
+                    tilOgMed = 20.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 25.januar(2025),
+                    tilOgMed = 30.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 5.februar(2025),
+                    tilOgMed = null,
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
                 ),
             )
+        val request = enDatadelingRequest(8.januar(2025)..26.januar(2025))
 
         coEvery { proxyClient.hentDagpengeperioder(request) } returns response
-        coEvery { behandlingResultatRepositoryPostgresql.hent(any()) } returns emptyList()
+        coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
         perioderService.hentDagpengeperioder(request).let {
-            assertEquals(1, it.perioder.size)
-            assertEquals(request.fraOgMedDato, it.perioder.first().fraOgMedDato)
-            assertEquals(request.tilOgMedDato, it.perioder.first().tilOgMedDato)
+            it.perioder shouldHaveSize 3
+
+            it.perioder[0].fraOgMedDato shouldBe 6.januar(2025)
+            it.perioder[1].fraOgMedDato shouldBe 15.januar(2025)
+            it.perioder[2].fraOgMedDato shouldBe 25.januar(2025)
         }
     }
 

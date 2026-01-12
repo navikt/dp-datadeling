@@ -7,7 +7,7 @@ import no.nav.dagpenger.datadeling.testutil.enAfpPeriode
 import no.nav.dagpenger.datadeling.testutil.enDatadelingAfpResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enRessurs
-import no.nav.dagpenger.datadeling.testutil.januar
+import no.nav.dagpenger.dato.januar
 import org.junit.jupiter.api.Test
 
 class KafkaLoggerTest {
@@ -28,7 +28,7 @@ class KafkaLoggerTest {
                             request =
                                 enDatadelingRequest(
                                     fnr = FNR,
-                                    fraOgMed = 1.januar(),
+                                    fraOgMed = 1.januar(2023),
                                 ),
                             data =
                                 enDatadelingAfpResponse(

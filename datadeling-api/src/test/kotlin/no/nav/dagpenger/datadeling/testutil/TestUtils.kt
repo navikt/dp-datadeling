@@ -5,10 +5,11 @@ import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.FagsystemDTO
 import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
-import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
+import no.nav.dagpenger.dato.januar
 import java.time.LocalDate
 import java.util.UUID
 
@@ -24,7 +25,7 @@ internal fun enDatadelingRequest(
 )
 
 internal fun enDatadelingRequest(
-    fraOgMed: LocalDate = 1.januar(),
+    fraOgMed: LocalDate = 1.januar(2023),
     tilOgMed: LocalDate? = null,
     fnr: String = FNR,
 ) = DatadelingRequestDTO(
@@ -74,7 +75,7 @@ internal fun enAfpPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
     ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-    kilde: PeriodeDTOKildeDTO = PeriodeDTOKildeDTO.ARENA,
+    kilde: FagsystemDTO = FagsystemDTO.ARENA,
 ) = PeriodeAfpDTO(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
@@ -85,14 +86,10 @@ internal fun enPeriode(
     fraOgMed: LocalDate,
     tilOgMed: LocalDate?,
     ytelseType: YtelseTypeDTO = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-    kilde: PeriodeDTOKildeDTO = PeriodeDTOKildeDTO.ARENA,
+    kilde: FagsystemDTO = FagsystemDTO.ARENA,
 ) = PeriodeDTO(
     fraOgMedDato = fraOgMed,
     tilOgMedDato = tilOgMed,
     ytelseType = ytelseType,
     kilde = kilde,
 )
-
-internal fun Int.januar(year: Int = 2023) = LocalDate.of(year, 1, this)
-
-internal fun Int.oktober(year: Int = 2023) = LocalDate.of(year, 1, this)

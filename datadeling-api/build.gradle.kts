@@ -62,6 +62,7 @@ dependencies {
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
     testImplementation(testFixtures(project(":behandling")))
+    testImplementation(project(":dato"))
 }
 
 application {

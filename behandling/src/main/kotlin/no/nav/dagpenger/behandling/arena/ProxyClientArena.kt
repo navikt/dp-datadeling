@@ -6,12 +6,11 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
+import no.nav.dagpenger.behandling.Fagsystem
+import no.nav.dagpenger.behandling.Periode
 import no.nav.dagpenger.behandling.PerioderClient
+import no.nav.dagpenger.behandling.YtelseType
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
-import no.nav.dagpenger.datadeling.models.PeriodeDTO
-import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO.ARENA
-import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.ktor.client.defaultHttpClient
 import java.time.LocalDate
 
@@ -43,7 +42,7 @@ class ProxyClientArena(
     private val tokenProvider: () -> String,
 ) : PerioderClient,
     VedtakClient {
-    override suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): DatadelingResponseDTO {
+    override suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): List<Periode> {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
 
         val token =
@@ -68,31 +67,27 @@ class ProxyClientArena(
         return result.fold(
             onSuccess = {
                 it.let {
-                    DatadelingResponseDTO(
-                        personIdent = it.personIdent,
-                        perioder =
-                            it.perioder.map { periode ->
-                                PeriodeDTO(
-                                    fraOgMedDato = periode.fraOgMedDato,
-                                    tilOgMedDato = periode.tilOgMedDato,
-                                    ytelseType =
-                                        when (periode.ytelseType) {
-                                            ArenaYtelseType.DAGPENGER_ARBEIDSSOKER_ORDINAER -> {
-                                                YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER
-                                            }
+                    it.perioder.map { periode ->
+                        Periode(
+                            fraOgMed = periode.fraOgMedDato,
+                            tilOgMed = periode.tilOgMedDato,
+                            ytelseType =
+                                when (periode.ytelseType) {
+                                    ArenaYtelseType.DAGPENGER_ARBEIDSSOKER_ORDINAER -> {
+                                        YtelseType.Ordinær
+                                    }
 
-                                            ArenaYtelseType.DAGPENGER_PERMITTERING_ORDINAER -> {
-                                                YtelseTypeDTO.DAGPENGER_PERMITTERING_ORDINAER
-                                            }
+                                    ArenaYtelseType.DAGPENGER_PERMITTERING_ORDINAER -> {
+                                        YtelseType.Permittering
+                                    }
 
-                                            ArenaYtelseType.DAGPENGER_PERMITTERING_FISKEINDUSTRI -> {
-                                                YtelseTypeDTO.DAGPENGER_PERMITTERING_FISKEINDUSTRI
-                                            }
-                                        },
-                                    kilde = ARENA,
-                                )
-                            },
-                    )
+                                    ArenaYtelseType.DAGPENGER_PERMITTERING_FISKEINDUSTRI -> {
+                                        YtelseType.Fiskeindustri
+                                    }
+                                },
+                            kilde = Fagsystem.ARENA,
+                        )
+                    }
                 }
             },
             onFailure = {

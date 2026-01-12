@@ -317,14 +317,16 @@ components:
           description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv. Dersom det er gitt en tilOgMedDato i request og ytelsen varer lenger enn tilOgMedDatoen, vil requestens tilOgMedDato benyttes.
 
         kilde:
-          type: string
-          description: Kildesystem for perioden
-          enum:
-            - ARENA
-            - DP_SAK
+          $ref: '#/components/schemas/Fagsystem'
 
         ytelseType:
           $ref: '#/components/schemas/YtelseType'
+
+    Fagsystem:
+      type: string
+      enum:
+        - ARENA
+        - DP_SAK
 
     YtelseType:
       type: string

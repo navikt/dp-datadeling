@@ -28,11 +28,11 @@ import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.FagsystemDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
-import no.nav.dagpenger.datadeling.models.PeriodeDTOKildeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.datadeling.testutil.januar
+import no.nav.dagpenger.dato.januar
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -56,10 +56,10 @@ class RessursE2ETest {
                             perioder =
                                 listOf(
                                     PeriodeDTO(
-                                        fraOgMedDato = 10.januar(),
-                                        tilOgMedDato = 25.januar(),
+                                        fraOgMedDato = 10.januar(2023),
+                                        tilOgMedDato = 25.januar(2023),
                                         ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                                        kilde = PeriodeDTOKildeDTO.ARENA,
+                                        kilde = FagsystemDTO.ARENA,
                                     ),
                                 ),
                         )
@@ -71,10 +71,10 @@ class RessursE2ETest {
                     perioder =
                         listOf(
                             PeriodeDTO(
-                                fraOgMedDato = 10.januar(),
-                                tilOgMedDato = 25.januar(),
+                                fraOgMedDato = 10.januar(2023),
+                                tilOgMedDato = 25.januar(2023),
                                 ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                                kilde = PeriodeDTOKildeDTO.ARENA,
+                                kilde = FagsystemDTO.ARENA,
                             ),
                         ),
                 )
@@ -97,10 +97,10 @@ class RessursE2ETest {
                         perioder =
                             listOf(
                                 PeriodeDTO(
-                                    fraOgMedDato = 10.januar(),
-                                    tilOgMedDato = 25.januar(),
+                                    fraOgMedDato = 10.januar(2023),
+                                    tilOgMedDato = 25.januar(2023),
                                     ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
-                                    kilde = PeriodeDTOKildeDTO.ARENA,
+                                    kilde = FagsystemDTO.ARENA,
                                 ),
                             ),
                     )
@@ -108,8 +108,8 @@ class RessursE2ETest {
                 val request =
                     DatadelingRequestDTO(
                         personIdent = response.personIdent,
-                        fraOgMedDato = 1.januar(),
-                        tilOgMedDato = 31.januar(),
+                        fraOgMedDato = 1.januar(2023),
+                        tilOgMedDato = 31.januar(2023),
                     )
 
                 val ressursUrl =
@@ -180,8 +180,8 @@ class RessursE2ETest {
                 val request =
                     DatadelingRequestDTO(
                         personIdent = "01020312345",
-                        fraOgMedDato = 1.januar(),
-                        tilOgMedDato = 31.januar(),
+                        fraOgMedDato = 1.januar(2023),
+                        tilOgMedDato = 31.januar(2023),
                     )
 
                 val ressursUrl =

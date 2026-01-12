@@ -27,7 +27,7 @@ import no.nav.dagpenger.datadeling.testutil.enDatadelingAfpResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enRessurs
-import no.nav.dagpenger.datadeling.testutil.januar
+import no.nav.dagpenger.dato.januar
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -100,7 +100,7 @@ class AfpPrivatRoutesTest {
                             personIdent = FNR,
                             listOf(
                                 PeriodeAfpDTO(
-                                    fraOgMedDato = 1.januar(),
+                                    fraOgMedDato = 1.januar(2023),
                                     ytelseType = YtelseTypeDTO.DAGPENGER_ARBEIDSSOKER_ORDINAER,
                                 ),
                             ),
