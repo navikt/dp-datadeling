@@ -88,7 +88,8 @@ paths:
   /dagpenger/datadeling/v1/perioder:
     post:
       description: |-
-        Returnerer perioder basert på innsendte data
+       Perioder er såkalte betingede perioder (rettighetsperioder) for Dagpenger. Bruker har rett til Dagpenger i disse periodene 
+        gitt at andre betingelser er oppfylt (Melder seg til Nav hver 14. dag pt).
       requestBody:
         required: true
         content:
