@@ -60,4 +60,36 @@ class DatoperiodeTest {
 
         periode.overlapperMed(langtFremITid) shouldBe true
     }
+
+    @Test
+    fun `avgrense med en periode`() {
+        val periode = Datoperiode(1.januar(2023), 31.januar(2023))
+        val avgrensMedPeriode = Datoperiode(10.januar(2023), 20.januar(2023))
+
+        periode.avgrensMed(avgrensMedPeriode) shouldBe Datoperiode(10.januar(2023), 20.januar(2023))
+    }
+
+    @Test
+    fun `avgrense uten til og med`() {
+        val periode = Datoperiode(1.januar(2023), 31.januar(2023))
+        val avgrensMedPeriode = Datoperiode(10.januar(2023))
+
+        periode.avgrensMed(avgrensMedPeriode) shouldBe Datoperiode(10.januar(2023), 31.januar(2023))
+    }
+
+    @Test
+    fun `avgrense en periode uten til og med`() {
+        val periode = Datoperiode(1.januar(2023))
+        val avgrensMedPeriode = Datoperiode(10.januar(2023), 20.januar(2023))
+
+        periode.avgrensMed(avgrensMedPeriode) shouldBe Datoperiode(10.januar(2023), 20.januar(2023))
+    }
+
+    @Test
+    fun `avgrense uten til og med på en periode uten til og med`() {
+        val periode = Datoperiode(1.januar(2023))
+        val avgrensMedPeriode = Datoperiode(10.januar(2023))
+
+        periode.avgrensMed(avgrensMedPeriode) shouldBe Datoperiode(10.januar(2023), null)
+    }
 }

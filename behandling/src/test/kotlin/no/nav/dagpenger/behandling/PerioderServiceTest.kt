@@ -2,7 +2,6 @@ package no.nav.dagpenger.behandling
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.ktor.client.request.request
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -103,6 +102,58 @@ class PerioderServiceTest {
             it.perioder[0].fraOgMedDato shouldBe 6.januar(2025)
             it.perioder[1].fraOgMedDato shouldBe 15.januar(2025)
             it.perioder[2].fraOgMedDato shouldBe 25.januar(2025)
+        }
+    }
+
+    @Test
+    fun `kan avgrense perioder`() {
+        val response =
+            listOf(
+                Periode(
+                    fraOgMed = 1.januar(2025),
+                    tilOgMed = 5.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 6.januar(2025),
+                    tilOgMed = 10.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 15.januar(2025),
+                    tilOgMed = 20.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 25.januar(2025),
+                    tilOgMed = 30.januar(2025),
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+                Periode(
+                    fraOgMed = 5.februar(2025),
+                    tilOgMed = null,
+                    ytelseType = YtelseType.Ordinær,
+                    kilde = Fagsystem.ARENA,
+                ),
+            )
+        val request = enDatadelingRequest(8.januar(2025)..26.januar(2025))
+
+        coEvery { proxyClient.hentDagpengeperioder(request) } returns response
+        coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
+
+        perioderService.hentDagpengeperioderAvgrenset(request).let {
+            it.perioder shouldHaveSize 3
+
+            it.perioder[0].fraOgMedDato shouldBe 8.januar(2025)
+            it.perioder[0].tilOgMedDato shouldBe 10.januar(2025)
+            it.perioder[1].fraOgMedDato shouldBe 15.januar(2025)
+            it.perioder[1].tilOgMedDato shouldBe 20.januar(2025)
+            it.perioder[2].fraOgMedDato shouldBe 25.januar(2025)
+            it.perioder[2].tilOgMedDato shouldBe 26.januar(2025)
         }
     }
 

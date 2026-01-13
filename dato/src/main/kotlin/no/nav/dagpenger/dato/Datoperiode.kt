@@ -11,4 +11,13 @@ data class Datoperiode(
         val otherTom = other.tilOgMed ?: LocalDate.MAX
         return fraOgMed <= otherTom && tom >= other.fraOgMed
     }
+
+    fun avgrensMed(other: Datoperiode): Datoperiode =
+        Datoperiode(
+            fraOgMed = maxOf(fraOgMed, other.fraOgMed),
+            tilOgMed =
+                minOf(tilOgMed ?: LocalDate.MAX, other.tilOgMed ?: LocalDate.MAX).let {
+                    if (it == LocalDate.MAX) null else it
+                },
+        )
 }

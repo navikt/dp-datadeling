@@ -47,7 +47,7 @@ class RessursE2ETest {
             val perioderService =
                 mockk<PerioderService>().also {
                     every {
-                        it.hentDagpengeperioder(
+                        it.hentDagpengeperioderAvgrenset(
                             any(),
                         )
                     } returns

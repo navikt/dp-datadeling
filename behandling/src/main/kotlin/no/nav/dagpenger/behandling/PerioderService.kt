@@ -15,6 +15,31 @@ class PerioderService(
 ) {
     private val kilder: List<PerioderClient> = kilde.asList()
 
+    fun hentDagpengeperioderAvgrenset(request: DatadelingRequestDTO): DatadelingResponseDTO {
+        val avgrensetTilPeriode = Datoperiode(request.fraOgMedDato, request.tilOgMedDato)
+        val helePerioden = hentDagpengeperioder(request)
+
+        val avgrensetPeriode =
+            helePerioden.perioder.map { periode ->
+                val avgrensetTilForespørselPerioder =
+                    Datoperiode(
+                        periode.fraOgMedDato,
+                        periode.tilOgMedDato,
+                    ).avgrensMed(avgrensetTilPeriode)
+                PeriodeDTO(
+                    fraOgMedDato = avgrensetTilForespørselPerioder.fraOgMed,
+                    tilOgMedDato = avgrensetTilForespørselPerioder.tilOgMed,
+                    ytelseType = periode.ytelseType,
+                    kilde = periode.kilde,
+                )
+            }
+
+        return DatadelingResponseDTO(
+            personIdent = helePerioden.personIdent,
+            perioder = avgrensetPeriode,
+        )
+    }
+
     fun hentDagpengeperioder(request: DatadelingRequestDTO) =
         runBlocking {
             val periode = Datoperiode(request.fraOgMedDato, request.tilOgMedDato)

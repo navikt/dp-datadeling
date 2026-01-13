@@ -54,7 +54,7 @@ fun Route.afpPrivatRoutes(
                         launch {
                             try {
                                 val perioder: DatadelingResponseAfpDTO =
-                                    perioderService.hentDagpengeperioder(request).let {
+                                    perioderService.hentDagpengeperioderAvgrenset(request).let {
                                         DatadelingResponseAfpDTO(
                                             personIdent = it.personIdent,
                                             perioder =
