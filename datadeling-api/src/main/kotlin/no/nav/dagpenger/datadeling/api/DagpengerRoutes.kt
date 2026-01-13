@@ -13,8 +13,6 @@ import io.ktor.server.routing.route
 import no.nav.dagpenger.behandling.BehandlingResultat
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
-import no.nav.dagpenger.behandling.arena.VedtakService
-import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.api.plugins.AuthorizationPlugin
@@ -24,19 +22,14 @@ import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.UtbetalingsdagDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.meldekort.MeldekortService
-import no.nav.dagpenger.søknad.SøknadService
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
     meldekortService: MeldekortService,
-    søknadService: SøknadService,
-    vedtakService: VedtakService,
     behandlingRepository: BehandlingResultatRepositoryMedTolker,
     auditLogger: Log,
 ) {
@@ -101,74 +94,6 @@ fun Route.dagpengerRoutes(
                         defaultLogger.error { "Kunne ikke hente meldekort. Se sikkerlogg for detaljer" }
                         sikkerlogger.error(e) { "Kunne ikke hente meldekort. Detaljer:" }
                         call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente meldekort")
-                    }
-                }
-            }
-
-            route("/soknader") {
-                kreverTilgangerTil(Tilgangsrolle.soknad)
-                post {
-                    try {
-                        val request = call.receive<DatadelingRequestDTO>()
-
-                        val response = søknadService.hentSøknader(request)
-
-                        auditLogger.log(
-                            DagpengerSøknaderHentetHendelse(
-                                saksbehandlerNavIdent = call.clientId(),
-                                request = request,
-                                response = response,
-                            ),
-                        )
-
-                        call.respond(HttpStatusCode.OK, response)
-                    } catch (e: BadRequestException) {
-                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om søknader. Se sikkerlogg for detaljer" }
-                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om søknader. Detaljer:" }
-                        call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om søknader")
-                    } catch (e: Exception) {
-                        defaultLogger.error { "Kunne ikke hente søknader. Se sikkerlogg for detaljer" }
-                        sikkerlogger.error(e) { "Kunne ikke hente søknader. Detaljer:" }
-                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente søknader")
-                    }
-                }
-            }
-
-            route("/siste_soknad") {
-                kreverTilgangerTil(Tilgangsrolle.soknad)
-                post {
-                    try {
-                        val ident = call.receive<String>()
-                        if (IDENT_REGEX.matches(ident).not()) {
-                            throw BadRequestException("Fødselsnummer/D-nummer må inneholde 11 siffer")
-                        }
-
-                        val søknad = søknadService.hentSisteSøknad(ident)
-
-                        auditLogger.log(
-                            DagpengerSisteSøknadHentetHendelse(
-                                saksbehandlerNavIdent = call.clientId(),
-                                request = ident,
-                                response = søknad,
-                            ),
-                        )
-
-                        if (søknad == null) {
-                            call.respond(HttpStatusCode.NotFound)
-                        } else {
-                            call.respond(HttpStatusCode.OK, søknad)
-                        }
-                    } catch (e: BadRequestException) {
-                        defaultLogger.error { "Kunne ikke lese ident fra forespørselen om siste søknad. Se sikkerlogg for detaljer" }
-                        sikkerlogger.error(e) { "Kunne ikke lese ident fra forespørselen om siste søknad. Detaljer:" }
-                        call.respond(
-                            HttpStatusCode.BadRequest,
-                            "Kunne ikke lese ident fra forespørselen om siste søknad",
-                        )
-                    } catch (e: Exception) {
-                        defaultLogger.error { "Kunne ikke hente siste søknad. Se sikkerlogg for detaljer" }
-                        sikkerlogger.error(e) { "Kunne ikke hente siste søknad. Detaljer:" }
-                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente siste søknad")
                     }
                 }
             }

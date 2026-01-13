@@ -8,14 +8,12 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
-import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.meldekort.MeldekortService
-import no.nav.dagpenger.søknad.SøknadService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
 object TestApplication {
@@ -109,8 +107,6 @@ object TestApplication {
     internal fun testEndepunkter(
         perioderService: PerioderService = mockk(relaxed = true),
         meldekortService: MeldekortService = mockk(relaxed = true),
-        søknadService: SøknadService = mockk(relaxed = true),
-        vedtakService: VedtakService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
         behandlingRepository: BehandlingResultatRepositoryMedTolker = mockk(relaxed = true),
         auditLogger: Log = NoopLogger,
@@ -122,8 +118,6 @@ object TestApplication {
                 config = Config.appConfig,
                 perioderService = perioderService,
                 meldekortService = meldekortService,
-                søknaderService = søknadService,
-                vedtakService = vedtakService,
                 ressursService = ressursService,
                 behandlingRepository = behandlingRepository,
             )

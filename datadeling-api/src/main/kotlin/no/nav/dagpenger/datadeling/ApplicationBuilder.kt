@@ -15,7 +15,6 @@ import no.nav.dagpenger.behandling.BehandlingResultatMottak
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
-import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
@@ -28,7 +27,6 @@ import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.dagpenger.meldekort.MeldekortregisterClient
 import no.nav.dagpenger.søknad.SøknadMottak
 import no.nav.dagpenger.søknad.SøknadRepository
-import no.nav.dagpenger.søknad.SøknadService
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.LoggerFactory
 
@@ -56,9 +54,6 @@ internal class ApplicationBuilder(
         PerioderService(proxyClient, tolker)
     private val meldekortService = MeldekortService(meldekortregisterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
-    private val søknaderService = SøknadService(søknadRepository)
-    private val vedtakService = VedtakService(proxyClient)
-
     private val leaderElector = LeaderElector(config)
     private val ressursDao = RessursDao()
     private val ressursService = RessursService(ressursDao, leaderElector, config.ressurs)
@@ -84,8 +79,6 @@ internal class ApplicationBuilder(
                                 config = config,
                                 perioderService = perioderService,
                                 meldekortService = meldekortService,
-                                søknaderService = søknaderService,
-                                vedtakService = vedtakService,
                                 ressursService = ressursService,
                                 behandlingRepository = tolker,
                             )
@@ -93,6 +86,8 @@ internal class ApplicationBuilder(
                     }
                 },
             ).apply {
+
+                // todo: Denne bør fjernes - Vi må høre Team innbyggerflate
                 SøknadMottak(this, søknadRepository)
                 BehandlingResultatMottak(
                     rapidsConnection = this,

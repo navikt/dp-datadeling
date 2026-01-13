@@ -7,7 +7,5 @@ package no.nav.dagpenger.datadeling.api.config
 enum class Tilgangsrolle {
     rettighetsperioder,
     meldekort,
-    soknad,
-    vedtak,
     utbetaling,
 }

@@ -31,7 +31,6 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
-        - "vedtak"
   - application: nav-persondata-api
     namespace: holmes
     cluster: dev-gcp

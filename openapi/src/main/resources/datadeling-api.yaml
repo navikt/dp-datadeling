@@ -148,47 +148,6 @@ paths:
                 $ref: '#/components/schemas/Meldekort'
       security:
         - azure: [ ]
-  /dagpenger/datadeling/v1/soknader:
-    post:
-      description: |-
-        Returnerer søknader basert på innsendte data
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DatadelingRequest'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Soknadsliste"
-      security:
-        - azure: [ ]
-  /dagpenger/datadeling/v1/siste_soknad:
-    post:
-      description: |-
-        Returnerer siste innsendt søknad
-      requestBody:
-        required: true
-        content:
-          text/plain:
-            schema:
-              type: string
-              example: Personens fødselsnummer eller D-nummer
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Soknad"
-        404:
-          description: Det finnes ikke søknader
-      security:
-        - azure: [ ]
 
 
 components:
@@ -435,55 +394,6 @@ components:
           enum: [ Bruker, Saksbehandler ]
         ident:
           type: string
-
-    Soknad:
-      type: object
-      required:
-        - søknadId
-        - journalpostId
-        - søknadsType
-        - skjemaKode
-        - kanal
-        - datoInnsendt
-      properties:
-        søknadId:
-          type: string
-          format: uuid
-          description: Søknad ID
-        journalpostId:
-          type: string
-          description: Journalpost ID
-        søknadstype:
-          $ref: '#/components/schemas/Soknadstype'
-        skjemaKode:
-          type: string
-          description: Skjemakode f.eks. NAV 04-16.03
-        kanal:
-          $ref: '#/components/schemas/Kanal'
-        datoInnsendt:
-          type: string
-          format: date-time
-          description: Tidspunkt for innsending
-
-    Soknadstype:
-      type: string
-      description: Søknadstype
-      enum:
-        - NySøknad
-        - Gjenopptak
-
-    Kanal:
-      type: string
-      description: Kanal
-      enum:
-        - Digital
-        - Papir
-
-    Soknadsliste:
-      type: array
-      description: Liste med søknader bruker har. Kan være en tom liste.
-      items:
-        $ref: '#/components/schemas/Soknad'
 
     StonadType:
       type: string
