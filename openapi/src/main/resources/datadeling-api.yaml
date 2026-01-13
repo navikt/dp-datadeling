@@ -189,28 +189,6 @@ paths:
           description: Det finnes ikke søknader
       security:
         - azure: [ ]
-  /dagpenger/datadeling/v1/vedtak:
-    post:
-      description: |-
-        NB: Dette endepunktet er foreløpig ikke tilgjengelig. Det jobbes med å et tilsvarende endepunkt klar til bruk. 
-        **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
-      
-        Vil ikke være riktig i forhold data som finnes i dp-sak.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DatadelingRequest'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Vedtaksliste"
-      security:
-        - azure: [ ]
 
 
 components:
