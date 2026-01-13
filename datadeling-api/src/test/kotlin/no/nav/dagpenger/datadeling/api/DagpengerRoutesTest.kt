@@ -7,7 +7,6 @@ import io.ktor.http.HttpStatusCode
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.PerioderService
-import no.nav.dagpenger.behandling.arena.Vedtak
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.api.TestApplication.issueAzureToken
 import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
@@ -15,7 +14,6 @@ import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.models.FagsystemDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
-import no.nav.dagpenger.datadeling.models.StonadTypeDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.datadeling.sporing.AuditHendelse
@@ -23,7 +21,6 @@ import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testPostText
@@ -89,14 +86,6 @@ class DagpengerRoutesTest {
         }
 
     @Test
-    fun `returnerer 401 uten token for vedtak`() =
-        testEndepunkter {
-            client.testPost("/dagpenger/datadeling/v1/vedtak", enDatadelingRequest(), token = null).apply {
-                assertEquals(HttpStatusCode.Unauthorized, this.status)
-            }
-        }
-
-    @Test
     fun `returnerer 400 hvis ikke kan prosessere request for perioder`() =
         testEndepunkter {
             client
@@ -148,21 +137,6 @@ class DagpengerRoutesTest {
                     "",
                     issueAzureToken(
                         azpRoles = listOf(Tilgangsrolle.soknad.name),
-                    ),
-                ).apply {
-                    assertEquals(HttpStatusCode.BadRequest, this.status)
-                }
-        }
-
-    @Test
-    fun `returnerer 400 hvis ikke kan prosessere request for vedtak`() =
-        testEndepunkter {
-            client
-                .testPost(
-                    "/dagpenger/datadeling/v1/vedtak",
-                    "",
-                    issueAzureToken(
-                        azpRoles = listOf(Tilgangsrolle.vedtak.name),
                     ),
                 ).apply {
                     assertEquals(HttpStatusCode.BadRequest, this.status)
@@ -390,61 +364,6 @@ class DagpengerRoutesTest {
                 it.shouldBeInstanceOf<DagpengerSisteSøknadHentetHendelse>()
                 it.ident() shouldBe FNR
                 it.request shouldBe FNR
-                it.response shouldBe response
-            }
-        }
-    }
-
-    @Test
-    fun `Audit og Sporing logger ved henting av vedtak`() {
-        val logger =
-            object : Log {
-                val hendelser = mutableListOf<AuditHendelse>()
-
-                override fun log(hendelse: AuditHendelse) {
-                    hendelser.add(hendelse)
-                }
-            }
-
-        val fraOgMedDato = LocalDate.now().minusDays(100)
-        val tilOgMedDato = LocalDate.now().minusDays(1)
-        val request = enDatadelingRequest(fraOgMed = fraOgMedDato, tilOgMed = tilOgMedDato)
-
-        val response =
-            listOf(
-                Vedtak(
-                    "1",
-                    "2",
-                    Vedtak.Utfall.AVSLÅTT,
-                    StonadTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                    LocalDate.now(),
-                    LocalDate.now(),
-                ),
-                Vedtak(
-                    "2",
-                    "3",
-                    Vedtak.Utfall.INNVILGET,
-                    StonadTypeDTO.DAGPENGER_PERMITTERING_ORDINAER,
-                    LocalDate.now(),
-                    LocalDate.now(),
-                ),
-            )
-        coEvery { vedtakService.hentVedtak(any()) } returns response
-
-        testEndepunkter(auditLogger = logger, vedtakService = vedtakService) {
-            client.testPost(
-                "/dagpenger/datadeling/v1/vedtak",
-                request,
-                issueAzureToken(
-                    azpRoles = listOf(Tilgangsrolle.vedtak.name),
-                ),
-            )
-
-            logger.hendelser.size shouldBe 1
-            logger.hendelser.first().let {
-                it.shouldBeInstanceOf<DagpengerVedtakHentetHendelse>()
-                it.ident() shouldBe FNR
-                it.request shouldBe request
                 it.response shouldBe response
             }
         }

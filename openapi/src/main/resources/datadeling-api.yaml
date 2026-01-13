@@ -191,7 +191,10 @@ paths:
   /dagpenger/datadeling/v1/vedtak:
     post:
       description: |-
-        Returnerer vedtak basert på innsendte data
+        NB: Dette endepunktet er foreløpig ikke tilgjengelig. Det jobbes med å et tilsvarende endepunkt klar til bruk. 
+        **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
+      
+        Vil ikke være riktig i forhold data som finnes i dp-sak.
       requestBody:
         required: true
         content:
@@ -503,46 +506,6 @@ components:
       items:
         $ref: '#/components/schemas/Soknad'
 
-    Vedtak:
-      type: object
-      required:
-        - vedtakId
-        - fagsakId
-        - utfall
-        - stønadType
-        - fraOgMedDato
-        - kilde
-      properties:
-        vedtakId:
-          type: string
-        fagsakId:
-          type: string
-        utfall:
-          $ref: '#/components/schemas/Utfall'
-        stønadType:
-          $ref: '#/components/schemas/StonadType'
-        fraOgMedDato:
-          type: string
-          format: date
-          description: Dato som vedtak gjelder fra og med
-        tilOgMedDato:
-          type: string
-          format: date
-          description: Dato som vedtak gjelder til og med
-        dagsats:
-          type: integer
-        barnetillegg:
-          type: integer
-        kilde:
-          $ref: '#/components/schemas/Kilde'
-
-    Utfall:
-      type: string
-      description: Utfall
-      enum:
-        - INNVILGET
-        - AVSLÅTT
-
     StonadType:
       type: string
       description: Stønadstype
@@ -550,19 +513,6 @@ components:
         - DAGPENGER_ARBEIDSSOKER_ORDINAER
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
-
-    Kilde:
-      type: string
-      description: Kilde
-      enum:
-        - ARENA
-        - DP
-
-    Vedtaksliste:
-      type: array
-      description: Liste med vedtak bruker har. Kan være en tom liste.
-      items:
-        $ref: '#/components/schemas/Vedtak'
 
     Utbetalingsdag:
       type: object

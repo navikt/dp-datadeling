@@ -13,7 +13,6 @@ import io.ktor.server.routing.route
 import no.nav.dagpenger.behandling.BehandlingResultat
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
-import no.nav.dagpenger.behandling.arena.Vedtak
 import no.nav.dagpenger.behandling.arena.VedtakService
 import no.nav.dagpenger.datadeling.Config.IDENT_REGEX
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
@@ -27,7 +26,6 @@ import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSisteSøknadHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerSøknaderHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerVedtakHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.dagpenger.søknad.SøknadService
@@ -175,34 +173,6 @@ fun Route.dagpengerRoutes(
                 }
             }
 
-            route("/vedtak") {
-                kreverTilgangerTil(Tilgangsrolle.vedtak)
-                post {
-                    try {
-                        val request = call.receive<DatadelingRequestDTO>()
-
-                        val response: List<Vedtak> = vedtakService.hentVedtak(request)
-
-                        auditLogger.log(
-                            DagpengerVedtakHentetHendelse(
-                                saksbehandlerNavIdent = call.clientId(),
-                                request = request,
-                                response = response,
-                            ),
-                        )
-
-                        call.respond(HttpStatusCode.OK, response)
-                    } catch (e: BadRequestException) {
-                        defaultLogger.error { "Kunne ikke lese innholdet i forespørselen om vedtak. Se sikkerlogg for detaljer" }
-                        sikkerlogger.error(e) { "Kunne ikke lese innholdet i forespørselen om vedtak. Detaljer:" }
-                        call.respond(HttpStatusCode.BadRequest, "Kunne ikke lese innholdet i forespørselen om vedtak")
-                    } catch (e: Exception) {
-                        defaultLogger.error { "Kunne ikke hente vedtak. Se sikkerlogg for detaljer" }
-                        sikkerlogger.error(e) { "Kunne ikke hente vedtak. Detaljer:" }
-                        call.respond(HttpStatusCode.InternalServerError, "Kunne ikke hente vedtak")
-                    }
-                }
-            }
             route("/utbetaling") {
                 kreverTilgangerTil(Tilgangsrolle.utbetaling)
                 post {
