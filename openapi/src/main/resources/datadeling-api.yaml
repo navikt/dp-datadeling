@@ -42,9 +42,9 @@ servers:
     description: prod
 tags:
   - name: Eksternt
-    description: API for datadeling av dagpengerettigheter til eksterne systemer
+    description: API for datadeling av dagpengerettigheter til eksterne systemer (Utenfor Nav)
   - name: Internt
-    description: API for datadeling av dagpengerettigheter til interne systemer
+    description: API for datadeling av dagpengerettigheter til interne systemer (Innenfor Nav)
   - name: Rettighetsperioder
     description: API for å hente rettighetsperioder for dagpenger
   - name: Utbetalinger
