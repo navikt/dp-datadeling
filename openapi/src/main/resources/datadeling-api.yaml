@@ -34,12 +34,25 @@ info:
     et lite antall saker.
 
 servers:
-  - url: https://dp-datadeling.ekstern.dev.nav.no
-    description: dev for eksterne
   - url: https://dp-datadeling.intern.dev.nav.no
     description: dev for interne
+  - url: https://dp-datadeling.ekstern.dev.nav.no
+    description: dev for eksterne
   - url: https://www.nav.no
     description: prod
+tags:
+  - name: Eksternt
+    description: API for datadeling av dagpengerettigheter til eksterne systemer
+  - name: Internt
+    description: API for datadeling av dagpengerettigheter til interne systemer
+  - name: Rettighetsperioder
+    description: API for å hente rettighetsperioder for dagpenger
+  - name: Utbetalinger
+    description: API for å hente utbetalingsdetaljer for dagpenger
+  - name: Meldekort
+    description: API for å hente meldekort for dagpenger
+
+
 
 paths:
   /dagpenger/datadeling/v1/periode:
@@ -48,6 +61,8 @@ paths:
         Opprett ny ressurs basert på innsendte data, returnerer URL til opprettede ressursen
         
         Scope: `nav:dagpenger:afpprivat.read`
+      tags:
+        - Eksternt
       requestBody:
         required: true
         content:
@@ -69,6 +84,8 @@ paths:
         Hent informasjon eksisterende ressurs ved hjelp av ressursens UUID
         
         Scope: `nav:dagpenger:afpprivat.read`
+      tags:
+        - Eksternt
       parameters:
         - in: path
           name: ressursUuid
@@ -90,6 +107,9 @@ paths:
       description: |-
        Perioder er såkalte betingede perioder (rettighetsperioder) for Dagpenger. Bruker har rett til Dagpenger i disse periodene 
         gitt at andre betingelser er oppfylt (Melder seg til Nav hver 14. dag pt).
+      tags:
+        - Internt
+        - Rettighetsperioder
       requestBody:
         required: true
         content:
@@ -111,6 +131,9 @@ paths:
       description: |-
         Returnerer brutto utbetalinger basert på beregnede meldeperioder
           **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
+      tags:
+        - Internt
+        - Utbetalinger
       requestBody:
         required: true
         content:
@@ -133,6 +156,9 @@ paths:
     post:
       description: |-
         Returnerer meldekort basert på innsendte data
+      tags:
+        - Internt
+        - Meldekort
       requestBody:
         required: true
         content:
