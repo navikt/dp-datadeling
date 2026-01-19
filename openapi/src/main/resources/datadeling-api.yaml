@@ -263,7 +263,7 @@ components:
         tilOgMedDato:
           type: string
           format: date
-          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv. Dersom det er gitt en tilOgMedDato i request og ytelsen varer lenger enn tilOgMedDatoen, vil requestens tilOgMedDato benyttes.
+          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv.
         ytelseType:
           $ref: '#/components/schemas/YtelseType'
 
@@ -281,7 +281,7 @@ components:
         tilOgMedDato:
           type: string
           format: date
-          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv. Dersom det er gitt en tilOgMedDato i request og ytelsen varer lenger enn tilOgMedDatoen, vil requestens tilOgMedDato benyttes.
+          description: Siste dato ytelsen gjelder. Hvis elementet er tomt eller ikke er angitt, er ytelsen fortsatt aktiv.
 
         kilde:
           $ref: '#/components/schemas/Fagsystem'
