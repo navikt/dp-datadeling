@@ -13,6 +13,18 @@ dpDatadelingHost: www.nav.no
 kafka_pool: nav-prod
 
 inbounds:
+  - application: fpabakus
+    namespace: teamforeldrepenger
+    cluster: prod-fss
+    permissions:
+      roles:
+        - "rettighetsperioder"
+  - application: fpsak
+    namespace: teamforeldrepenger
+    cluster: prod-fss
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: prod-gcp
