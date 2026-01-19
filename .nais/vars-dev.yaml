@@ -13,6 +13,18 @@ dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
 kafka_pool: nav-dev
 
 inbounds:
+  - application: fpabakus
+    namespace: teamforeldrepenger
+    cluster: dev-fss
+    permissions:
+      roles:
+        - "rettighetsperioder"
+  - application: fpsak
+    namespace: teamforeldrepenger
+    cluster: dev-fss
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: dev-gcp
