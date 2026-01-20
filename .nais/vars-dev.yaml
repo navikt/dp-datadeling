@@ -13,6 +13,12 @@ dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
 kafka_pool: nav-dev
 
 inbounds:
+  - application: veilarbportefolje
+    namespace: obo
+    cluster: dev-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: fpabakus
     namespace: teamforeldrepenger
     cluster: dev-fss

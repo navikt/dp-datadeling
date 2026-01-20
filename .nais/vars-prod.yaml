@@ -13,6 +13,12 @@ dpDatadelingHost: www.nav.no
 kafka_pool: nav-prod
 
 inbounds:
+  - application: veilarbportefolje
+    namespace: obo
+    cluster: prod-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: fpabakus
     namespace: teamforeldrepenger
     cluster: prod-fss
