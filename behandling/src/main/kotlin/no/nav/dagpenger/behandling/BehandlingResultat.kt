@@ -8,7 +8,7 @@ interface BehandlingResultat {
     val behandlingId: UUID
     val rettighetsperioder: List<Rettighetsperiode>
     val rettighetstyper: List<Rettighetstyper>
-    val utbetalinger: List<Utbetaling>
+    val beregninger: List<BeregnetDag>
 }
 
 interface Rettighetsperiode {
@@ -23,7 +23,7 @@ interface Rettighetstyper {
     val tilOgMed: LocalDate
 }
 
-interface Utbetaling {
+interface BeregnetDag {
     val dato: LocalDate
     val sats: Int
     val utbetaling: Int

@@ -11,7 +11,6 @@ import no.nav.dagpenger.behandling.kontrakt.v1.models.Behandlingsresultatv1DTO
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.collections.map
-import kotlin.text.get
 
 class BehandlingResultatV1Tolker(
     private val dto: Behandlingsresultatv1DTO,
@@ -47,9 +46,9 @@ class BehandlingResultatV1Tolker(
                     }
             }
 
-    override val utbetalinger: List<Utbetaling> =
+    override val beregninger: List<BeregnetDag> =
         dto.utbetalinger.map { utbetalingDto ->
-            object : Utbetaling {
+            object : BeregnetDag {
                 override val dato: LocalDate = utbetalingDto.dato
                 override val sats: Int = utbetalingDto.sats
                 override val utbetaling: Int = utbetalingDto.utbetaling

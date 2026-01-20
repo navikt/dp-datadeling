@@ -17,9 +17,9 @@ import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.api.plugins.AuthorizationPlugin
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.models.BeregnetDagDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
-import no.nav.dagpenger.datadeling.models.UtbetalingsdagDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
@@ -98,8 +98,8 @@ fun Route.dagpengerRoutes(
                 }
             }
 
-            route("/utbetaling") {
-                kreverTilgangerTil(Tilgangsrolle.utbetaling)
+            route("/beregninger") {
+                kreverTilgangerTil(Tilgangsrolle.beregninger)
                 post {
                     try {
                         val request = call.receive<DatadelingRequestDTO>()
@@ -107,8 +107,8 @@ fun Route.dagpengerRoutes(
 
                         val response =
                             utbetalinger.flatMap { behandling ->
-                                behandling.utbetalinger.map {
-                                    UtbetalingsdagDTO(
+                                behandling.beregninger.map {
+                                    BeregnetDagDTO(
                                         dato = it.dato,
                                         sats = it.sats,
                                         utbetaltBeløp = it.utbetaling,

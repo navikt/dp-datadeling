@@ -49,15 +49,15 @@ class BehandlingResultatV1TolkerTest {
         val behandlingResultat: JsonNode = objectMapper.readTree(meldekortBeregning_v1)
         val tolker = BehandlingResultatV1Tolker.fra(behandlingResultat)
 
-        tolker.utbetalinger.size shouldBe 11
-        tolker.utbetalinger[0].dato shouldBe LocalDate.of(2018, 6, 21)
-        tolker.utbetalinger[0].sats shouldBe 1259
-        tolker.utbetalinger[0].utbetaling shouldBe 719
+        tolker.beregninger.size shouldBe 11
+        tolker.beregninger[0].dato shouldBe LocalDate.of(2018, 6, 21)
+        tolker.beregninger[0].sats shouldBe 1259
+        tolker.beregninger[0].utbetaling shouldBe 719
 
-        tolker.utbetalinger[10].dato shouldBe LocalDate.of(2018, 7, 1)
-        tolker.utbetalinger[10].sats shouldBe 1259
-        tolker.utbetalinger[10].utbetaling shouldBe 0
+        tolker.beregninger[10].dato shouldBe LocalDate.of(2018, 7, 1)
+        tolker.beregninger[10].sats shouldBe 1259
+        tolker.beregninger[10].utbetaling shouldBe 0
 
-        tolker.utbetalinger.sumOf { it.utbetaling } shouldBe 5036
+        tolker.beregninger.sumOf { it.utbetaling } shouldBe 5036
     }
 }

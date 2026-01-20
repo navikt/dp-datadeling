@@ -47,8 +47,8 @@ tags:
     description: API for datadeling av dagpengerettigheter til interne systemer (Innenfor Nav)
   - name: Rettighetsperioder
     description: API for å hente rettighetsperioder for dagpenger
-  - name: Utbetalinger
-    description: API for å hente utbetalingsdetaljer for dagpenger
+  - name: Beregninger
+    description: API for å hente beregningsdetaljer for dagpenger
   - name: Meldekort
     description: API for å hente meldekort for dagpenger
 
@@ -126,14 +126,14 @@ paths:
       security:
         - azure: [ ]
 
-  /dagpenger/datadeling/v1/utbetaling:
+  /dagpenger/datadeling/v1/beregninger:
     post:
       description: |-
         Returnerer brutto utbetalinger basert på beregnede meldeperioder
           **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
       tags:
         - Internt
-        - Utbetalinger
+        - Beregninger
       requestBody:
         required: true
         content:
@@ -148,7 +148,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Utbetalingsdag'
+                  $ref: '#/components/schemas/BeregnetDag'
       security:
         - azure: [ ]
 
@@ -429,7 +429,7 @@ components:
         - DAGPENGER_PERMITTERING_ORDINAER
         - DAGPENGER_PERMITTERING_FISKEINDUSTRI
 
-    Utbetalingsdag:
+    BeregnetDag:
       type: object
       required:
         - dato

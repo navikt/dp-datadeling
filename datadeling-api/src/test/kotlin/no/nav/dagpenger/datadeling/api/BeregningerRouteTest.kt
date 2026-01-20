@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.BehandlingResultat
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
-import no.nav.dagpenger.behandling.Utbetaling
+import no.nav.dagpenger.behandling.BeregnetDag
 import no.nav.dagpenger.datadeling.api.TestApplication.issueAzureToken
 import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
@@ -18,20 +18,20 @@ import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 import kotlin.test.Test
 
-class UtbetalingRouteTest {
+class BeregningerRouteTest {
     @Test
-    fun `returnerer 200 og utbetalinger`() {
+    fun `returnerer 200 og beregninger`() {
         val behandlinger = mockk<BehandlingResultatRepositoryMedTolker>()
         val behandling =
             mockk<BehandlingResultat>().apply {
-                every { utbetalinger } returns
+                every { beregninger } returns
                     listOf(
-                        TestUtbetaling(
+                        TestBeregnetDag(
                             dato = LocalDate.of(2024, 1, 1),
                             sats = 500,
                             utbetaling = 15000,
                         ),
-                        TestUtbetaling(
+                        TestBeregnetDag(
                             dato = LocalDate.of(2024, 2, 1),
                             sats = 600,
                             utbetaling = 18000,
@@ -43,9 +43,9 @@ class UtbetalingRouteTest {
         testEndepunkter(behandlingRepository = behandlinger) {
             val response =
                 client.testPost(
-                    "/dagpenger/datadeling/v1/utbetaling",
+                    "/dagpenger/datadeling/v1/beregninger",
                     enDatadelingRequest(),
-                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.utbetaling.name)),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.beregninger.name)),
                 )
 
             response.status shouldBe HttpStatusCode.OK
@@ -68,9 +68,9 @@ class UtbetalingRouteTest {
         }
     }
 
-    private data class TestUtbetaling(
+    private data class TestBeregnetDag(
         override val dato: LocalDate,
         override val sats: Int,
         override val utbetaling: Int,
-    ) : Utbetaling
+    ) : BeregnetDag
 }
