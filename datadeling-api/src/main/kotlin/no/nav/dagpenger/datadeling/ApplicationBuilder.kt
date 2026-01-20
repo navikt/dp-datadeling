@@ -1,5 +1,7 @@
 package no.nav.dagpenger.datadeling
 
+import com.github.navikt.tbd_libs.kafka.AivenConfig
+import com.github.navikt.tbd_libs.kafka.ConsumerProducerFactory
 import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -13,6 +15,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.behandling.BehandlingResultatMottak
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
+import no.nav.dagpenger.behandling.BehandlingResultatVarsler
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.api.datadelingApi
@@ -58,10 +61,12 @@ internal class ApplicationBuilder(
     private val ressursDao = RessursDao()
     private val ressursService = RessursService(ressursDao, leaderElector, config.ressurs)
 
+    private val consumerProducerFactory = ConsumerProducerFactory(AivenConfig.default)
     private val rapidsConnection =
         RapidApplication
             .create(
                 configuration,
+                consumerProducerFactory = consumerProducerFactory,
                 builder = {
                     withKtor { preStopHook, rapid ->
                         naisApp(
@@ -86,12 +91,12 @@ internal class ApplicationBuilder(
                     }
                 },
             ).apply {
-
                 // todo: Denne bør fjernes - Vi må høre Team innbyggerflate
                 SøknadMottak(this, søknadRepository)
                 BehandlingResultatMottak(
                     rapidsConnection = this,
                     behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
+                    behandlingResultatVarsler = BehandlingResultatVarsler(consumerProducerFactory.createProducer(), "foo", objectMapper),
                 )
             }
 
