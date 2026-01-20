@@ -53,10 +53,12 @@ class BehandlingResultatV1TolkerTest {
         tolker.beregninger[0].dato shouldBe LocalDate.of(2018, 6, 21)
         tolker.beregninger[0].sats shouldBe 1259
         tolker.beregninger[0].utbetaling shouldBe 719
+        tolker.beregninger[0].gjenståendeDager shouldBe 519
 
         tolker.beregninger[10].dato shouldBe LocalDate.of(2018, 7, 1)
         tolker.beregninger[10].sats shouldBe 1259
         tolker.beregninger[10].utbetaling shouldBe 0
+        tolker.beregninger[10].gjenståendeDager shouldBe 513
 
         tolker.beregninger.sumOf { it.utbetaling } shouldBe 5036
     }

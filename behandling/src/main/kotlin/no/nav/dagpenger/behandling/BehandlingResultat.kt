@@ -27,6 +27,7 @@ interface BeregnetDag {
     val dato: LocalDate
     val sats: Int
     val utbetaling: Int
+    val gjenståendeDager: Int
 }
 
 enum class Rettighetstype {

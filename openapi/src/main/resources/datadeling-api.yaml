@@ -435,6 +435,8 @@ components:
         - dato
         - sats
         - utbetaltBeløp
+        - kilde
+        - gjenståendeDager
       properties:
         dato:
           type: string
@@ -445,6 +447,9 @@ components:
         utbetaltBeløp:
           type: integer
           format: int32
+        gjenståendeDager:
+          description: Vi har ikke denne informasjonen for Arena
+          type: integer
 
   securitySchemes:
     maskinporten:

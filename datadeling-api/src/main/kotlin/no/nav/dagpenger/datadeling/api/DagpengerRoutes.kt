@@ -112,6 +112,7 @@ fun Route.dagpengerRoutes(
                                         dato = it.dato,
                                         sats = it.sats,
                                         utbetaltBeløp = it.utbetaling,
+                                        gjenståendeDager = it.gjenståendeDager,
                                     )
                                 }
                             }

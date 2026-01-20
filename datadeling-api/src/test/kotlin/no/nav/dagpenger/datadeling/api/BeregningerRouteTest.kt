@@ -30,11 +30,13 @@ class BeregningerRouteTest {
                             dato = LocalDate.of(2024, 1, 1),
                             sats = 500,
                             utbetaling = 15000,
+                            gjenståendeDager = 10,
                         ),
                         TestBeregnetDag(
                             dato = LocalDate.of(2024, 2, 1),
                             sats = 600,
                             utbetaling = 18000,
+                            gjenståendeDager = 9,
                         ),
                     )
             }
@@ -56,12 +58,14 @@ class BeregningerRouteTest {
                   {
                     "dato": "2024-01-01",
                     "sats": 500,
-                    "utbetaltBeløp": 15000
+                    "utbetaltBeløp": 15000,
+                    "gjenståendeDager": 10
                   },
                   {
                     "dato": "2024-02-01",
                     "utbetaltBeløp": 18000,
-                    "sats": 600
+                    "sats": 600,
+                    "gjenståendeDager": 9
                   }
                 ] 
                 """.trimIndent()
@@ -72,5 +76,6 @@ class BeregningerRouteTest {
         override val dato: LocalDate,
         override val sats: Int,
         override val utbetaling: Int,
+        override val gjenståendeDager: Int = 0,
     ) : BeregnetDag
 }
