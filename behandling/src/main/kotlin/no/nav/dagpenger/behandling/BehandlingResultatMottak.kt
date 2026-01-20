@@ -1,5 +1,6 @@
 package no.nav.dagpenger.behandling
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
@@ -11,6 +12,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
 import java.time.LocalDate
 import java.util.UUID
 
@@ -19,6 +22,7 @@ private val logg = KotlinLogging.logger {}
 class BehandlingResultatMottak(
     rapidsConnection: RapidsConnection,
     private val behandlingResultatRepository: BehandlingResultatRepository,
+    private val behandlingResultatVarsler: BehandlingResultatVarsler,
 ) : River.PacketListener {
     init {
         River(rapidsConnection)
@@ -31,6 +35,7 @@ class BehandlingResultatMottak(
                         "ident",
                         "behandlingskjedeId",
                         "@opprettet",
+                        "førteTil",
                     )
                     it.interestedIn("basertPå")
                 }
@@ -77,6 +82,66 @@ class BehandlingResultatMottak(
                 json = json,
                 opprettetTidspunkt = opprettetTidspunkt,
             )
+
+            when (packet["førteTil"].asText()) {
+                "Innvilgelse" -> behandlingResultatVarsler.varsleFørstegangsinnvilgelse(ident)
+                else -> behandlingResultatVarsler.varsleEndring(ident)
+            }
+        }
+    }
+}
+
+class BehandlingResultatVarsler(
+    private val producer: KafkaProducer<String, String>,
+    private val topic: String,
+    private val objectMapper: ObjectMapper,
+) {
+    fun varsleFørstegangsinnvilgelse(ident: String) {
+        lagOgSendObomelding(ident, Obomelding.Meldingstype.OPPRETT)
+    }
+
+    fun varsleEndring(ident: String) {
+        lagOgSendObomelding(ident, Obomelding.Meldingstype.OPPDATER)
+    }
+
+    private fun lagOgSendObomelding(
+        ident: String,
+        meldingstype: Obomelding.Meldingstype,
+    ) {
+        val obomelding = lagObomelding(ident, meldingstype)
+        sendMelding(ident, obomelding)
+    }
+
+    private fun sendMelding(
+        ident: String,
+        melding: String,
+    ) {
+        val record = ProducerRecord(topic, ident, melding)
+        producer.send(record)
+    }
+
+    private fun lagObomelding(
+        ident: String,
+        meldingstype: Obomelding.Meldingstype,
+    ): String {
+        val obomelding =
+            Obomelding(
+                personId = ident,
+                meldingstype = meldingstype,
+            )
+        return objectMapper.writeValueAsString(obomelding)
+    }
+
+    private data class Obomelding(
+        val personId: String,
+        val meldingstype: Meldingstype,
+    ) {
+        val ytelsestype = "DAGPENGER"
+        val kildesystem = "DPSAK"
+
+        enum class Meldingstype {
+            OPPRETT,
+            OPPDATER,
         }
     }
 }

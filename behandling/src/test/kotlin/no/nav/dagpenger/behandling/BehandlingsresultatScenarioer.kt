@@ -11,6 +11,15 @@ object BehandlingsresultatScenarioer {
             .readText()
     }
 
+    val endring_v1 by lazy {
+        requireNotNull(
+            this.javaClass
+                .getResourceAsStream("/testdata/behandlingresultat_endring_v1.json"),
+        ) { "Kunne ikke finne testdata/behandlingresultat_endring_v1.json" }
+            .reader()
+            .readText()
+    }
+
     // Henter fra https://github.com/navikt/dp-behandling/blob/bf3f22a6f9f1e88bcbf9fd0657eeca34a3382928/mediator/src/test/kotlin/no/nav/dagpenger/behandling/scenario/BeregningTest.kt#L143
     val meldekortBeregning_v1 by lazy {
         requireNotNull(
