@@ -26,12 +26,14 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"
   - application: fpsak
     namespace: teamforeldrepenger
     cluster: prod-fss
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: prod-gcp
