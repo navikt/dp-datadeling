@@ -19,6 +19,7 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"
   - application: fpabakus
     namespace: teamforeldrepenger
     cluster: prod-fss
