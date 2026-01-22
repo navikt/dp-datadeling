@@ -41,6 +41,13 @@ inbounds:
       roles:
         - "rettighetsperioder"
         - "beregninger"
+  - application: sparkel-dagpenger
+    namespace: tbd
+    cluster: dev-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
+        - "beregninger"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: dev-gcp
