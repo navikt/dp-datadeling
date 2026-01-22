@@ -13,6 +13,13 @@ dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
 kafka_pool: nav-dev
 
 inbounds:
+  - application: k9-abakus
+    namespace: k9saksbehandling
+    cluster: dev-fss
+    permissions:
+      roles:
+        - "rettighetsperioder"
+        - "beregninger"
   - application: veilarbportefolje
     namespace: obo
     cluster: dev-gcp
