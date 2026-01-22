@@ -1,0 +1,29 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                [ÅPEN LOGG] %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <appender name="SIKKER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                [SKJULT LOGG] %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <logger name="tjenestekall" level="INFO" />
+
+    <logger name="org.flywaydb" level="WARN" />
+    <logger name="com.zaxxer" level="WARN" />
+    <logger name="org.testcontainers" level="WARN" />
+    <logger name="com.github.dockerjava" level="WARN" />
+
+    <logger name="io.ktor.auth" level="TRACE" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
