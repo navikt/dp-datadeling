@@ -171,7 +171,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Meldekort'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meldekort'
       security:
         - azure: [ ]
 
