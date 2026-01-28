@@ -26,7 +26,6 @@ class ArenaRoutesTest {
                         meldekortFraDato = 1.januar(2018),
                         meldekortTilDato = 14.januar(2019),
                         innvilgetSats = 800.toBigDecimal(),
-                        posteringSats = 500.toBigDecimal(),
                         utbetalingsgrad = 20.toBigDecimal(),
                         belop = 5000.toBigDecimal(),
                     ),
@@ -49,8 +48,7 @@ class ArenaRoutesTest {
                           {
                             "fraOgMed": "2018-01-01",
                             "tilOgMed": "2019-01-14",
-                            "innvilgetSats": 800.0,
-                            "beregnetSats": 500.0,
+                            "dagsats": 800.0,
                             "utbetaltBeløp": 5000.0,
                             "gjenståendeDager": 260
                           }

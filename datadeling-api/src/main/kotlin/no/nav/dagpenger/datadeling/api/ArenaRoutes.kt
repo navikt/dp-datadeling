@@ -37,8 +37,7 @@ fun Route.arenaRoutes(arenaClient: ProxyClientArena) {
                                 ArenaBeregningDTO(
                                     fraOgMed = it.meldekortFraDato,
                                     tilOgMed = it.meldekortTilDato,
-                                    innvilgetSats = it.innvilgetSats.toDouble(),
-                                    beregnetSats = it.posteringSats.toDouble(),
+                                    dagsats = it.innvilgetSats.toDouble(),
                                     utbetaltBeløp = it.belop.toDouble(),
                                     gjenståendeDager = 260,
                                 )
