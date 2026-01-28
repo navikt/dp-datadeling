@@ -497,7 +497,7 @@ components:
         tilOgMed:
           type: string
           format: date
-        dagsats:
+        sats:
           type: number
           format: double
         utbetaltBeløp:
