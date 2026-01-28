@@ -51,7 +51,8 @@ tags:
     description: API for å hente beregningsdetaljer for dagpenger
   - name: Meldekort
     description: API for å hente meldekort for dagpenger
-
+  - name: Arena
+    description: Data vi tilbyr på vegne av Arena
 
 
 paths:
@@ -149,6 +150,33 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BeregnetDag'
+      security:
+        - azure: [ ]
+
+  /arena/datadeling/v1/beregninger:
+    post:
+      description: |-
+        Returnerer brutto utbetalinger basert på beregnede meldeperioder
+          **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
+      tags:
+        - Internt
+        - Beregninger
+        - Arena
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArenaBeregning'
       security:
         - azure: [ ]
 
@@ -449,6 +477,35 @@ components:
         utbetaltBeløp:
           type: integer
           format: int32
+        gjenståendeDager:
+          description: Vi har ikke denne informasjonen for Arena
+          type: integer
+
+    ArenaBeregning:
+      type: object
+      required:
+        - fraOgMed
+        - tilOgMed
+        - innvilgetSats
+        - beregnetSats
+        - utbetaltBeløp
+        - gjenståendeDager
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+        tilOgMed:
+          type: string
+          format: date
+        innvilgetSats:
+          type: number
+          format: double
+        beregnetSats:
+          type: number
+          format: double
+        utbetaltBeløp:
+          type: number
+          format: double
         gjenståendeDager:
           description: Vi har ikke denne informasjonen for Arena
           type: integer

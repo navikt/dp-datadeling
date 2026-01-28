@@ -45,13 +45,6 @@ class ProxyClientArena(
     override suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): List<Periode> {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/dagpengerperioder").replace("//p", "/p")
 
-        val token =
-            try {
-                tokenProvider.invoke()
-            } catch (e: Exception) {
-                sikkerlogger.error(e) { "Kunne ikke hente token" }
-            }
-
         val result =
             runCatching {
                 defaultHttpClient
@@ -100,13 +93,6 @@ class ProxyClientArena(
     override suspend fun hentVedtak(request: DatadelingRequestDTO): List<Vedtak> {
         val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/vedtaksliste").replace("//p", "/p")
 
-        val token =
-            try {
-                tokenProvider.invoke()
-            } catch (e: Exception) {
-                sikkerlogger.error(e) { "Kunne ikke hente token" }
-            }
-
         val result =
             runCatching {
                 defaultHttpClient
@@ -127,4 +113,37 @@ class ProxyClientArena(
             },
         )
     }
+
+    suspend fun hentBeregninger(request: DatadelingRequestDTO): List<ArenaBeregning> {
+        val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/beregning").replace("//p", "/p")
+
+        val result =
+            runCatching {
+                defaultHttpClient
+                    .post(urlString) {
+                        headers {
+                            append(HttpHeaders.Accept, "application/json")
+                            append(HttpHeaders.Authorization, "Bearer $token")
+                            append(HttpHeaders.ContentType, "application/json")
+                        }
+                        setBody(request)
+                    }.body<List<ArenaBeregning>>()
+            }
+        return result.fold(
+            onSuccess = { it },
+            onFailure = {
+                sikkerlogger.error(it) { "Kunne ikke hente vedtak fra url: $urlString for request $request" }
+                throw it
+            },
+        )
+    }
+
+    private val token: String
+        get() =
+            try {
+                tokenProvider.invoke()
+            } catch (e: Exception) {
+                sikkerlogger.error(e) { "Kunne ikke hente token" }
+                throw e
+            }
 }

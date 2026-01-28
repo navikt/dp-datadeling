@@ -8,6 +8,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
+import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.objectMapper
@@ -109,17 +110,18 @@ object TestApplication {
         meldekortService: MeldekortService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
         behandlingRepository: BehandlingResultatRepositoryMedTolker = mockk(relaxed = true),
+        arenaClient: ProxyClientArena = mockk(relaxed = true),
         auditLogger: Log = NoopLogger,
         test: suspend TestContext.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
             datadelingApi(
                 logger = auditLogger,
-                config = Config.appConfig,
                 perioderService = perioderService,
                 meldekortService = meldekortService,
                 ressursService = ressursService,
                 behandlingRepository = behandlingRepository,
+                arenaClient = arenaClient,
             )
         }) {
             test()

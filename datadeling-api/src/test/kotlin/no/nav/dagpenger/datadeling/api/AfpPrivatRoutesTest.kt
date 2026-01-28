@@ -39,7 +39,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 401 uten token`() =
-        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService) {
             client.testPost("/dagpenger/datadeling/v1/periode", enDatadelingRequest(), token = null).apply {
                 assertEquals(HttpStatusCode.Unauthorized, this.status)
             }
@@ -47,7 +47,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 500 hvis oppretting av ressurs feiler`() =
-        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService) {
             coEvery { ressursService.opprett(any()) }.throws(Exception())
             Config.appConfig.maskinporten.also {
                 println(it)
@@ -60,7 +60,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 200 og url til ressurs`() =
-        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService) {
             val ressurs = enRessurs()
             coEvery { ressursService.opprett(any()) } returns ressurs
             coEvery { perioderService.hentDagpengeperioder(any()) } returns enDatadelingResponse()
@@ -74,7 +74,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer 404 om en ressus ikke finnes`() {
-        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService) {
             val uuid = UUID.randomUUID()
 
             coEvery { ressursService.hent(uuid) } returns null
@@ -89,7 +89,7 @@ class AfpPrivatRoutesTest {
 
     @Test
     fun `returnerer ressurs om den finnes`() =
-        testEndepunkter(ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService) {
             val uuid = UUID.randomUUID()
             val ressurs =
                 enRessurs(
@@ -142,7 +142,7 @@ class AfpPrivatRoutesTest {
                     hendelser.add(hendelse)
                 }
             }
-        testEndepunkter(auditLogger = logger, ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService, auditLogger = logger) {
             val ressurs = enRessurs()
             coEvery { ressursService.opprett(any()) } returns ressurs
 
@@ -172,7 +172,7 @@ class AfpPrivatRoutesTest {
                 }
             }
         val uuid = UUID.randomUUID()
-        testEndepunkter(auditLogger = logger, ressursService = ressursService, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, ressursService = ressursService, auditLogger = logger) {
             coEvery { ressursService.hent(uuid) } returns
                 enRessurs(
                     uuid = uuid,

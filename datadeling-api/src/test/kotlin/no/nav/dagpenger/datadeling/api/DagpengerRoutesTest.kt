@@ -163,7 +163,7 @@ class DagpengerRoutesTest {
             )
         coEvery { perioderService.hentDagpengeperioder(any()) } returns response
 
-        testEndepunkter(auditLogger = logger, perioderService = perioderService) {
+        testEndepunkter(perioderService = perioderService, auditLogger = logger) {
             client.testPost(
                 "/dagpenger/datadeling/v1/perioder",
                 request,

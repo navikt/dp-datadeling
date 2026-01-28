@@ -4,6 +4,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.PerioderService
+import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.authentication
@@ -19,11 +20,13 @@ fun Application.datadelingApi(
     meldekortService: MeldekortService,
     ressursService: RessursService,
     behandlingRepository: BehandlingResultatRepositoryMedTolker,
+    arenaClient: ProxyClientArena,
 ) {
     authentication(config)
     configureMetrics()
     routing {
         afpPrivatRoutes(ressursService, perioderService, logger)
         dagpengerRoutes(perioderService, meldekortService, behandlingRepository, logger)
+        arenaRoutes(arenaClient)
     }
 }

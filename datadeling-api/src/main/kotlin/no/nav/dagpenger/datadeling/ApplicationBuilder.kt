@@ -86,6 +86,7 @@ internal class ApplicationBuilder(
                                 meldekortService = meldekortService,
                                 ressursService = ressursService,
                                 behandlingRepository = tolker,
+                                proxyClient,
                             )
                         }
                     }
