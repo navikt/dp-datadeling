@@ -25,6 +25,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
         with:
           gradle-version: wrapper
           arguments: --configuration-cache build installDist
@@ -38,8 +39,6 @@ jobs:
           tag: ${{ github.sha }}
           docker_context: datadeling-api # optional, default .
           dockerfile: datadeling-api/Dockerfile # optional, default Dockerfile
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
 
