@@ -115,7 +115,7 @@ class ProxyClientArena(
     }
 
     suspend fun hentBeregninger(request: DatadelingRequestDTO): List<ArenaBeregning> {
-        val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/beregning").replace("//p", "/p")
+        val urlString = ("$dpProxyBaseUrl/proxy/v1/arena/beregninger").replace("//p", "/p")
 
         val result =
             runCatching {
