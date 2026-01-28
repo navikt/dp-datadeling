@@ -26,7 +26,6 @@ class ArenaRoutesTest {
                         meldekortFraDato = 1.januar(2018),
                         meldekortTilDato = 14.januar(2019),
                         innvilgetSats = 800.toBigDecimal(),
-                        utbetalingsgrad = 20.toBigDecimal(),
                         belop = 5000.toBigDecimal(),
                     ),
                 )
