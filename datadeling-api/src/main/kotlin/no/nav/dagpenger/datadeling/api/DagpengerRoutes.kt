@@ -20,6 +20,7 @@ import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.BeregnetDagDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
+import no.nav.dagpenger.datadeling.models.FagsystemDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.Log
@@ -109,10 +110,12 @@ fun Route.dagpengerRoutes(
                             utbetalinger.flatMap { behandling ->
                                 behandling.beregninger.map {
                                     BeregnetDagDTO(
-                                        dato = it.dato,
+                                        tilOgMed = it.dato,
+                                        fraOgMed = it.dato,
                                         sats = it.sats,
                                         utbetaltBeløp = it.utbetaling,
                                         gjenståendeDager = it.gjenståendeDager,
+                                        kilde = FagsystemDTO.DP_SAK,
                                     )
                                 }
                             }

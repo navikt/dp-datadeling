@@ -49,7 +49,8 @@ class ArenaRoutesTest {
                             "tilOgMed": "2019-01-14",
                             "sats": 800.0,
                             "utbetaltBeløp": 5000.0,
-                            "gjenståendeDager": 260
+                            "gjenståendeDager": 260,
+                            "kilde": "ARENA"
                           }
                         ]
                         """.trimIndent(),

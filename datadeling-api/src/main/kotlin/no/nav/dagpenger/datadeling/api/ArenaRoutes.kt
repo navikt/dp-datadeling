@@ -15,8 +15,9 @@ import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.plugins.AuthorizationPlugin
 import no.nav.dagpenger.datadeling.defaultLogger
-import no.nav.dagpenger.datadeling.models.ArenaBeregningDTO
+import no.nav.dagpenger.datadeling.models.BeregnetDagDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.FagsystemDTO
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 
@@ -34,12 +35,13 @@ fun Route.arenaRoutes(arenaClient: ProxyClientArena) {
 
                         val response =
                             utbetalinger.map {
-                                ArenaBeregningDTO(
+                                BeregnetDagDTO(
                                     fraOgMed = it.meldekortFraDato,
                                     tilOgMed = it.meldekortTilDato,
-                                    sats = it.innvilgetSats.toDouble(),
-                                    utbetaltBeløp = it.belop.toDouble(),
+                                    sats = it.innvilgetSats.toInt(),
+                                    utbetaltBeløp = it.belop.toInt(),
                                     gjenståendeDager = 260,
+                                    kilde = FagsystemDTO.ARENA,
                                 )
                             }
 

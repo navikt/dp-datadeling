@@ -462,34 +462,12 @@ components:
     BeregnetDag:
       type: object
       required:
-        - dato
-        - sats
-        - utbetaltBeløp
-        - kilde
-        - gjenståendeDager
-      properties:
-        dato:
-          type: string
-          format: date
-        sats:
-          type: integer
-          format: int32
-        utbetaltBeløp:
-          type: integer
-          format: int32
-        gjenståendeDager:
-          description: Vi har ikke denne informasjonen for Arena
-          type: integer
-
-    ArenaBeregning:
-      type: object
-      required:
         - fraOgMed
         - tilOgMed
-        - innvilgetSats
-        - beregnetSats
+        - sats
         - utbetaltBeløp
         - gjenståendeDager
+        - kilde
       properties:
         fraOgMed:
           type: string
@@ -498,14 +476,16 @@ components:
           type: string
           format: date
         sats:
-          type: number
-          format: double
+          type: integer
+          format: int32
         utbetaltBeløp:
-          type: number
-          format: double
+          type: integer
+          format: int32
         gjenståendeDager:
           description: Vi har ikke denne informasjonen for Arena
           type: integer
+        kilde:
+          $ref: '#/components/schemas/Fagsystem'
 
   securitySchemes:
     maskinporten:

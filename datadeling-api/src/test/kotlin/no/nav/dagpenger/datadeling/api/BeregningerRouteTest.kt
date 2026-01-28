@@ -56,16 +56,20 @@ class BeregningerRouteTest {
                 """
                 [
                   {
-                    "dato": "2024-01-01",
+                    "fraOgMed": "2024-01-01",
+                    "tilOgMed": "2024-01-01",
                     "sats": 500,
                     "utbetaltBeløp": 15000,
-                    "gjenståendeDager": 10
+                    "gjenståendeDager": 10,
+                    "kilde": "DP_SAK"
                   },
                   {
-                    "dato": "2024-02-01",
+                    "fraOgMed": "2024-02-01",
+                    "tilOgMed": "2024-02-01",
                     "utbetaltBeløp": 18000,
                     "sats": 600,
-                    "gjenståendeDager": 9
+                    "gjenståendeDager": 9,
+                    "kilde": "DP_SAK"
                   }
                 ] 
                 """.trimIndent()
