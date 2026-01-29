@@ -8,16 +8,16 @@ plugins {
 
 tasks {
     compileKotlin {
-        dependsOn("fabriktGenerate")
+        dependsOn("fabriktGenerateDatadeling")
     }
 }
 
 tasks.named("runKtlintCheckOverMainSourceSet").configure {
-    dependsOn("fabriktGenerate")
+    dependsOn("fabriktGenerateDatadeling")
 }
 
 tasks.named("runKtlintFormatOverMainSourceSet").configure {
-    dependsOn("fabriktGenerate")
+    dependsOn("fabriktGenerateDatadeling")
 }
 
 sourceSets {

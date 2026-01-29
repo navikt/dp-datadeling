@@ -5,6 +5,7 @@ import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.BeregnetDagDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.FagsystemDTO
+import java.time.LocalDate
 
 /**
  * Service for å hente beregninger (utbetalingsdetaljer) fra både Arena og dp-sak.
@@ -19,9 +20,18 @@ class BeregningerService(
             val arenaBeregninger = hentArenaBeregninger(request)
             val dpSakBeregninger = hentDpSakBeregninger(request.personIdent)
 
-            (arenaBeregninger + dpSakBeregninger)
-                .sortedBy { it.fraOgMed }
+            val dager =
+                (arenaBeregninger + dpSakBeregninger)
+                    .sortedBy { it.fraOgMed }
+
+            val ønsketPeriode = request.periode
+
+            // Fjern alle beregnetDag med perioder som ikke inkluderes av forespørselen
+            dager.filter { it.periode overlapper ønsketPeriode }
         }
+
+    private val DatadelingRequestDTO.periode get() = fraOgMedDato..(tilOgMedDato ?: LocalDate.MAX)
+    private val BeregnetDagDTO.periode get() = fraOgMed..tilOgMed
 
     private suspend fun hentArenaBeregninger(request: DatadelingRequestDTO): List<BeregnetDagDTO> =
         arenaClient.hentBeregninger(request).map { arenaBeregning ->
@@ -49,3 +59,5 @@ class BeregningerService(
             }
         }
 }
+
+infix fun ClosedRange<LocalDate>.overlapper(b: ClosedRange<LocalDate>): Boolean = start <= b.endInclusive && b.start <= endInclusive

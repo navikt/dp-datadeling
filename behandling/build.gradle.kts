@@ -6,16 +6,25 @@ plugins {
 
 tasks {
     compileKotlin {
-        dependsOn("fabriktGenerate")
+        dependsOn("fabriktGenerateBehandlingV1")
+    }
+}
+
+// Forhindrer parallell kjøring med openapi:fabriktGenerateDatadeling fordi
+// fabrikt bruker globale mutable settings (MutableSettings singleton) som
+// fører til at konfigurasjoner "smitter" mellom prosjekter ved parallell kjøring.
+afterEvaluate {
+    tasks.named("fabriktGenerateBehandlingV1") {
+        mustRunAfter(":openapi:fabriktGenerateDatadeling")
     }
 }
 
 tasks.named("runKtlintCheckOverMainSourceSet").configure {
-    dependsOn("fabriktGenerate")
+    dependsOn("fabriktGenerateBehandlingV1")
 }
 
 tasks.named("runKtlintFormatOverMainSourceSet").configure {
-    dependsOn("fabriktGenerate")
+    dependsOn("fabriktGenerateBehandlingV1")
 }
 
 sourceSets {
