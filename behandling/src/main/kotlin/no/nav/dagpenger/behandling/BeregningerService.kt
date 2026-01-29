@@ -1,0 +1,51 @@
+package no.nav.dagpenger.behandling
+
+import kotlinx.coroutines.coroutineScope
+import no.nav.dagpenger.behandling.arena.ProxyClientArena
+import no.nav.dagpenger.datadeling.models.BeregnetDagDTO
+import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.FagsystemDTO
+
+/**
+ * Service for å hente beregninger (utbetalingsdetaljer) fra både Arena og dp-sak.
+ * Kombinerer data fra begge kilder til én samlet liste.
+ */
+class BeregningerService(
+    private val arenaClient: ProxyClientArena,
+    private val dpSakRepository: BehandlingResultatRepositoryMedTolker,
+) {
+    suspend fun hentBeregninger(request: DatadelingRequestDTO): List<BeregnetDagDTO> =
+        coroutineScope {
+            val arenaBeregninger = hentArenaBeregninger(request)
+            val dpSakBeregninger = hentDpSakBeregninger(request.personIdent)
+
+            (arenaBeregninger + dpSakBeregninger)
+                .sortedBy { it.fraOgMed }
+        }
+
+    private suspend fun hentArenaBeregninger(request: DatadelingRequestDTO): List<BeregnetDagDTO> =
+        arenaClient.hentBeregninger(request).map { arenaBeregning ->
+            BeregnetDagDTO(
+                fraOgMed = arenaBeregning.meldekortFraDato,
+                tilOgMed = arenaBeregning.meldekortTilDato,
+                sats = arenaBeregning.innvilgetSats.toInt(),
+                utbetaltBeløp = arenaBeregning.belop.toInt(),
+                gjenståendeDager = 260, // Arena har ikke denne informasjonen
+                kilde = FagsystemDTO.ARENA,
+            )
+        }
+
+    private fun hentDpSakBeregninger(ident: String): List<BeregnetDagDTO> =
+        dpSakRepository.hent(ident).flatMap { behandling ->
+            behandling.beregninger.map { beregning ->
+                BeregnetDagDTO(
+                    fraOgMed = beregning.dato,
+                    tilOgMed = beregning.dato,
+                    sats = beregning.sats,
+                    utbetaltBeløp = beregning.utbetaling,
+                    gjenståendeDager = beregning.gjenståendeDager,
+                    kilde = FagsystemDTO.DP_SAK,
+                )
+            }
+        }
+}

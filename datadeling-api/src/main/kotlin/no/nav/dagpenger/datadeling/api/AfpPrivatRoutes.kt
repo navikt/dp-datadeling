@@ -3,7 +3,6 @@ package no.nav.dagpenger.datadeling.api
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
-import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -34,8 +33,6 @@ fun Route.afpPrivatRoutes(
     perioderService: PerioderService,
     auditLogger: Log,
 ) {
-    swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
-
     authenticate("afpPrivat") {
         route("/dagpenger/datadeling/v1/periode") {
             post {

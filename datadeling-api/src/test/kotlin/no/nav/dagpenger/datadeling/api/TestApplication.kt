@@ -6,9 +6,8 @@ import io.ktor.server.application.Application
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
-import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
+import no.nav.dagpenger.behandling.BeregningerService
 import no.nav.dagpenger.behandling.PerioderService
-import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.objectMapper
@@ -108,9 +107,8 @@ object TestApplication {
     internal fun testEndepunkter(
         perioderService: PerioderService = mockk(relaxed = true),
         meldekortService: MeldekortService = mockk(relaxed = true),
+        beregningerService: BeregningerService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
-        behandlingRepository: BehandlingResultatRepositoryMedTolker = mockk(relaxed = true),
-        arenaClient: ProxyClientArena = mockk(relaxed = true),
         auditLogger: Log = NoopLogger,
         test: suspend TestContext.() -> Unit,
     ) {
@@ -119,9 +117,8 @@ object TestApplication {
                 logger = auditLogger,
                 perioderService = perioderService,
                 meldekortService = meldekortService,
+                beregningerService = beregningerService,
                 ressursService = ressursService,
-                behandlingRepository = behandlingRepository,
-                arenaClient = arenaClient,
             )
         }) {
             test()

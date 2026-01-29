@@ -51,8 +51,6 @@ tags:
     description: API for å hente beregningsdetaljer for dagpenger
   - name: Meldekort
     description: API for å hente meldekort for dagpenger
-  - name: Arena
-    description: Data vi tilbyr på vegne av Arena
 
 
 paths:
@@ -130,8 +128,10 @@ paths:
   /dagpenger/datadeling/v1/beregninger:
     post:
       description: |-
-        Returnerer brutto utbetalinger basert på beregnede meldeperioder
-          **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
+        Returnerer brutto utbetalinger basert på beregnede meldeperioder fra både Arena og dp-sak.
+        Dataene kombineres og sorteres kronologisk.
+        
+        **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
       tags:
         - Internt
         - Beregninger
@@ -150,33 +150,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BeregnetDag'
-      security:
-        - azure: [ ]
-
-  /arena/datadeling/v1/beregninger:
-    post:
-      description: |-
-        Returnerer brutto utbetalinger basert på beregnede meldeperioder
-          **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
-      tags:
-        - Internt
-        - Beregninger
-        - Arena
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DatadelingRequest'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ArenaBeregning'
       security:
         - azure: [ ]
 

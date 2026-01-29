@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import no.nav.dagpenger.behandling.BehandlingResultatMottak
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.BehandlingResultatVarsler
+import no.nav.dagpenger.behandling.BeregningerService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.api.datadelingApi
@@ -53,8 +54,8 @@ internal class ApplicationBuilder(
 
     private val tolker = BehandlingResultatRepositoryMedTolker(behandlingResultatRepositoryPostgresql)
 
-    private val perioderService =
-        PerioderService(proxyClient, tolker)
+    private val perioderService = PerioderService(proxyClient, tolker)
+    private val beregningerService = BeregningerService(proxyClient, tolker)
     private val meldekortService = MeldekortService(meldekortregisterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val leaderElector = LeaderElector(config)
@@ -70,8 +71,7 @@ internal class ApplicationBuilder(
                 builder = {
                     withKtor { preStopHook, rapid ->
                         naisApp(
-                            meterRegistry =
-                            meterRegistry,
+                            meterRegistry = meterRegistry,
                             objectMapper = objectMapper,
                             applicationLogger = LoggerFactory.getLogger("ApplicationLogger"),
                             callLogger = LoggerFactory.getLogger("CallLogger"),
@@ -84,9 +84,8 @@ internal class ApplicationBuilder(
                                 config = config,
                                 perioderService = perioderService,
                                 meldekortService = meldekortService,
+                                beregningerService = beregningerService,
                                 ressursService = ressursService,
-                                behandlingRepository = tolker,
-                                proxyClient,
                             )
                         }
                     }
