@@ -28,18 +28,21 @@ class BeregningerServiceTest {
                         meldekortTilDato = 14.mars(2023),
                         innvilgetSats = 800.toBigDecimal(),
                         belop = 1000.toBigDecimal(),
+                        antallDagerGjenstående = 260.toBigDecimal(),
                     ),
                     ArenaBeregning(
                         meldekortFraDato = 1.januar(2024),
                         meldekortTilDato = 14.januar(2024),
                         innvilgetSats = 800.toBigDecimal(),
                         belop = 1000.toBigDecimal(),
+                        antallDagerGjenstående = 250.toBigDecimal(),
                     ),
                     ArenaBeregning(
                         meldekortFraDato = 15.januar(2024),
                         meldekortTilDato = 29.januar(2024),
                         innvilgetSats = 800.toBigDecimal(),
                         belop = 1000.toBigDecimal(),
+                        antallDagerGjenstående = 240.toBigDecimal(),
                     ),
                 )
             coEvery { dpSakRepository.hent(any()) } returns

@@ -40,7 +40,7 @@ class BeregningerService(
                 tilOgMed = arenaBeregning.meldekortTilDato,
                 sats = arenaBeregning.innvilgetSats.toInt(),
                 utbetaltBeløp = arenaBeregning.belop.toInt(),
-                gjenståendeDager = 260, // Arena har ikke denne informasjonen
+                gjenståendeDager = arenaBeregning.antallDagerGjenstående.toInt(),
                 kilde = FagsystemDTO.ARENA,
             )
         }

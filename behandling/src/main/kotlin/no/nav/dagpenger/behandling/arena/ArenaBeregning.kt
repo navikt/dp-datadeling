@@ -8,4 +8,5 @@ data class ArenaBeregning(
     val meldekortTilDato: LocalDate,
     val innvilgetSats: BigDecimal, // Innvilget dagsats inklusive barnetillegg og samordning til vedtaket som er grunnlag for utbetalingen
     val belop: BigDecimal, // Beregnet totalbeløp for utbetalingen
+    val antallDagerGjenstående: BigDecimal,
 )
