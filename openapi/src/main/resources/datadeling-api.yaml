@@ -320,7 +320,6 @@ components:
         - sisteFristForTrekk
         - opprettetAv
         - type
-        - migrert
       properties:
         id:
           type: string
@@ -367,8 +366,6 @@ components:
         meldedato:
           type: string
           format: date
-        migrert:
-          type: boolean
 
     MeldekortPeriode:
       type: object

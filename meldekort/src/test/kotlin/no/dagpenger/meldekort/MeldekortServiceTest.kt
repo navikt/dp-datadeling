@@ -117,7 +117,6 @@ class MeldekortServiceTest {
             kanSendesFra = fraOgMed.plusDays(11),
             sisteFristForTrekk = fraOgMed.plusDays(20),
             opprettetAv = OpprettetAvDTO.DAGPENGER,
-            migrert = false,
             originalMeldekortId = null,
             begrunnelse = null,
             kilde =
