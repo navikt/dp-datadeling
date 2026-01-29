@@ -17,7 +17,7 @@ class BeregningerService(
 ) {
     suspend fun hentBeregninger(request: DatadelingRequestDTO): List<BeregnetDagDTO> =
         coroutineScope {
-            val arenaBeregninger = hentArenaBeregninger(request)
+            val arenaBeregninger = emptyList<BeregnetDagDTO>() // hentArenaBeregninger(request)
             val dpSakBeregninger = hentDpSakBeregninger(request.personIdent)
 
             val dager =

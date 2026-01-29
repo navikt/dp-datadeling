@@ -11,10 +11,12 @@ import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.dato.januar
 import no.nav.dagpenger.dato.mars
+import org.junit.jupiter.api.Disabled
 import java.time.LocalDate
 import kotlin.test.Test
 
 class BeregningerServiceTest {
+    @Disabled("Arena har ikke tjenesten i prod")
     @Test
     fun `returnerer beregninger fra både Arena og dp-sak med filtrering på periode`() =
         runBlocking {
