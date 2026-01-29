@@ -11,6 +11,7 @@ import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
+import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
 import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
@@ -65,17 +66,23 @@ private fun Route.meldekortRoute(
         kreverTilgang(Tilgangsrolle.meldekort)
         post {
             val request = call.receive<DatadelingRequestDTO>()
-            val response = meldekortService.hentMeldekort(request)
 
-            auditLogger.log(
-                DagpengerMeldekortHentetHendelse(
-                    saksbehandlerNavIdent = call.clientId(),
-                    request = request,
-                    response = response,
-                ),
-            )
+            try {
+                val response = meldekortService.hentMeldekort(request)
 
-            call.respond(HttpStatusCode.OK, response)
+                auditLogger.log(
+                    DagpengerMeldekortHentetHendelse(
+                        saksbehandlerNavIdent = call.clientId(),
+                        request = request,
+                        response = response,
+                    ),
+                )
+
+                call.respond(HttpStatusCode.OK, response)
+            } catch (e: Exception) {
+                defaultLogger.error(e) { "Feil ved henting av meldekort" }
+                throw e
+            }
         }
     }
 }
