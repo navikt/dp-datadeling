@@ -12,6 +12,10 @@ dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no
 kafka_pool: nav-dev
 
+feature:
+  arena:
+    perioder: true
+
 inbounds:
   - application: k9-abakus
     namespace: k9saksbehandling

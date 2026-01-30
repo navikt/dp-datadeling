@@ -7,6 +7,10 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.FagsystemDTO
 import java.time.LocalDate
 
+private val featureArenaPerioder: Boolean by lazy {
+    System.getenv("FEATURE_ARENA_PERIODER").takeIf { it.isNotEmpty() }?.toBoolean() ?: false
+}
+
 /**
  * Service for å hente beregninger (utbetalingsdetaljer) fra både Arena og dp-sak.
  * Kombinerer data fra begge kilder til én samlet liste.
@@ -17,7 +21,7 @@ class BeregningerService(
 ) {
     suspend fun hentBeregninger(request: DatadelingRequestDTO): List<BeregnetDagDTO> =
         coroutineScope {
-            val arenaBeregninger = emptyList<BeregnetDagDTO>() // hentArenaBeregninger(request)
+            val arenaBeregninger = if (featureArenaPerioder) hentArenaBeregninger(request) else emptyList()
             val dpSakBeregninger = hentDpSakBeregninger(request.personIdent)
 
             val dager =

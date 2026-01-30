@@ -69,7 +69,8 @@ spec:
       value: https://{{ dpDatadelingHost }}
     - name: OBO_TOPIC
       value: "obo.ytelser-v1"
-
+    - name: FEATURE_ARENA_PERIODER
+      value: "{{ feature.arena.perioder }}"
   azure:
     application:
       enabled: true
