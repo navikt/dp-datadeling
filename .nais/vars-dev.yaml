@@ -52,6 +52,7 @@ inbounds:
       roles:
         - "rettighetsperioder"
         - "beregninger"
+        - "meldekort"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: dev-gcp
