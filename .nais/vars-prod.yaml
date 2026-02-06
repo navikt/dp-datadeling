@@ -77,3 +77,9 @@ inbounds:
     permissions:
       roles:
         - "meldekort"
+  - application: behandlingsflyt
+    namespace: aap
+    cluster: prod-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"

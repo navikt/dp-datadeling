@@ -77,6 +77,12 @@ inbounds:
     permissions:
       roles:
         - "meldekort"
+  - application: behandlingsflyt
+    namespace: aap
+    cluster: dev-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
