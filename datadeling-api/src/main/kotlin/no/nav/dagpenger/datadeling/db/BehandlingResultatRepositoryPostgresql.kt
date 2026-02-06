@@ -3,7 +3,6 @@ package no.nav.dagpenger.datadeling.db
 import com.fasterxml.jackson.databind.JsonNode
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.behandling.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.objectMapper
@@ -43,25 +42,27 @@ class BehandlingResultatRepositoryPostgresql : BehandlingResultatRepository {
         json: String,
         opprettetTidspunkt: LocalDateTime,
     ) {
-        using(sessionOf(dataSource)) { session ->
-            session.run(
-                queryOf(
-                    //language=PostgreSQL
-                    """
-                    update behandlingresultat set
-                         behandling_id = :nyId,
-                         json_data = :jsonData::jsonb,
-                         opprettet = :opprettetTidspunkt
-                    where behandling_id = :gammelId
-                    """.trimIndent(),
-                    mapOf(
-                        "nyId" to nyId,
-                        "gammelId" to gammelId,
-                        "jsonData" to json,
-                        "opprettetTidspunkt" to opprettetTidspunkt,
-                    ),
-                ).asUpdate,
-            )
+        sessionOf(dataSource).use { session ->
+            session.transaction { transaction ->
+                transaction.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        """
+                        UPDATE behandlingresultat SET
+                             behandling_id = :nyId,
+                             json_data = :jsonData::jsonb,
+                             opprettet = :opprettetTidspunkt
+                        WHERE behandling_id = :gammelId
+                        """.trimIndent(),
+                        mapOf(
+                            "nyId" to nyId,
+                            "gammelId" to gammelId,
+                            "jsonData" to json,
+                            "opprettetTidspunkt" to opprettetTidspunkt,
+                        ),
+                    ).asUpdate,
+                )
+            }
         }
     }
 
@@ -72,40 +73,42 @@ class BehandlingResultatRepositoryPostgresql : BehandlingResultatRepository {
         json: String,
         opprettetTidspunkt: LocalDateTime,
     ) {
-        using(sessionOf(dataSource)) { session ->
-            session.run(
-                queryOf(
-                    //language=PostgreSQL
-                    """
-                    INSERT INTO behandlingresultat (
-                        ident, 
-                        behandling_id, 
-                        sak_id, 
-                        json_data, 
-                        opprettet
-                    )
-                    VALUES (
-                        :ident, 
-                        :behandlingId, 
-                        :sakId, 
-                        :jsonData::jsonb, 
-                        :opprettetTidspunkt
-                    )
-                    """.trimIndent(),
-                    mapOf(
-                        "ident" to ident,
-                        "behandlingId" to behandlingId,
-                        "sakId" to sakId,
-                        "jsonData" to json,
-                        "opprettetTidspunkt" to opprettetTidspunkt,
-                    ),
-                ).asUpdate,
-            )
+        sessionOf(dataSource).use { session ->
+            session.transaction { transaction ->
+                transaction.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        """
+                        INSERT INTO behandlingresultat (
+                            ident, 
+                            behandling_id, 
+                            sak_id, 
+                            json_data, 
+                            opprettet
+                        )
+                        VALUES (
+                            :ident, 
+                            :behandlingId, 
+                            :sakId, 
+                            :jsonData::jsonb, 
+                            :opprettetTidspunkt
+                        )
+                        """.trimIndent(),
+                        mapOf(
+                            "ident" to ident,
+                            "behandlingId" to behandlingId,
+                            "sakId" to sakId,
+                            "jsonData" to json,
+                            "opprettetTidspunkt" to opprettetTidspunkt,
+                        ),
+                    ).asUpdate,
+                )
+            }
         }
     }
 
     override fun hent(ident: String): List<JsonNode> =
-        using(sessionOf(dataSource)) { session ->
+        sessionOf(dataSource).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL

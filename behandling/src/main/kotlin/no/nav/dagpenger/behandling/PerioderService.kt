@@ -2,7 +2,7 @@ package no.nav.dagpenger.behandling
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseDTO
 import no.nav.dagpenger.datadeling.models.FagsystemDTO
@@ -15,7 +15,7 @@ class PerioderService(
 ) {
     private val kilder: List<PerioderClient> = kilde.asList()
 
-    fun hentDagpengeperioderAvgrenset(request: DatadelingRequestDTO): DatadelingResponseDTO {
+    suspend fun hentDagpengeperioderAvgrenset(request: DatadelingRequestDTO): DatadelingResponseDTO {
         val avgrensetTilPeriode = Datoperiode(request.fraOgMedDato, request.tilOgMedDato)
         val helePerioden = hentDagpengeperioder(request)
 
@@ -40,8 +40,8 @@ class PerioderService(
         )
     }
 
-    fun hentDagpengeperioder(request: DatadelingRequestDTO) =
-        runBlocking {
+    suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): DatadelingResponseDTO =
+        coroutineScope {
             val periode = Datoperiode(request.fraOgMedDato, request.tilOgMedDato)
             val kildeOppslag = kilder.map { client -> async { client.hentDagpengeperioder(request) } }
 

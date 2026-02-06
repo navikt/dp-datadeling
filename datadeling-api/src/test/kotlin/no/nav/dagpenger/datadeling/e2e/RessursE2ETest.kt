@@ -14,7 +14,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.append
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.behandling.PerioderService
@@ -46,7 +46,7 @@ class RessursE2ETest {
         Postgres.withMigratedDb {
             val perioderService =
                 mockk<PerioderService>().also {
-                    every {
+                    coEvery {
                         it.hentDagpengeperioderAvgrenset(
                             any(),
                         )
@@ -159,7 +159,7 @@ class RessursE2ETest {
         Postgres.withMigratedDb {
             val perioderService =
                 mockk<PerioderService>().also {
-                    every {
+                    coEvery {
                         it.hentDagpengeperioder(
                             any(),
                         )

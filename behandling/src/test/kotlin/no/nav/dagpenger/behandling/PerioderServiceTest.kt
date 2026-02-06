@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
@@ -32,7 +33,7 @@ class PerioderServiceTest {
         coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
         val request = enDatadelingRequest(1.januar(2025)..10.januar(2025))
-        val response = perioderService.hentDagpengeperioder(request)
+        val response = runBlocking { perioderService.hentDagpengeperioder(request) }
 
         assertEquals(emptyList<PeriodeDTO>(), response.perioder)
     }
@@ -53,7 +54,7 @@ class PerioderServiceTest {
         coEvery { proxyClient.hentDagpengeperioder(request) } returns response
         coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
-        perioderService.hentDagpengeperioder(request).perioder shouldHaveSize 1
+        runBlocking { perioderService.hentDagpengeperioder(request) }.perioder shouldHaveSize 1
     }
 
     @Test
@@ -96,7 +97,7 @@ class PerioderServiceTest {
         coEvery { proxyClient.hentDagpengeperioder(request) } returns response
         coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
-        perioderService.hentDagpengeperioder(request).let {
+        runBlocking { perioderService.hentDagpengeperioder(request) }.let {
             it.perioder shouldHaveSize 3
 
             it.perioder[0].fraOgMedDato shouldBe 6.januar(2025)
@@ -145,7 +146,7 @@ class PerioderServiceTest {
         coEvery { proxyClient.hentDagpengeperioder(request) } returns response
         coEvery { behandlingResultatRepositoryPostgresql.hentDagpengeperioder(any()) } returns emptyList()
 
-        perioderService.hentDagpengeperioderAvgrenset(request).let {
+        runBlocking { perioderService.hentDagpengeperioderAvgrenset(request) }.let {
             it.perioder shouldHaveSize 3
 
             it.perioder[0].fraOgMedDato shouldBe 8.januar(2025)
