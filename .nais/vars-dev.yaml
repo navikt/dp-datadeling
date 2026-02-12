@@ -7,6 +7,8 @@ ingresses:
   - https://dp-datadeling.intern.dev.nav.no
 dpMeldekortregisterHost: dp-meldekortregister.teamdagpenger
 dpMeldekortregisterScope: api://dev-gcp.teamdagpenger.dp-meldekortregister/.default
+dpMeldepliktAdapterHost: dp-arena-meldeplikt-adapter.teamdagpenger
+dpMeldepliktAdapterScope: api://dev-gcp.teamdagpenger.dp-arena-meldeplikt-adapter/.default
 dpProxyHost: dp-proxy.dev-fss-pub.nais.io
 dpProxyScope: api://dev-fss.teamdagpenger.dp-proxy/.default
 dpDatadelingHost: dp-datadeling.ekstern.dev.nav.no

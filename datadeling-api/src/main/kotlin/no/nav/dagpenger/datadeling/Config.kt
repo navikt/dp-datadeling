@@ -94,6 +94,13 @@ internal object Config {
         azureAdTokenSupplier(properties[Key("DP_MELDEKORTREGISTER_SCOPE", stringType)])
     }
 
+    val dpMeldepliktAdapterUrl by lazy {
+        properties[Key("DP_MELDEPLIKT_ADAPTER_URL", stringType)]
+    }
+    val dpMeldepliktAdapterTokenProvider by lazy {
+        azureAdTokenSupplier(properties[Key("DP_MELDEPLIKT_ADAPTER_SCOPE", stringType)])
+    }
+
     val dpProxyUrl by lazy {
         properties[Key("DP_PROXY_URL", stringType)]
     }
