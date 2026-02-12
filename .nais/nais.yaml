@@ -51,6 +51,7 @@ spec:
     outbound:
       rules:
         - application: dp-meldekortregister
+        - application: dp-arena-meldeplikt-adapter
         - application: logging
           namespace: nais-system
       external:
@@ -61,6 +62,10 @@ spec:
       value: http://{{ dpMeldekortregisterHost }}
     - name: DP_MELDEKORTREGISTER_SCOPE
       value: "{{ dpMeldekortregisterScope }}"
+    - name: DP_MELDEPLIKT_ADAPTER_URL
+      value: http://{{ dpMeldepliktAdapterHost }}
+    - name: DP_MELDEPLIKT_ADAPTER_SCOPE
+      value: "{{ dpMeldepliktAdapterScope }}"
     - name: DP_PROXY_URL
       value: https://{{ dpProxyHost }}
     - name: DP_PROXY_SCOPE

@@ -29,6 +29,7 @@ import no.nav.dagpenger.datadeling.db.SøknadRepositoryPostgresql
 import no.nav.dagpenger.datadeling.sporing.KafkaLogger
 import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.dagpenger.meldekort.MeldekortregisterClient
+import no.nav.dagpenger.meldekort.MeldepliktAdapterClient
 import no.nav.dagpenger.søknad.SøknadMottak
 import no.nav.dagpenger.søknad.SøknadRepository
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -50,13 +51,14 @@ internal class ApplicationBuilder(
     private val behandlingResultatRepositoryPostgresql = BehandlingResultatRepositoryPostgresql()
     private val config = Config.appConfig
     private val meldekortregisterClient = MeldekortregisterClient(Config.dpMeldekortregisterUrl, Config.dpMeldekortregisterTokenProvider)
+    private val meldepliktAdapterClient = MeldepliktAdapterClient(Config.dpMeldepliktAdapterUrl, Config.dpMeldepliktAdapterTokenProvider)
     private val proxyClient = ProxyClientArena(Config.dpProxyUrl, Config.dpProxyTokenProvider)
 
     private val tolker = BehandlingResultatRepositoryMedTolker(behandlingResultatRepositoryPostgresql)
 
     private val perioderService = PerioderService(proxyClient, tolker)
     private val beregningerService = BeregningerService(proxyClient, tolker)
-    private val meldekortService = MeldekortService(meldekortregisterClient)
+    private val meldekortService = MeldekortService(meldekortregisterClient, meldepliktAdapterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val leaderElector = LeaderElector(config)
     private val ressursDao = RessursDao()

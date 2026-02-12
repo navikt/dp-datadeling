@@ -4,8 +4,9 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 
 class MeldekortService(
     private val meldekortregisterClient: MeldekortregisterClient,
+    private val meldepliktAdapterClient: MeldepliktAdapterClient,
 ) {
     suspend fun hentMeldekort(request: DatadelingRequestDTO) =
-        // dp-meldekortregister returnerer alle meldekort (både fra meldekortregister og Arena) for personId
-        meldekortregisterClient.hentMeldekort(request)
+        (meldekortregisterClient.hentMeldekort(request) + meldepliktAdapterClient.hentMeldekort(request))
+            .sortedBy { it.periode.fraOgMed }
 }
