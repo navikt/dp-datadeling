@@ -95,6 +95,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/HttpProblem'
+
   /behandling:
     post:
       description: Hent alle behandlinger for en gitt person
@@ -624,15 +625,26 @@ components:
       required:
         - ident
       properties:
+        behandlingstype:
+          $ref: '#/components/schemas/Behandlingstype'
         ident:
           $ref: '#/components/schemas/Personident'
-        hendelse:
-          $ref: '#/components/schemas/Hendelse'
-        prøvingsdato:
-          type: string
-          format: date
         begrunnelse:
           type: string
+        id:
+          type: string
+          format: uuid
+          description: Valgfritt id for hendelsen, hvis ikke genereres det en uuid
+        skjedde:
+          type: string
+          format: date
+          description: Når hendelsen skjedde, hvis ikke settes det til nåværende tidspunkt
+
+    Behandlingstype:
+      type: string
+      enum:
+        - Revurdering
+        - Manuell
 
     NyOpplysning:
       type: object
@@ -1389,7 +1401,7 @@ components:
       enum: [ "dato", "desimaltall", "heltall", "boolsk", "ulid", "penger", "inntekt", "tekst", "barn", "periode" ]
       description: |
         Hvilken datatype opplysningen har, for å kunne validere at verdi er riktig format
-    
+
     Kvittering:
       type: object
       required:
@@ -1719,6 +1731,8 @@ components:
           type: integer
         utbetaling:
           type: integer
+        opprinnelse:
+          $ref: '#/components/schemas/Opprinnelse'
 
     BehandletAv:
       type: object
@@ -1757,7 +1771,7 @@ components:
           type: string
         type:
           type: string
-          enum: [ "Søknad", "Meldekort" ,"Manuell" ]
+          enum: [ "Søknad", "Meldekort" ,"Manuell", "Omgjøring" ]
         skjedde:
           type: string
           format: date
@@ -1827,7 +1841,9 @@ components:
         - Mottar ikke andre fulle ytelser
         - Oppfyller krav til ikke utestengt
         - Oppfyller kravet til alder
+        - Oppfyller kravet til framsatt søknad
         - Oppfyller kravet til heltid- og deltidsarbeid
+        - Oppfyller kravet til ikke gi mangelfull informasjon
         - Oppfyller kravet til medlemskap
         - Oppfyller kravet til minsteinntekt
         - Oppfyller kravet til mobilitet
