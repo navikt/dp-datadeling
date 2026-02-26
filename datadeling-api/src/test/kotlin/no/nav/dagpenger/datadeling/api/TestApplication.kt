@@ -11,8 +11,6 @@ import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.objectMapper
-import no.nav.dagpenger.datadeling.sporing.Log
-import no.nav.dagpenger.datadeling.sporing.NoopLogger
 import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
@@ -109,12 +107,10 @@ object TestApplication {
         meldekortService: MeldekortService = mockk(relaxed = true),
         beregningerService: BeregningerService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
-        auditLogger: Log = NoopLogger,
         test: suspend TestContext.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
             datadelingApi(
-                logger = auditLogger,
                 perioderService = perioderService,
                 meldekortService = meldekortService,
                 beregningerService = beregningerService,

@@ -2,7 +2,6 @@ package no.nav.dagpenger.datadeling.api
 
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.mockk.coEvery
@@ -16,14 +15,9 @@ import no.nav.dagpenger.datadeling.api.ressurs.RessursStatus
 import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
 import no.nav.dagpenger.datadeling.models.YtelseTypeDTO
-import no.nav.dagpenger.datadeling.sporing.AuditHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
-import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.datadeling.testGet
 import no.nav.dagpenger.datadeling.testPost
 import no.nav.dagpenger.datadeling.testutil.FNR
-import no.nav.dagpenger.datadeling.testutil.enDatadelingAfpResponse
 import no.nav.dagpenger.datadeling.testutil.enDatadelingRequest
 import no.nav.dagpenger.datadeling.testutil.enDatadelingResponse
 import no.nav.dagpenger.datadeling.testutil.enRessurs
@@ -131,67 +125,4 @@ class AfpPrivatRoutesTest {
                     """.trimIndent()
             }
         }
-
-    @Test
-    fun `Audit og Sporing logger ved opprettelse av ressurs`() {
-        val logger =
-            object : Log {
-                val hendelser = mutableListOf<AuditHendelse>()
-
-                override fun log(hendelse: AuditHendelse) {
-                    hendelser.add(hendelse)
-                }
-            }
-        testEndepunkter(perioderService = perioderService, ressursService = ressursService, auditLogger = logger) {
-            val ressurs = enRessurs()
-            coEvery { ressursService.opprett(any()) } returns ressurs
-
-            client.testPost(
-                "/dagpenger/datadeling/v1/periode",
-                enDatadelingRequest(),
-                issueMaskinportenToken(orgNummer = "0192:889640782"),
-            )
-
-            logger.hendelser.size shouldBe 1
-            logger.hendelser.first().let {
-                it.shouldBeInstanceOf<DagpengerPeriodeSpørringHendelse>()
-                it.ident() shouldBe FNR
-                // todo test orgnummer
-            }
-        }
-    }
-
-    @Test
-    fun `Audit og Sporing logging ved henting av ressurs`() {
-        val logger =
-            object : Log {
-                val hendelser = mutableListOf<AuditHendelse>()
-
-                override fun log(hendelse: AuditHendelse) {
-                    hendelser.add(hendelse)
-                }
-            }
-        val uuid = UUID.randomUUID()
-        testEndepunkter(perioderService = perioderService, ressursService = ressursService, auditLogger = logger) {
-            coEvery { ressursService.hent(uuid) } returns
-                enRessurs(
-                    uuid = uuid,
-                    status = RessursStatus.FERDIG,
-                    request = enDatadelingRequest(fnr = FNR),
-                    data = enDatadelingAfpResponse(),
-                )
-
-            client.testGet(
-                "/dagpenger/datadeling/v1/periode/$uuid",
-                issueMaskinportenToken(orgNummer = "0192:889640782"),
-            )
-
-            logger.hendelser.size shouldBe 1
-            logger.hendelser.first().let {
-                it.shouldBeInstanceOf<DagpengerPeriodeHentetHendelse>()
-                it.ident() shouldBe FNR
-                // todo test ressurs
-            }
-        }
-    }
 }

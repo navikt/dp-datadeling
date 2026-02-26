@@ -26,7 +26,6 @@ import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.db.BehandlingResultatRepositoryPostgresql
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.datadeling.db.SøknadRepositoryPostgresql
-import no.nav.dagpenger.datadeling.sporing.KafkaLogger
 import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.dagpenger.meldekort.MeldekortregisterClient
 import no.nav.dagpenger.meldekort.MeldepliktAdapterClient
@@ -82,7 +81,6 @@ internal class ApplicationBuilder(
                             preStopHook = preStopHook::handlePreStopRequest,
                         ) {
                             datadelingApi(
-                                logger = KafkaLogger(rapid),
                                 config = config,
                                 perioderService = perioderService,
                                 meldekortService = meldekortService,

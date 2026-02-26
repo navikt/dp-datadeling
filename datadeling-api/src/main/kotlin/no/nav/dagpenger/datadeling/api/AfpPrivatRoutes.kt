@@ -15,15 +15,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.Config
-import no.nav.dagpenger.datadeling.api.config.orgNummer
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.models.PeriodeAfpDTO
-import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerPeriodeSpørringHendelse
-import no.nav.dagpenger.datadeling.sporing.Log
 import java.util.UUID
 
 private val sikkerlogger = KotlinLogging.logger("tjenestekall")
@@ -31,7 +27,6 @@ private val sikkerlogger = KotlinLogging.logger("tjenestekall")
 fun Route.afpPrivatRoutes(
     ressursService: RessursService,
     perioderService: PerioderService,
-    auditLogger: Log,
 ) {
     authenticate("afpPrivat") {
         route("/dagpenger/datadeling/v1/periode") {
@@ -41,13 +36,6 @@ fun Route.afpPrivatRoutes(
                         val request = call.receive<DatadelingRequestDTO>()
                         val ressurs = requireNotNull(ressursService.opprett(request))
                         val ressursUrl = "${Config.dpDatadelingUrl}/dagpenger/datadeling/v1/periode/${ressurs.uuid}"
-                        auditLogger.log(
-                            DagpengerPeriodeSpørringHendelse(
-                                ident = request.personIdent,
-                                saksbehandlerNavIdent = call.orgNummer(),
-                            ),
-                        )
-
                         launch {
                             try {
                                 val perioder: DatadelingResponseAfpDTO =
@@ -85,17 +73,11 @@ fun Route.afpPrivatRoutes(
                 try {
                     val ressursRef = UUID.fromString(call.parameters["uuid"])
                     val ressurs = ressursService.hent(ressursRef)
-
                     ressurs?.let { ressurs ->
-                        auditLogger.log(
-                            DagpengerPeriodeHentetHendelse(
-                                saksbehandlerNavIdent = call.orgNummer(),
-                                ressurs = ressurs,
-                            ),
-                        )
                         call.respond(HttpStatusCode.OK, ressurs)
                     } ?: call.respond(HttpStatusCode.NotFound)
                 } catch (e: IllegalArgumentException) {
+                    defaultLogger.warn(e) { "Kunne ikke godta forespørsel" }
                     call.respond(HttpStatusCode.BadRequest)
                 } catch (e: Exception) {
                     defaultLogger.error { "Kunne ikke hente ressurs. Se sikkerlogg for detaljer" }

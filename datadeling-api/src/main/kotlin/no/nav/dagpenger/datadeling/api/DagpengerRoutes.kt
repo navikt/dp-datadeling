@@ -9,13 +9,9 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
-import no.nav.dagpenger.datadeling.api.config.clientId
 import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.sporing.DagpengerMeldekortHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.DagpengerPerioderHentetHendelse
-import no.nav.dagpenger.datadeling.sporing.Log
 import no.nav.dagpenger.meldekort.MeldekortService
 
 /**
@@ -25,43 +21,28 @@ import no.nav.dagpenger.meldekort.MeldekortService
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
     meldekortService: MeldekortService,
-    auditLogger: Log,
 ) {
     authenticate("azure") {
         route("/dagpenger/datadeling/v1") {
-            perioderRoute(perioderService, auditLogger)
-            meldekortRoute(meldekortService, auditLogger)
+            perioderRoute(perioderService)
+            meldekortRoute(meldekortService)
         }
     }
 }
 
-private fun Route.perioderRoute(
-    perioderService: PerioderService,
-    auditLogger: Log,
-) {
+private fun Route.perioderRoute(perioderService: PerioderService) {
     route("/perioder") {
         kreverTilgang(Tilgangsrolle.rettighetsperioder)
         post {
             val request = call.receive<DatadelingRequestDTO>()
             val response = perioderService.hentDagpengeperioder(request)
 
-            auditLogger.log(
-                DagpengerPerioderHentetHendelse(
-                    saksbehandlerNavIdent = call.clientId(),
-                    request = request,
-                    response = response,
-                ),
-            )
-
             call.respond(HttpStatusCode.OK, response)
         }
     }
 }
 
-private fun Route.meldekortRoute(
-    meldekortService: MeldekortService,
-    auditLogger: Log,
-) {
+private fun Route.meldekortRoute(meldekortService: MeldekortService) {
     route("/meldekort") {
         kreverTilgang(Tilgangsrolle.meldekort)
         post {
@@ -69,14 +50,6 @@ private fun Route.meldekortRoute(
 
             try {
                 val response = meldekortService.hentMeldekort(request)
-
-                auditLogger.log(
-                    DagpengerMeldekortHentetHendelse(
-                        saksbehandlerNavIdent = call.clientId(),
-                        request = request,
-                        response = response,
-                    ),
-                )
 
                 call.respond(HttpStatusCode.OK, response)
             } catch (e: Exception) {
