@@ -32,6 +32,10 @@ info:
     feilutbetalingssaker og eventuelle etterfølgende feilutbetalingssaker. Vedtaksperiodene er dermed ikke nødvendigvis 
     korrekte. Det er imidlertid sjeldent at en feilutbetalingssak får betydning for vedtaksperiode, og det vil berøre 
     et lite antall saker.
+    
+    Tjenesten vil også hente beregnede perioder fra arena og dp-sak, og kombinere disse til en liste med beregningsdetaljer for dagpenger. 
+    Disse detaljene inkluderer blant annet innvilget dagsats, utbetalt brutto beløp, gjenstående dager, og kilde for beregningen (Arena eller DP-sak).
+    Arena gir beregnede perioder mens dp-sak gir enkeltdager.
 
 servers:
   - url: https://dp-datadeling.intern.dev.nav.no
@@ -447,12 +451,14 @@ components:
           format: date
         sats:
           type: integer
+          description: Innvilget dagpengesats for perioden. Dette er inklusiv barnetillegg og eventuelt redusert etter samordning
           format: int32
         utbetaltBeløp:
           type: integer
+          description: Viser brutto beregnet for perioden som er oversendt til utbetaling. Denne kan være gradert etter timer arbeidet, syk eller fravær som er meldt i meldekort
           format: int32
         gjenståendeDager:
-          description: Vi har ikke denne informasjonen for Arena
+          description: Viser gjenstående dager med dagpengerettighet etter denne perioden.
           type: integer
         kilde:
           $ref: '#/components/schemas/Fagsystem'

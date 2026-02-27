@@ -16,7 +16,7 @@ kafka_pool: nav-prod
 
 feature:
   arena:
-    perioder: false
+    perioder: true
 
 inbounds:
   - application: k9-abakus
