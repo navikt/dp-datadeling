@@ -132,10 +132,8 @@ paths:
   /dagpenger/datadeling/v1/beregninger:
     post:
       description: |-
-        Returnerer brutto utbetalinger basert på beregnede meldeperioder fra både Arena og dp-sak.
+        Returnerer brutto beregnet beløp basert på beregnede meldeperioder fra både Arena og dp-sak.
         Dataene kombineres og sorteres kronologisk.
-        
-        **POC: Dette endepunktet er foreløpig en Proof of Concept og kan endres uten forvarsel.**
       tags:
         - Internt
         - Beregninger
