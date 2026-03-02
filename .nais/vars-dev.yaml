@@ -85,6 +85,12 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+  - application: modiapersonoversikt-api
+    namespace: personoversikt
+    cluster: dev-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
