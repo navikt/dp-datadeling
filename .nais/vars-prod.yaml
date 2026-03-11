@@ -61,6 +61,7 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"
   - application: saas-proxy
     namespace: teamcrm
     cluster: prod-gcp
