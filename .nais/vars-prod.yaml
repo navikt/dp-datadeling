@@ -86,3 +86,9 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+  - application: modiapersonoversikt-api
+    namespace: personoversikt
+    cluster: prod-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
