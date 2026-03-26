@@ -4,6 +4,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.behandling.BeregningerService
+import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.AppConfig
 import no.nav.dagpenger.datadeling.Config
@@ -17,6 +18,7 @@ fun Application.datadelingApi(
     perioderService: PerioderService,
     meldekortService: MeldekortService,
     beregningerService: BeregningerService,
+    dagpengestatusService: DagpengestatusService,
     ressursService: RessursService,
 ) {
     authentication(config)
@@ -25,7 +27,7 @@ fun Application.datadelingApi(
     routing {
         swaggerUI(path = "openapi", swaggerFile = "datadeling-api.yaml")
         afpPrivatRoutes(ressursService, perioderService)
-        dagpengerRoutes(perioderService, meldekortService)
+        dagpengerRoutes(perioderService, meldekortService, dagpengestatusService)
         beregningerRoutes(beregningerService)
     }
 }

@@ -7,6 +7,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.BeregningerService
+import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
@@ -106,6 +107,7 @@ object TestApplication {
         perioderService: PerioderService = mockk(relaxed = true),
         meldekortService: MeldekortService = mockk(relaxed = true),
         beregningerService: BeregningerService = mockk(relaxed = true),
+        dagpengestatusService: DagpengestatusService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
         test: suspend TestContext.() -> Unit,
     ) {
@@ -114,6 +116,7 @@ object TestApplication {
                 perioderService = perioderService,
                 meldekortService = meldekortService,
                 beregningerService = beregningerService,
+                dagpengestatusService = dagpengestatusService,
                 ressursService = ressursService,
             )
         }) {
