@@ -19,7 +19,7 @@ class BehandlingResultatRepositoryMedTolker(
     override suspend fun hentDagpengeperioder(request: DatadelingRequestDTO): List<Periode> =
         hent(request.personIdent).flatMap { res ->
             // dp-sak
-            res.rettighetsperioder.map { rettighetsperiode ->
+            res.rettighetsperioder.filter { it.harRett }.map { rettighetsperiode ->
                 val rettighetstype =
                     res.rettighetstyper
                         .firstOrNull { rettighetstyper ->
