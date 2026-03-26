@@ -159,17 +159,14 @@ paths:
 
   /dagpenger/datadeling/v1/dagpengestatus:
     post:
-      x-status: not-implemented
-      summary: Dagpengestatus i ny løsning (IKKE IMPLEMENTERT)
+      summary: Dagpengestatus i ny løsning
       description: |-
-        ⚠️ Dette endepunktet er spesifisert men ikke implementert ennå. Returnerer 501 Not Implemented inntil videre.
-
         Returnerer om en person er i ny dagpengeløsning (DP-sak), og fra når.
-        Gir første dato personen har vedtak (avslag eller innvilgelse) behandlet i DP-sak.
+        Gir første dato personen har innvilget vedtak i DP-sak.
 
         Brukes av Arena for overlappskontroll ved behandling av dagpenger.
 
-        Returnerer 404 dersom personen ikke har noen behandling i ny løsning.
+        Returnerer 404 dersom personen ikke har noen innvilget dagpengevedtak i ny løsning.
       tags:
         - Internt
         - Dagpengestatus
@@ -188,8 +185,6 @@ paths:
                 $ref: '#/components/schemas/DagpengestatusResponse'
         404:
           description: Personen har ingen dagpengebehandling i ny løsning
-        501:
-          description: Endepunktet er ikke implementert ennå
       security:
         - azure: []
 
