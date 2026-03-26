@@ -125,4 +125,37 @@ class DagpengerRoutesTest {
                 ).bodyAsText()
                 .apply { assertEquals(objectMapper.writeValueAsString(response), this) }
         }
+
+    @Test
+    fun `dagpengestatus returnerer 501 Not Implemented`() =
+        testEndepunkter {
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/dagpengestatus",
+                    mapOf("personIdent" to "12345678901"),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.dagpengestatus.name)),
+                ).status shouldBe HttpStatusCode.NotImplemented
+        }
+
+    @Test
+    fun `dagpengestatus returnerer 401 uten token`() =
+        testEndepunkter {
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/dagpengestatus",
+                    mapOf("personIdent" to "12345678901"),
+                    token = null,
+                ).status shouldBe HttpStatusCode.Unauthorized
+        }
+
+    @Test
+    fun `dagpengestatus returnerer 403 uten riktig rolle`() =
+        testEndepunkter {
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/dagpengestatus",
+                    mapOf("personIdent" to "12345678901"),
+                    issueAzureToken(azpRoles = listOf("FEIL_ROLLE")),
+                ).status shouldBe HttpStatusCode.Forbidden
+        }
 }

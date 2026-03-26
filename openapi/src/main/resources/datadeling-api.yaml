@@ -55,6 +55,8 @@ tags:
     description: API for å hente beregningsdetaljer for dagpenger
   - name: Meldekort
     description: API for å hente meldekort for dagpenger
+  - name: Dagpengestatus
+    description: API for overlappskontroll — om en person er i ny dagpengeløsning (DP-sak)
 
 
 paths:
@@ -154,6 +156,42 @@ paths:
                   $ref: '#/components/schemas/BeregnetDag'
       security:
         - azure: [ ]
+
+  /dagpenger/datadeling/v1/dagpengestatus:
+    post:
+      x-status: not-implemented
+      summary: Dagpengestatus i ny løsning (IKKE IMPLEMENTERT)
+      description: |-
+        ⚠️ Dette endepunktet er spesifisert men ikke implementert ennå. Returnerer 501 Not Implemented inntil videre.
+
+        Returnerer om en person er i ny dagpengeløsning (DP-sak), og fra når.
+        Gir første dato personen har vedtak (avslag eller innvilgelse) behandlet i DP-sak.
+
+        Brukes av Arena for overlappskontroll ved behandling av dagpenger.
+
+        Returnerer 404 dersom personen ikke har noen behandling i ny løsning.
+      tags:
+        - Internt
+        - Dagpengestatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DagpengestatusRequest'
+      responses:
+        200:
+          description: Personen har vedtak i ny løsning
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DagpengestatusResponse'
+        404:
+          description: Personen har ingen dagpengebehandling i ny løsning
+        501:
+          description: Endepunktet er ikke implementert ennå
+      security:
+        - azure: []
 
   /dagpenger/datadeling/v1/meldekort:
     post:
@@ -460,6 +498,32 @@ components:
           type: integer
         kilde:
           $ref: '#/components/schemas/Fagsystem'
+
+    DagpengestatusRequest:
+      type: object
+      required:
+        - personIdent
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+
+    DagpengestatusResponse:
+      type: object
+      required:
+        - personIdent
+        - forsteDagpengevedtakDato
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        forsteDagpengevedtakDato:
+          type: string
+          format: date
+          description: >-
+            Første dato et dagpengevedtak (avslag eller innvilgelse) gjelder fra
+            i ny løsning. Denne datoen angir fra når personen ikke lenger skal
+            behandles for dagpenger i Arena.
 
   securitySchemes:
     maskinporten:

@@ -26,6 +26,7 @@ fun Route.dagpengerRoutes(
         route("/dagpenger/datadeling/v1") {
             perioderRoute(perioderService)
             meldekortRoute(meldekortService)
+            dagpengestatusRoute()
         }
     }
 }
@@ -56,6 +57,15 @@ private fun Route.meldekortRoute(meldekortService: MeldekortService) {
                 defaultLogger.error(e) { "Feil ved henting av meldekort" }
                 throw e
             }
+        }
+    }
+}
+
+private fun Route.dagpengestatusRoute() {
+    route("/dagpengestatus") {
+        kreverTilgang(Tilgangsrolle.dagpengestatus)
+        post {
+            call.respond(HttpStatusCode.NotImplemented)
         }
     }
 }

@@ -74,6 +74,7 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "dagpengestatus"
   - application: nav-persondata-api
     namespace: holmes
     cluster: dev-gcp
