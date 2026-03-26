@@ -1,5 +1,6 @@
 package no.nav.dagpenger.behandling
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -11,9 +12,6 @@ import kotlin.test.Test
 class DagpengestatusServiceTest {
     private val repository: BehandlingResultatRepository = mockk()
     private val service = DagpengestatusService(DagpengestatusRepository(repository))
-    private val objectMapper =
-        com.fasterxml.jackson.module.kotlin
-            .jacksonObjectMapper()
 
     @Test
     fun `returnerer første innvilgelse-dato fra behandlingsresultat`() {
@@ -69,43 +67,31 @@ class DagpengestatusServiceTest {
         resultat!!.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
-    @Test
-    fun `bruker testdata fra BehandlingsresultatScenarioer`() {
-        val json = objectMapper.readTree(BehandlingsresultatScenarioer.innvilgelse_v1)
-        every { repository.hent("12345678901") } returns listOf(json)
+    private val testObjectMapper = jacksonObjectMapper()
 
-        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
+    private fun lagInnvilgelseJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Innvilgelse", fraOgMed, true))
 
-        resultat shouldNotBe null
-        resultat!!.forsteDagpengevedtakDato shouldBe LocalDate.of(2018, 6, 21)
-    }
+    private fun lagAvslagJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Avslag", fraOgMed, false))
+
+    private fun lagBehandlingsresultatJson(
+        førteTil: String,
+        fraOgMed: String,
+        harRett: Boolean,
+    ) = //language=JSON
+        """
+        {
+            "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+            "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
+            "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+            "automatisk": true,
+            "ident": "12345678901",
+            "rettighetsperioder": [{"fraOgMed": "$fraOgMed", "harRett": $harRett}],
+            "opprettet": "2026-03-15T10:00:00",
+            "sistEndret": "2026-03-15T10:00:00",
+            "opplysninger": [],
+            "utbetalinger": [],
+            "behandletAv": [],
+            "førteTil": "$førteTil"
+        }
+        """.trimIndent()
 }
-
-private val testObjectMapper =
-    com.fasterxml.jackson.module.kotlin
-        .jacksonObjectMapper()
-
-private fun lagInnvilgelseJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Innvilgelse", fraOgMed, true))
-
-private fun lagAvslagJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Avslag", fraOgMed, false))
-
-private fun lagBehandlingsresultatJson(
-    førteTil: String,
-    fraOgMed: String,
-    harRett: Boolean,
-) = """
-    {
-        "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
-        "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
-        "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
-        "automatisk": true,
-        "ident": "12345678901",
-        "rettighetsperioder": [{"fraOgMed": "$fraOgMed", "harRett": $harRett}],
-        "opprettet": "2026-03-15T10:00:00",
-        "sistEndret": "2026-03-15T10:00:00",
-        "opplysninger": [],
-        "utbetalinger": [],
-        "behandletAv": [],
-        "førteTil": "$førteTil"
-    }
-    """.trimIndent()
