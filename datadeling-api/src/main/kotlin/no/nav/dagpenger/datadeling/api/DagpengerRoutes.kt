@@ -71,10 +71,14 @@ private fun Route.dagpengestatusRoute(dagpengestatusService: DagpengestatusServi
             val request = call.receive<DagpengestatusRequestDTO>()
             val response = dagpengestatusService.hentDagpengestatus(request)
 
-            if (response != null) {
-                call.respond(HttpStatusCode.OK, response)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
+            when {
+                response != null -> {
+                    call.respond(HttpStatusCode.OK, response)
+                }
+
+                else -> {
+                    call.respond(HttpStatusCode.NotFound)
+                }
             }
         }
     }

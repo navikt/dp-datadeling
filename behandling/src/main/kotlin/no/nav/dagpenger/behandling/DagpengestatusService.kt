@@ -4,28 +4,20 @@ import no.nav.dagpenger.datadeling.models.DagpengestatusRequestDTO
 import no.nav.dagpenger.datadeling.models.DagpengestatusResponseDTO
 import java.time.LocalDate
 
-class DagpengestatusRepository(
-    private val behandlingResultatRepository: BehandlingResultatRepository,
-) {
-    fun hent(ident: String): List<BehandlingResultat> = behandlingResultatRepository.hent(ident).map { BehandlingResultatV1Tolker.fra(it) }
-}
-
 class DagpengestatusService(
     private val dagpengestatusRepository: DagpengestatusRepository,
 ) {
-    fun hentDagpengestatus(request: DagpengestatusRequestDTO): DagpengestatusResponseDTO? {
-        val førsteDato =
-            dagpengestatusRepository
-                .hent(request.personIdent)
-                .mapNotNull { it.tidligsteInnvilgelseDato() }
-                .minOrNull()
-                ?: return null
-
-        return DagpengestatusResponseDTO(
-            personIdent = request.personIdent,
-            forsteDagpengevedtakDato = førsteDato,
-        )
-    }
+    fun hentDagpengestatus(request: DagpengestatusRequestDTO): DagpengestatusResponseDTO? =
+        dagpengestatusRepository
+            .hent(request.personIdent)
+            .mapNotNull { it.tidligsteInnvilgelseDato() }
+            .minOrNull()
+            ?.let {
+                DagpengestatusResponseDTO(
+                    personIdent = request.personIdent,
+                    forsteDagpengevedtakDato = it,
+                )
+            }
 
     private fun BehandlingResultat.tidligsteInnvilgelseDato(): LocalDate? =
         rettighetsperioder.filter { it.harRett }.minByOrNull { it.fraOgMed }?.fraOgMed
