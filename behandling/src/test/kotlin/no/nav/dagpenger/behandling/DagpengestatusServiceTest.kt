@@ -16,7 +16,7 @@ class DagpengestatusServiceTest {
     @Test
     fun `returnerer første innvilgelse-dato fra behandlingsresultat`() {
         every { repository.hent("12345678901") } returns
-            listOf(lagInnvilgelseJson("2026-03-15"))
+                listOf(lagInnvilgelseJson("2026-03-15"))
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
@@ -34,7 +34,7 @@ class DagpengestatusServiceTest {
     @Test
     fun `ignorerer avslag`() {
         every { repository.hent("12345678901") } returns
-            listOf(lagAvslagJson("2026-01-01"))
+                listOf(lagAvslagJson("2026-01-01"))
 
         service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")) shouldBe null
     }
@@ -42,10 +42,10 @@ class DagpengestatusServiceTest {
     @Test
     fun `returnerer tidligste dato blant flere innvilgelser`() {
         every { repository.hent("12345678901") } returns
-            listOf(
-                lagInnvilgelseJson("2026-05-01"),
-                lagInnvilgelseJson("2026-03-15"),
-            )
+                listOf(
+                    lagInnvilgelseJson("2026-05-01"),
+                    lagInnvilgelseJson("2026-03-15"),
+                )
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
@@ -56,10 +56,10 @@ class DagpengestatusServiceTest {
     @Test
     fun `returnerer innvilgelse selv om avslag også finnes`() {
         every { repository.hent("12345678901") } returns
-            listOf(
-                lagAvslagJson("2026-01-01"),
-                lagInnvilgelseJson("2026-03-15"),
-            )
+                listOf(
+                    lagAvslagJson("2026-01-01"),
+                    lagInnvilgelseJson("2026-03-15"),
+                )
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
@@ -69,9 +69,11 @@ class DagpengestatusServiceTest {
 
     private val testObjectMapper = jacksonObjectMapper()
 
-    private fun lagInnvilgelseJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Innvilgelse", fraOgMed, true))
+    private fun lagInnvilgelseJson(fraOgMed: String) =
+        testObjectMapper.readTree(lagBehandlingsresultatJson("Innvilgelse", fraOgMed, true))
 
-    private fun lagAvslagJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Avslag", fraOgMed, false))
+    private fun lagAvslagJson(fraOgMed: String) =
+        testObjectMapper.readTree(lagBehandlingsresultatJson("Avslag", fraOgMed, false))
 
     private fun lagBehandlingsresultatJson(
         førteTil: String,
