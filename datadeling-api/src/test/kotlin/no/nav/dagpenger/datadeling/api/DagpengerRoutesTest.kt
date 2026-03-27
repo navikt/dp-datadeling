@@ -4,11 +4,14 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.api.TestApplication.issueAzureToken
 import no.nav.dagpenger.datadeling.api.TestApplication.testEndepunkter
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
+import no.nav.dagpenger.datadeling.models.DagpengestatusResponseDTO
 import no.nav.dagpenger.datadeling.models.FagsystemDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.datadeling.models.PeriodeDTO
@@ -127,15 +130,43 @@ class DagpengerRoutesTest {
         }
 
     @Test
-    fun `dagpengestatus returnerer 501 Not Implemented`() =
-        testEndepunkter {
+    fun `dagpengestatus returnerer 200 med dato ved innvilgelse`() {
+        val dagpengestatusService: DagpengestatusService = mockk()
+        every { dagpengestatusService.hentDagpengestatus(any()) } returns
+            DagpengestatusResponseDTO(
+                personIdent = "12345678901",
+                forsteDagpengevedtakDato = LocalDate.of(2026, 3, 15),
+            )
+
+        testEndepunkter(dagpengestatusService = dagpengestatusService) {
             client
                 .testPost(
                     "/dagpenger/datadeling/v1/dagpengestatus",
                     mapOf("personIdent" to "12345678901"),
                     issueAzureToken(azpRoles = listOf(Tilgangsrolle.dagpengestatus.name)),
-                ).status shouldBe HttpStatusCode.NotImplemented
+                ).apply {
+                    status shouldBe HttpStatusCode.OK
+                    val body = objectMapper.readTree(bodyAsText())
+                    body["personIdent"].asText() shouldBe "12345678901"
+                    body["forsteDagpengevedtakDato"].asText() shouldBe "2026-03-15"
+                }
         }
+    }
+
+    @Test
+    fun `dagpengestatus returnerer 404 når person ikke finnes i ny løsning`() {
+        val dagpengestatusService: DagpengestatusService = mockk()
+        every { dagpengestatusService.hentDagpengestatus(any()) } returns null
+
+        testEndepunkter(dagpengestatusService = dagpengestatusService) {
+            client
+                .testPost(
+                    "/dagpenger/datadeling/v1/dagpengestatus",
+                    mapOf("personIdent" to "12345678901"),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.dagpengestatus.name)),
+                ).status shouldBe HttpStatusCode.NotFound
+        }
+    }
 
     @Test
     fun `dagpengestatus returnerer 401 uten token`() =

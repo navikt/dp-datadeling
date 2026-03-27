@@ -7,10 +7,12 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.models.DagpengestatusRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.meldekort.MeldekortService
 
@@ -21,12 +23,13 @@ import no.nav.dagpenger.meldekort.MeldekortService
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
     meldekortService: MeldekortService,
+    dagpengestatusService: DagpengestatusService,
 ) {
     authenticate("azure") {
         route("/dagpenger/datadeling/v1") {
             perioderRoute(perioderService)
             meldekortRoute(meldekortService)
-            dagpengestatusRoute()
+            dagpengestatusRoute(dagpengestatusService)
         }
     }
 }
@@ -61,11 +64,22 @@ private fun Route.meldekortRoute(meldekortService: MeldekortService) {
     }
 }
 
-private fun Route.dagpengestatusRoute() {
+private fun Route.dagpengestatusRoute(dagpengestatusService: DagpengestatusService) {
     route("/dagpengestatus") {
         kreverTilgang(Tilgangsrolle.dagpengestatus)
         post {
-            call.respond(HttpStatusCode.NotImplemented)
+            val request = call.receive<DagpengestatusRequestDTO>()
+            val response = dagpengestatusService.hentDagpengestatus(request)
+
+            when {
+                response != null -> {
+                    call.respond(HttpStatusCode.OK, response)
+                }
+
+                else -> {
+                    call.respond(HttpStatusCode.NotFound)
+                }
+            }
         }
     }
 }
