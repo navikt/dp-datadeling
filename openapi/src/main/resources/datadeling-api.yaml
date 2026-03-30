@@ -231,11 +231,11 @@ components:
         fraOgMedDato:
           type: string
           format: date
-          description: Tidligste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Vedtak som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
+          description: Tidligste dato man trenger informasjon om dagpengerettighet. Perioder som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Perioder som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
         tilOgMedDato:
           type: string
           format: date
-          description: Seneste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Vedtak med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
+          description: Seneste dato man trenger informasjon om dagpengerettighet. Perioder som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Perioder med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
 
     Ressurs:
       type: object
