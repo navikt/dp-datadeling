@@ -154,9 +154,10 @@ class DagpengerRoutesTest {
     }
 
     @Test
-    fun `dagpengestatus returnerer 404 når person ikke finnes i ny løsning`() {
+    fun `dagpengestatus returnerer 200 med null dato når person ikke finnes i ny løsning`() {
         val dagpengestatusService: DagpengestatusService = mockk()
-        every { dagpengestatusService.hentDagpengestatus(any()) } returns null
+        every { dagpengestatusService.hentDagpengestatus(any()) } returns
+            DagpengestatusResponseDTO(personIdent = "12345678901")
 
         testEndepunkter(dagpengestatusService = dagpengestatusService) {
             client
@@ -164,7 +165,12 @@ class DagpengerRoutesTest {
                     "/dagpenger/datadeling/v1/dagpengestatus",
                     mapOf("personIdent" to "12345678901"),
                     issueAzureToken(azpRoles = listOf(Tilgangsrolle.dagpengestatus.name)),
-                ).status shouldBe HttpStatusCode.NotFound
+                ).apply {
+                    status shouldBe HttpStatusCode.OK
+                    val body = objectMapper.readTree(bodyAsText())
+                    body["personIdent"].asText() shouldBe "12345678901"
+                    body.has("forsteDagpengevedtakDato") shouldBe false
+                }
         }
     }
 

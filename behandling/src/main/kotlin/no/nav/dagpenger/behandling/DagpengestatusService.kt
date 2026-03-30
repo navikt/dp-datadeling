@@ -7,17 +7,15 @@ import java.time.LocalDate
 class DagpengestatusService(
     private val dagpengestatusRepository: DagpengestatusRepository,
 ) {
-    fun hentDagpengestatus(request: DagpengestatusRequestDTO): DagpengestatusResponseDTO? =
-        dagpengestatusRepository
-            .hent(request.personIdent)
-            .mapNotNull { it.tidligsteInnvilgelseDato() }
-            .minOrNull()
-            ?.let {
-                DagpengestatusResponseDTO(
-                    personIdent = request.personIdent,
-                    forsteDagpengevedtakDato = it,
-                )
-            }
+    fun hentDagpengestatus(request: DagpengestatusRequestDTO): DagpengestatusResponseDTO =
+        DagpengestatusResponseDTO(
+            personIdent = request.personIdent,
+            forsteDagpengevedtakDato =
+                dagpengestatusRepository
+                    .hent(request.personIdent)
+                    .mapNotNull { it.tidligsteInnvilgelseDato() }
+                    .minOrNull(),
+        )
 
     private fun BehandlingResultat.tidligsteInnvilgelseDato(): LocalDate? =
         rettighetsperioder.filter { it.harRett }.minByOrNull { it.fraOgMed }?.fraOgMed

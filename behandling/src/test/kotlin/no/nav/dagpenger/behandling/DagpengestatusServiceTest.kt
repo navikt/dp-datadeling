@@ -2,7 +2,6 @@ package no.nav.dagpenger.behandling
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.datadeling.models.DagpengestatusRequestDTO
@@ -20,15 +19,17 @@ class DagpengestatusServiceTest {
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat shouldNotBe null
-        resultat!!.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
     @Test
-    fun `returnerer null når ingen behandlingsresultat finnes`() {
+    fun `returnerer null dato når ingen behandlingsresultat finnes`() {
         every { repository.hent("12345678901") } returns emptyList()
 
-        service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")) shouldBe null
+        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
+
+        resultat.personIdent shouldBe "12345678901"
+        resultat.forsteDagpengevedtakDato shouldBe null
     }
 
     @Test
@@ -36,7 +37,7 @@ class DagpengestatusServiceTest {
         every { repository.hent("12345678901") } returns
             listOf(lagAvslagJson("2026-01-01"))
 
-        service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")) shouldBe null
+        service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")).forsteDagpengevedtakDato shouldBe null
     }
 
     @Test
@@ -49,8 +50,7 @@ class DagpengestatusServiceTest {
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat shouldNotBe null
-        resultat!!.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
     @Test
@@ -63,8 +63,7 @@ class DagpengestatusServiceTest {
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat shouldNotBe null
-        resultat!!.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
     private val testObjectMapper = jacksonObjectMapper()

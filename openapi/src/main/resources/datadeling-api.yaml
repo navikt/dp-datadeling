@@ -162,14 +162,14 @@ paths:
       summary: Dagpengestatus i ny løsning
       description: |-
         Returnerer om en person er i ny dagpengeløsning (DP-sak), og fra når.
-        Gir første dato personen har vedtak i DP-sak.
 
         Per nå returneres kun innvilgede vedtak. Avslag vil inkluderes
         når dp-sak overtar eierskap for avslagsvedtak (fase 2).
 
         Brukes av Arena for overlappskontroll ved behandling av dagpenger.
 
-        Returnerer 404 dersom personen ikke har noen dagpengevedtak i ny løsning.
+        Dersom personen ikke har noen dagpengevedtak i ny løsning returneres
+        forsteDagpengevedtakDato som null.
       tags:
         - Internt
         - Dagpengestatus
@@ -181,13 +181,11 @@ paths:
               $ref: '#/components/schemas/DagpengestatusRequest'
       responses:
         200:
-          description: Personen har vedtak i ny løsning
+          description: Dagpengestatus for personen
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DagpengestatusResponse'
-        404:
-          description: Personen har ingen dagpengebehandling i ny løsning
       security:
         - azure: []
 
@@ -510,7 +508,6 @@ components:
       type: object
       required:
         - personIdent
-        - forsteDagpengevedtakDato
       properties:
         personIdent:
           type: string
@@ -518,9 +515,11 @@ components:
         forsteDagpengevedtakDato:
           type: string
           format: date
+          nullable: true
           description: >-
-            Første dato et dagpengevedtak (avslag eller innvilgelse) gjelder fra
-            i ny løsning. Denne datoen angir fra når personen ikke lenger skal
+            Første dato et dagpengevedtak gjelder fra i ny løsning.
+            Null dersom personen ikke har noen dagpengevedtak i ny løsning.
+            Denne datoen angir fra når personen ikke lenger skal
             behandles for dagpenger i Arena.
 
   securitySchemes:
