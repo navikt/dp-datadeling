@@ -1,5 +1,6 @@
 package no.nav.dagpenger.datadeling.api
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -68,7 +69,7 @@ private fun Route.meldekortRoute(meldekortService: MeldekortService) {
 }
 
 private val dagpengestatusObjectMapper =
-    objectMapper.copy().setDefaultPropertyInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+    objectMapper.copy().setDefaultPropertyInclusion(ALWAYS)
 
 private fun Route.dagpengestatusRoute(dagpengestatusService: DagpengestatusService) {
     route("/dagpengestatus") {
