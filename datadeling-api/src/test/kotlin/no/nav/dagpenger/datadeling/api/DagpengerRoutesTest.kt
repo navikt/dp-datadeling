@@ -169,7 +169,8 @@ class DagpengerRoutesTest {
                     status shouldBe HttpStatusCode.OK
                     val body = objectMapper.readTree(bodyAsText())
                     body["personIdent"].asText() shouldBe "12345678901"
-                    body.has("forsteDagpengevedtakDato") shouldBe false
+                    body.has("forsteDagpengevedtakDato") shouldBe true
+                    body["forsteDagpengevedtakDato"].isNull shouldBe true
                 }
         }
     }

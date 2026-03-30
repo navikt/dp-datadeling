@@ -1,9 +1,11 @@
 package no.nav.dagpenger.datadeling.api
 
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -14,6 +16,7 @@ import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
 import no.nav.dagpenger.datadeling.defaultLogger
 import no.nav.dagpenger.datadeling.models.DagpengestatusRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.meldekort.MeldekortService
 
 /**
@@ -64,13 +67,16 @@ private fun Route.meldekortRoute(meldekortService: MeldekortService) {
     }
 }
 
+private val dagpengestatusObjectMapper =
+    objectMapper.copy().setDefaultPropertyInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+
 private fun Route.dagpengestatusRoute(dagpengestatusService: DagpengestatusService) {
     route("/dagpengestatus") {
         kreverTilgang(Tilgangsrolle.dagpengestatus)
         post {
             val request = call.receive<DagpengestatusRequestDTO>()
             val response = dagpengestatusService.hentDagpengestatus(request)
-            call.respond(HttpStatusCode.OK, response)
+            call.respondText(dagpengestatusObjectMapper.writeValueAsString(response), ContentType.Application.Json)
         }
     }
 }
