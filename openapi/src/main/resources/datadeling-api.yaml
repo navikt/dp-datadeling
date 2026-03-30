@@ -162,11 +162,14 @@ paths:
       summary: Dagpengestatus i ny løsning
       description: |-
         Returnerer om en person er i ny dagpengeløsning (DP-sak), og fra når.
-        Gir første dato personen har innvilget vedtak i DP-sak.
+        Gir første dato personen har vedtak i DP-sak.
+
+        Per nå returneres kun innvilgede vedtak. Avslag vil inkluderes
+        når dp-sak overtar eierskap for avslagsvedtak (fase 2).
 
         Brukes av Arena for overlappskontroll ved behandling av dagpenger.
 
-        Returnerer 404 dersom personen ikke har noen innvilget dagpengevedtak i ny løsning.
+        Returnerer 404 dersom personen ikke har noen dagpengevedtak i ny løsning.
       tags:
         - Internt
         - Dagpengestatus
