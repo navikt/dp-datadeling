@@ -168,8 +168,7 @@ paths:
 
         Brukes av Arena for overlappskontroll ved behandling av dagpenger.
 
-        Dersom personen ikke har noen dagpengevedtak i ny løsning returneres
-        forsteDagpengevedtakDato som null.
+        Dersom personen ikke finnes i ny løsning returneres forsteDato som null.
       tags:
         - Internt
         - Dagpengestatus
@@ -512,13 +511,13 @@ components:
         personIdent:
           type: string
           description: Personens fødselsnummer eller D-nummer
-        forsteDagpengevedtakDato:
+        forsteDato:
           type: string
           format: date
           nullable: true
           description: >-
-            Første dato et dagpengevedtak gjelder fra i ny løsning.
-            Null dersom personen ikke har noen dagpengevedtak i ny løsning.
+            Første dato personen har en dagpengesak i ny løsning.
+            Null dersom personen ikke finnes i ny løsning.
             Denne datoen angir fra når personen ikke lenger skal
             behandles for dagpenger i Arena.
 

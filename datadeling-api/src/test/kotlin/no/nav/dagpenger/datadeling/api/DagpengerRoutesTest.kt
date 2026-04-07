@@ -135,7 +135,7 @@ class DagpengerRoutesTest {
         every { dagpengestatusService.hentDagpengestatus(any()) } returns
             DagpengestatusResponseDTO(
                 personIdent = "12345678901",
-                forsteDagpengevedtakDato = LocalDate.of(2026, 3, 15),
+                forsteDato = LocalDate.of(2026, 3, 15),
             )
 
         testEndepunkter(dagpengestatusService = dagpengestatusService) {
@@ -148,7 +148,7 @@ class DagpengerRoutesTest {
                     status shouldBe HttpStatusCode.OK
                     val body = objectMapper.readTree(bodyAsText())
                     body["personIdent"].asText() shouldBe "12345678901"
-                    body["forsteDagpengevedtakDato"].asText() shouldBe "2026-03-15"
+                    body["forsteDato"].asText() shouldBe "2026-03-15"
                 }
         }
     }
@@ -169,8 +169,8 @@ class DagpengerRoutesTest {
                     status shouldBe HttpStatusCode.OK
                     val body = objectMapper.readTree(bodyAsText())
                     body["personIdent"].asText() shouldBe "12345678901"
-                    body.has("forsteDagpengevedtakDato") shouldBe true
-                    body["forsteDagpengevedtakDato"].isNull shouldBe true
+                    body.has("forsteDato") shouldBe true
+                    body["forsteDato"].isNull shouldBe true
                 }
         }
     }

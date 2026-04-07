@@ -19,7 +19,7 @@ class DagpengestatusServiceTest {
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
     @Test
@@ -29,7 +29,7 @@ class DagpengestatusServiceTest {
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
         resultat.personIdent shouldBe "12345678901"
-        resultat.forsteDagpengevedtakDato shouldBe null
+        resultat.forsteDato shouldBe null
     }
 
     @Test
@@ -37,7 +37,7 @@ class DagpengestatusServiceTest {
         every { repository.hent("12345678901") } returns
             listOf(lagAvslagJson("2026-01-01"))
 
-        service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")).forsteDagpengevedtakDato shouldBe null
+        service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")).forsteDato shouldBe null
     }
 
     @Test
@@ -50,7 +50,7 @@ class DagpengestatusServiceTest {
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
     @Test
@@ -63,7 +63,7 @@ class DagpengestatusServiceTest {
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat.forsteDagpengevedtakDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
     }
 
     private val testObjectMapper = jacksonObjectMapper()
