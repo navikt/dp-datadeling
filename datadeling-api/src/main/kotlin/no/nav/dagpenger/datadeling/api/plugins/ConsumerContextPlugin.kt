@@ -9,6 +9,9 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import no.nav.dagpenger.datadeling.api.config.konsument
 
+private const val KONSUMENT_KEY = "konsument"
+private val KONSUMENT_ATTRIBUTE_KEY = AttributeKey.stringKey(KONSUMENT_KEY)
+
 internal val ConsumerContextPlugin =
     createApplicationPlugin("ConsumerContextPlugin") {
         // Auth runs in the Plugins phase; by intercepting Call we have the principal available
@@ -16,8 +19,8 @@ internal val ConsumerContextPlugin =
         application.intercept(ApplicationCallPipeline.Call) {
             val konsument = context.konsument()
 
-            withLoggingContextAsync("konsument" to konsument) {
-                Span.current().setAttribute(AttributeKey.stringKey("konsument"), konsument)
+            withLoggingContextAsync(KONSUMENT_KEY to konsument) {
+                Span.current().setAttribute(KONSUMENT_ATTRIBUTE_KEY, konsument)
                 proceed()
             }
         }
