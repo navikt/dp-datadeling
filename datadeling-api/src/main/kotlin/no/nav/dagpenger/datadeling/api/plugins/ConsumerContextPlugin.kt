@@ -14,7 +14,7 @@ internal val ConsumerContextPlugin =
         // Auth runs in the Plugins phase; by intercepting Call we have the principal available
         // and proceed() lets us wrap the entire handler execution
         application.intercept(ApplicationCallPipeline.Call) {
-            val konsument = runCatching { context.konsument() }.getOrElse { "ukjent" }
+            val konsument = context.konsument()
 
             withLoggingContextAsync("konsument" to konsument) {
                 Span.current().setAttribute(AttributeKey.stringKey("konsument"), konsument)
