@@ -28,17 +28,17 @@ class BehandlingResultatV1TolkerTest {
     }
 
     @Test
-    fun `tar bare med rettighetsperioder som er true`() {
+    fun `tar med alle rettighetsperioder`() {
         val behandlingResultat: JsonNode = objectMapper.readTree(stans_v1)
         val tolker = BehandlingResultatV1Tolker.fra(behandlingResultat)
 
         tolker.behandlingId shouldBe UUID.fromString("019b4a54-0d82-7a74-b0aa-a19d160016f8")
         tolker.ident shouldBe "10399847102"
 
-        tolker.rettighetsperioder.size shouldBe 1
-        tolker.rettighetsperioder.first().fraOgMed shouldBe LocalDate.of(2018, 6, 21)
-        tolker.rettighetsperioder.first().tilOgMed shouldBe LocalDate.of(2018, 7, 21)
-        tolker.rettighetsperioder.first().harRett shouldBe true
+        tolker.rettighetsperioder.size shouldBe 2
+        tolker.rettighetsperioder.first { it.harRett }.fraOgMed shouldBe LocalDate.of(2018, 6, 21)
+        tolker.rettighetsperioder.first { it.harRett }.tilOgMed shouldBe LocalDate.of(2018, 7, 21)
+        tolker.rettighetsperioder.first { !it.harRett }.fraOgMed shouldBe LocalDate.of(2018, 7, 22)
 
         tolker.rettighetstyper.size shouldBe 1
         tolker.rettighetstyper.first().type shouldBe Rettighetstype.ORDINÆR

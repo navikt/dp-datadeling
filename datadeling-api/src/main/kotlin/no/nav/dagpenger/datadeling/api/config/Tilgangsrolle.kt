@@ -8,4 +8,5 @@ enum class Tilgangsrolle {
     rettighetsperioder,
     meldekort,
     beregninger,
+    dagpengestatus,
 }

@@ -17,6 +17,8 @@ import no.nav.dagpenger.behandling.BehandlingResultatMottak
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.BehandlingResultatVarsler
 import no.nav.dagpenger.behandling.BeregningerService
+import no.nav.dagpenger.behandling.DagpengestatusRepository
+import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.api.datadelingApi
@@ -57,6 +59,7 @@ internal class ApplicationBuilder(
 
     private val perioderService = PerioderService(proxyClient, tolker)
     private val beregningerService = BeregningerService(proxyClient, tolker)
+    private val dagpengestatusService = DagpengestatusService(DagpengestatusRepository(behandlingResultatRepositoryPostgresql))
     private val meldekortService = MeldekortService(meldekortregisterClient, meldepliktAdapterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val leaderElector = LeaderElector(config)
@@ -85,6 +88,7 @@ internal class ApplicationBuilder(
                                 perioderService = perioderService,
                                 meldekortService = meldekortService,
                                 beregningerService = beregningerService,
+                                dagpengestatusService = dagpengestatusService,
                                 ressursService = ressursService,
                             )
                         }

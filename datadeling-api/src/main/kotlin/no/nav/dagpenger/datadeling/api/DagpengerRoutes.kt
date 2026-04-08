@@ -1,17 +1,23 @@
 package no.nav.dagpenger.datadeling.api
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
 import no.nav.dagpenger.datadeling.defaultLogger
+import no.nav.dagpenger.datadeling.models.DagpengestatusRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.meldekort.MeldekortService
 
 /**
@@ -21,11 +27,13 @@ import no.nav.dagpenger.meldekort.MeldekortService
 fun Route.dagpengerRoutes(
     perioderService: PerioderService,
     meldekortService: MeldekortService,
+    dagpengestatusService: DagpengestatusService,
 ) {
     authenticate("azure") {
         route("/dagpenger/datadeling/v1") {
             perioderRoute(perioderService)
             meldekortRoute(meldekortService)
+            dagpengestatusRoute(dagpengestatusService)
         }
     }
 }
@@ -56,6 +64,20 @@ private fun Route.meldekortRoute(meldekortService: MeldekortService) {
                 defaultLogger.error(e) { "Feil ved henting av meldekort" }
                 throw e
             }
+        }
+    }
+}
+
+private val dagpengestatusObjectMapper =
+    objectMapper.copy().setDefaultPropertyInclusion(ALWAYS)
+
+private fun Route.dagpengestatusRoute(dagpengestatusService: DagpengestatusService) {
+    route("/dagpengestatus") {
+        kreverTilgang(Tilgangsrolle.dagpengestatus)
+        post {
+            val request = call.receive<DagpengestatusRequestDTO>()
+            val response = dagpengestatusService.hentDagpengestatus(request)
+            call.respondText(dagpengestatusObjectMapper.writeValueAsString(response), ContentType.Application.Json)
         }
     }
 }

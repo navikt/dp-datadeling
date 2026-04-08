@@ -20,7 +20,6 @@ class BehandlingResultatV1Tolker(
 
     override val rettighetsperioder: List<Rettighetsperiode> =
         dto.rettighetsperioder
-            .filter { it.harRett }
             .map { periode ->
                 object : Rettighetsperiode {
                     override val fraOgMed: LocalDate = periode.fraOgMed

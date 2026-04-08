@@ -55,6 +55,8 @@ tags:
     description: API for å hente beregningsdetaljer for dagpenger
   - name: Meldekort
     description: API for å hente meldekort for dagpenger
+  - name: Dagpengestatus
+    description: API for overlappskontroll — om en person er i ny dagpengeløsning (DP-sak)
 
 
 paths:
@@ -155,6 +157,38 @@ paths:
       security:
         - azure: [ ]
 
+  /dagpenger/datadeling/v1/dagpengestatus:
+    post:
+      summary: Dagpengestatus i ny løsning
+      description: |-
+        Returnerer om en person er i ny dagpengeløsning (DP-sak), og fra når.
+
+        Per nå returneres kun innvilgede vedtak. Avslag vil inkluderes
+        når dp-sak overtar eierskap for avslagsvedtak (fase 2).
+
+        Brukes av Arena for overlappskontroll ved behandling av dagpenger.
+
+        Dersom personen ikke har noen dagpengevedtak i ny løsning returneres
+        forsteDagpengevedtakDato som null.
+      tags:
+        - Internt
+        - Dagpengestatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DagpengestatusRequest'
+      responses:
+        200:
+          description: Dagpengestatus for personen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DagpengestatusResponse'
+      security:
+        - azure: []
+
   /dagpenger/datadeling/v1/meldekort:
     post:
       description: |-
@@ -197,11 +231,11 @@ components:
         fraOgMedDato:
           type: string
           format: date
-          description: Tidligste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Vedtak som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
+          description: Tidligste dato man trenger informasjon om dagpengerettighet. Perioder som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Perioder som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
         tilOgMedDato:
           type: string
           format: date
-          description: Seneste dato man trenger informasjon om dagpengerettighet. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Vedtak med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
+          description: Seneste dato man trenger informasjon om dagpengerettighet. Perioder som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Perioder med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
 
     Ressurs:
       type: object
@@ -460,6 +494,33 @@ components:
           type: integer
         kilde:
           $ref: '#/components/schemas/Fagsystem'
+
+    DagpengestatusRequest:
+      type: object
+      required:
+        - personIdent
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+
+    DagpengestatusResponse:
+      type: object
+      required:
+        - personIdent
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        forsteDagpengevedtakDato:
+          type: string
+          format: date
+          nullable: true
+          description: >-
+            Første dato et dagpengevedtak gjelder fra i ny løsning.
+            Null dersom personen ikke har noen dagpengevedtak i ny løsning.
+            Denne datoen angir fra når personen ikke lenger skal
+            behandles for dagpenger i Arena.
 
   securitySchemes:
     maskinporten:

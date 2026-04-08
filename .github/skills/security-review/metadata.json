@@ -1,0 +1,14 @@
+{
+  "domain": "general",
+  "tags": ["security", "pre-commit", "vulnerability-scanning", "code-review"],
+  "examples": [
+    {
+      "prompt": "Kjør en sikkerhetssjekk på endringene i fp-sak før jeg pusher",
+      "scenario": "Sikkerhetssjekk før commit"
+    },
+    {
+      "prompt": "Er det trygt å merge denne PR-en i sosialhjelp-innsyn-api?",
+      "scenario": "Sikkerhetssjekk av PR"
+    }
+  ]
+}
