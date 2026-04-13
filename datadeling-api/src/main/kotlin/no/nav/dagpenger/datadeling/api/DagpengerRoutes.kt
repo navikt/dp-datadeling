@@ -43,7 +43,7 @@ private fun Route.perioderRoute(perioderService: PerioderService) {
         kreverTilgang(Tilgangsrolle.rettighetsperioder)
         post {
             val request = call.receive<DatadelingRequestDTO>()
-            val response = perioderService.hentDagpengeperioder(request)
+            val response = perioderService.hentDagpengeperioderAvgrenset(request)
 
             call.respond(HttpStatusCode.OK, response)
         }

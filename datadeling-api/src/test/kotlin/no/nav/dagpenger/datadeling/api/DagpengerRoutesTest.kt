@@ -101,7 +101,7 @@ class DagpengerRoutesTest {
                         kilde = FagsystemDTO.ARENA,
                     ),
                 )
-            coEvery { perioderService.hentDagpengeperioder(any()) } returns response
+            coEvery { perioderService.hentDagpengeperioderAvgrenset(any()) } returns response
 
             client
                 .testPost(
