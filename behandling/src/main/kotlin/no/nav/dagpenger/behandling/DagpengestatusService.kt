@@ -10,7 +10,7 @@ class DagpengestatusService(
     fun hentDagpengestatus(request: DagpengestatusRequestDTO): DagpengestatusResponseDTO =
         DagpengestatusResponseDTO(
             personIdent = request.personIdent,
-            forsteDagpengevedtakDato =
+            forsteDato =
                 dagpengestatusRepository
                     .hent(request.personIdent)
                     .mapNotNull { it.tidligsteInnvilgelseDato() }
