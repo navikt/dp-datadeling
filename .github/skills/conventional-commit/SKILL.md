@@ -1,6 +1,10 @@
 ---
 name: conventional-commit
 description: Generer conventional commit-meldinger med Nav-relevante scopes og breaking change-format
+license: MIT
+metadata:
+  domain: general
+  tags: git commit conventional-commits changelog
 ---
 
 # Conventional Commit Skill
