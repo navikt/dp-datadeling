@@ -10,14 +10,8 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
-import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.config.SslConfigs
-import org.apache.kafka.common.security.auth.SecurityProtocol
-import org.apache.kafka.common.serialization.StringSerializer
 import java.net.URI
 import java.net.URL
-import java.util.Properties
 import javax.sql.DataSource
 
 internal object Config {
@@ -127,58 +121,6 @@ internal object Config {
         properties.list().reversed().fold(emptyMap()) { map, pair ->
             map + pair.second
         }
-}
-
-data class KafkaAivenCredentials(
-    val securityProtocolConfig: String = SecurityProtocol.SSL.name,
-    val sslEndpointIdentificationAlgorithmConfig: String = "",
-    val sslTruststoreTypeConfig: String = "jks",
-    val sslKeystoreTypeConfig: String = "PKCS12",
-    val sslTruststoreLocationConfig: String = "/var/run/secrets/nais.io/kafka/client.truststore.jks",
-    val sslTruststorePasswordConfig: String = Config.properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)],
-    val sslKeystoreLocationConfig: String = "/var/run/secrets/nais.io/kafka/client.keystore.p12",
-    val sslKeystorePasswordConfig: String = sslTruststorePasswordConfig,
-) {
-    companion object {
-        private val stringSerializer = StringSerializer()
-
-        internal fun producerConfig(
-            appId: String,
-            bootStapServerUrl: String,
-            aivenCredentials: KafkaAivenCredentials?,
-        ): Properties =
-            Properties().apply {
-                putAll(
-                    listOf(
-                        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootStapServerUrl,
-                        ProducerConfig.CLIENT_ID_CONFIG to appId,
-                        ProducerConfig.ACKS_CONFIG to "all",
-                        ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to true,
-                        ProducerConfig.RETRIES_CONFIG to Int.MAX_VALUE.toString(),
-                        ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to "5",
-                        ProducerConfig.COMPRESSION_TYPE_CONFIG to "snappy",
-                        ProducerConfig.LINGER_MS_CONFIG to "20",
-                        ProducerConfig.BATCH_SIZE_CONFIG to 32.times(1024).toString(),
-                        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to stringSerializer,
-                        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to stringSerializer,
-                    ),
-                )
-
-                aivenCredentials?.let {
-                    put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, it.securityProtocolConfig)
-                    put(
-                        SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-                        it.sslEndpointIdentificationAlgorithmConfig,
-                    )
-                    put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, it.sslTruststoreTypeConfig)
-                    put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, it.sslKeystoreTypeConfig)
-                    put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, it.sslTruststoreLocationConfig)
-                    put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, it.sslTruststorePasswordConfig)
-                    put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, it.sslKeystoreLocationConfig)
-                    put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, it.sslKeystorePasswordConfig)
-                }
-            }
-    }
 }
 
 data class AppConfig(
