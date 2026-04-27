@@ -1,6 +1,11 @@
 ---
 name: kotlin-app-config
 description: Sealed class-konfigurasjon for Kotlin-applikasjoner med miljøspesifikke innstillinger
+license: MIT
+compatibility: Kotlin application
+metadata:
+  domain: backend
+  tags: kotlin configuration sealed-class environment
 ---
 
 # Kotlin Application Configuration Skill
@@ -43,7 +48,7 @@ sealed class Environment(
 
     companion object {
         fun from(env: Map<String, String>): Environment {
-            return when (env["Nais_CLUSTER_NAME"]) {
+            return when (env["NAIS_CLUSTER_NAME"]) {
                 "dev-gcp" -> Dev(env)
                 "prod-gcp" -> Prod(env)
                 else -> Local
@@ -78,7 +83,31 @@ data class AppConfig(
 )
 
 data class DatabaseConfig(
-    val url: String,
+    val url: String
+)
+data class KafkaConfig(
+    val brokers: String
+)
+data class AzureConfig(
+    val issuer: String
+)
+
+val config = EnvironmentVariables()
+
+val appConfig = AppConfig(
+    database = DatabaseConfig(
+        url = config.getOrNull(Key("DATABASE_URL", stringType))
+            ?: "jdbc:postgresql://localhost:5432/myapp"
+    ),
+    kafka = KafkaConfig(
+        brokers = config.getOrNull(Key("KAFKA_BROKERS", stringType))
+            ?: "localhost:9092"
+    ),
+    azure = AzureConfig(
+        issuer = config.getOrNull(Key("AZURE_OPENID_CONFIG_ISSUER", stringType))
+            ?: "http://localhost:8080/azuread"
+    )
+)
 ```
 
 ## Alternative: Sealed Interface Pattern (navikt/hotlibs)
@@ -101,7 +130,7 @@ sealed interface Environment {
         )
 
         val current: Environment by lazy {
-            val cluster = System.getenv("Nais_CLUSTER_NAME")
+            val cluster = System.getenv("NAIS_CLUSTER_NAME")
             all.find { it.cluster == cluster } ?: LocalEnvironment
         }
     }

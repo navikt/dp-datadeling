@@ -1,0 +1,76 @@
+{
+  "up_to_date": false,
+  "source": "fa7e104",
+  "updates": [
+    {
+      "path": ".github/agents/auth.agent.md",
+      "current_hash": "9d013206d684372d",
+      "source_hash": "97b03fd441f35a44"
+    },
+    {
+      "path": ".github/agents/code-review.agent.md",
+      "current_hash": "e46beba21ce5df32",
+      "source_hash": "83d872eba6edd7e6"
+    },
+    {
+      "path": ".github/agents/nais.agent.md",
+      "current_hash": "6b2e7fb2322c7fe6",
+      "source_hash": "fa07ad8cfdf54a4a"
+    },
+    {
+      "path": ".github/agents/observability.agent.md",
+      "current_hash": "34e6bbe61132719a",
+      "source_hash": "ba87267d1d23aee2"
+    },
+    {
+      "path": ".github/agents/security-champion.agent.md",
+      "current_hash": "b1871587f069eb13",
+      "source_hash": "3081dcf0ddde695d"
+    },
+    {
+      "path": ".github/instructions/kotlin-ktor.instructions.md",
+      "current_hash": "32ca1c5ff40db124",
+      "source_hash": "5d85d53d8f375ec2"
+    },
+    {
+      "path": ".github/instructions/kotlin-spring.instructions.md",
+      "current_hash": "7b7d55ac22e314cc",
+      "source_hash": "bdf9d1bfd4121803"
+    },
+    {
+      "path": ".github/instructions/testing.instructions.md",
+      "current_hash": "54b09caf505acd1e",
+      "source_hash": "4a6a7547a3701ce1"
+    },
+    {
+      "path": ".github/skills/api-design/",
+      "current_hash": "7af00e10677fd1b5",
+      "source_hash": "a353aded69a4bd4c"
+    },
+    {
+      "path": ".github/skills/conventional-commit/",
+      "current_hash": "0aff7c53b973946a",
+      "source_hash": "b81a4898fed3139d"
+    },
+    {
+      "path": ".github/skills/flyway-migration/",
+      "current_hash": "fd585cc9c2d5e470",
+      "source_hash": "ebb952121b180fac"
+    },
+    {
+      "path": ".github/skills/kotlin-app-config/",
+      "current_hash": "83193753724d9dd8",
+      "source_hash": "9168a07cc0b620c3"
+    },
+    {
+      "path": ".github/skills/observability-setup/",
+      "current_hash": "5dd42f6e1225fca5",
+      "source_hash": "533cfb6d1dd88af3"
+    },
+    {
+      "path": ".github/skills/security-review/",
+      "current_hash": "407f8ea7d440592c",
+      "source_hash": "c74a83a4e61fbf58"
+    }
+  ]
+}
