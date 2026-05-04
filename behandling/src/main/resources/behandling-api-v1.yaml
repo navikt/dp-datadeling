@@ -154,6 +154,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/HttpProblem'
 
+  /behandling/{behandlingId}/flytt:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Behandlingens id
+    post:
+      summary: Flytt en behandling til en annen behandling
+      security:
+        - azureAd: [ ]
+      tags:
+        - Behandling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlyttBehandling'
+      responses:
+        201:
+          description: Accepted
+        default:
+          description: Feil ved henting av behandling
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
   /behandling/{behandlingId}/vurderinger:
     parameters:
       - name: behandlingId
@@ -796,6 +827,11 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Regelsett'
+            saksbehandlingsregler:
+              type: array
+              description: Regler som ut ifra saksbehandlingskonteksten har vært relevante for den konkrete behandlingen
+              items:
+                $ref: '#/components/schemas/Regelsett'
             opplysninger:
               description: Alle opplysninger som har vært til stede under behandlingen, også historiske
               type: array
@@ -820,7 +856,7 @@ components:
 
     RegelsettType:
       type: string
-      enum: [ "Vilkår", "Fastsettelse" ]
+      enum: [ "Vilkår", "Fastsettelse", "Prosess" ]
 
     RegelsettMeta:
       type: object
@@ -1412,6 +1448,13 @@ components:
           type: string
           format: uuid
 
+    FlyttBehandling:
+      type: object
+      properties:
+        nyBasertPå:
+          default: null
+          $ref: '#/components/schemas/BehandlingId'
+
     Saksbehandlerbegrunnelse:
       type: object
       required:
@@ -1771,7 +1814,7 @@ components:
           type: string
         type:
           type: string
-          enum: [ "Søknad", "Meldekort" ,"Manuell", "Omgjøring" ]
+          enum: [ "Søknad", "Meldekort" ,"Manuell", "Omgjøring", "Arbeidssøkerperiode", "Ferietillegg", "Samordning" ]
         skjedde:
           type: string
           format: date
@@ -1854,9 +1897,11 @@ components:
         - Oppfyller kravet til verneplikt
         - Oppfyller kravet til å ta ethvert arbeid
         - Oppfyller kravet til å være arbeidsfør
+        - Oppfyller meldeplikt
         - Registrert som arbeidssøker på søknadstidspunktet
         - Tap av arbeidstid er minst terskel
         - Utfall etter samordning
+        - Oppfyller kravet for gjenopptak av stønadsperiode
 
   securitySchemes:
     azureAd:
