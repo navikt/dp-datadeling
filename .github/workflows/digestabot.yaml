@@ -14,8 +14,17 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v6 
-      - uses: navikt/digestabot@v1.1 
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: navikt/digestabot@v1.1
+        id: digestabot
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           team: teamdagpenger
+
+      - name: Enable auto-merge for digest updates
+        if: steps.digestabot.outputs.pull_request_number
+        run: gh pr merge --auto --squash "${{ steps.digestabot.outputs.pull_request_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
