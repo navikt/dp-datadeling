@@ -6,10 +6,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.jackson.jackson
+import java.time.Duration
 
 val defaultHttpClient =
     HttpClient {
@@ -26,6 +28,12 @@ val defaultHttpClient =
         install(Logging) {
             level = LogLevel.INFO
         }
+        install(HttpTimeout) {
+            connectTimeoutMillis = Duration.ofSeconds(60).toMillis()
+            requestTimeoutMillis = Duration.ofSeconds(300).toMillis()
+            socketTimeoutMillis = Duration.ofSeconds(300).toMillis()
+        }
+        expectSuccess = false
     }
 
 fun HttpClientConfig<*>.installRetryClient(
