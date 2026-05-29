@@ -116,7 +116,7 @@ spec:
           hour: 3
         pointInTimeRecovery: false
         tier: "{{ db_tier }}"
-        type: POSTGRES_15
+        type: POSTGRES_16
         #cascadingDelete: true # DETTE ER EN DESTRUKTIV OPERASJON! cascadingDelete=true sletter db-instans hvis appen slettes
         # OBS! Man kan ikke opprette, slette og opprette instance igjen med en gang:
         # man kan ikke gjenbruke samme instansnavn på 7 dager. Dette er en "feature" i gcp.
