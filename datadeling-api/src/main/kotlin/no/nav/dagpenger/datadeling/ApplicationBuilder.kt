@@ -15,11 +15,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.dagpenger.behandling.BehandlingResultatMottak
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
-import no.nav.dagpenger.behandling.BehandlingResultatVarsler
 import no.nav.dagpenger.behandling.BeregningerService
 import no.nav.dagpenger.behandling.DagpengestatusRepository
 import no.nav.dagpenger.behandling.DagpengestatusService
+import no.nav.dagpenger.behandling.OboDagpengerStatusKonsument
 import no.nav.dagpenger.behandling.PerioderService
+import no.nav.dagpenger.behandling.SammensattKonsument
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
 import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
@@ -100,11 +101,13 @@ internal class ApplicationBuilder(
                 BehandlingResultatMottak(
                     rapidsConnection = this,
                     behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
-                    behandlingResultatVarsler =
-                        BehandlingResultatVarsler(
-                            consumerProducerFactory.createProducer(),
-                            Config.obotopic,
-                            objectMapper,
+                    konsument =
+                        SammensattKonsument(
+                            OboDagpengerStatusKonsument(
+                                consumerProducerFactory.createProducer(),
+                                Config.obotopic,
+                                objectMapper,
+                            ),
                         ),
                 )
             }

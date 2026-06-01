@@ -1,6 +1,5 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
@@ -12,8 +11,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 import java.time.LocalDate
 import java.util.UUID
 
@@ -22,7 +19,7 @@ private val logg = KotlinLogging.logger {}
 class BehandlingResultatMottak(
     rapidsConnection: RapidsConnection,
     private val behandlingResultatRepository: BehandlingResultatRepository,
-    private val behandlingResultatVarsler: BehandlingResultatVarsler,
+    private val konsument: DagpengerStatusKonsument,
 ) : River.PacketListener {
     init {
         River(rapidsConnection)
@@ -83,65 +80,51 @@ class BehandlingResultatMottak(
                 opprettetTidspunkt = opprettetTidspunkt,
             )
 
-            when (packet["førteTil"].asText()) {
-                "Innvilgelse" -> behandlingResultatVarsler.varsleFørstegangsinnvilgelse(ident)
-                else -> behandlingResultatVarsler.varsleEndring(ident)
-            }
+            konsument.varsle(
+                DagpengerHendelse.fraFørteTil(
+                    ident = ident,
+                    førteTil = packet["førteTil"].asText(),
+                ),
+            )
         }
     }
 }
 
-class BehandlingResultatVarsler(
-    private val producer: KafkaProducer<String, String>,
-    private val topic: String,
-    private val objectMapper: ObjectMapper,
+data class DagpengerHendelse(
+    val ident: String,
+    val meldingstype: Meldingstype,
 ) {
-    fun varsleFørstegangsinnvilgelse(ident: String) {
-        lagOgSendObomelding(ident, Obomelding.Meldingstype.OPPRETT)
+    enum class Meldingstype {
+        OPPRETT,
+        OPPDATER,
     }
 
-    fun varsleEndring(ident: String) {
-        lagOgSendObomelding(ident, Obomelding.Meldingstype.OPPDATER)
-    }
-
-    private fun lagOgSendObomelding(
-        ident: String,
-        meldingstype: Obomelding.Meldingstype,
-    ) {
-        val obomelding = lagObomelding(ident, meldingstype)
-        sendMelding(ident, obomelding)
-    }
-
-    private fun sendMelding(
-        ident: String,
-        melding: String,
-    ) {
-        val record = ProducerRecord(topic, ident, melding)
-        producer.send(record)
-    }
-
-    private fun lagObomelding(
-        ident: String,
-        meldingstype: Obomelding.Meldingstype,
-    ): String {
-        val obomelding =
-            Obomelding(
-                personId = ident,
-                meldingstype = meldingstype,
+    companion object {
+        fun fraFørteTil(
+            ident: String,
+            førteTil: String,
+        ): DagpengerHendelse =
+            DagpengerHendelse(
+                ident = ident,
+                meldingstype =
+                    when (førteTil) {
+                        "Innvilgelse" -> Meldingstype.OPPRETT
+                        else -> Meldingstype.OPPDATER
+                    },
             )
-        return objectMapper.writeValueAsString(obomelding)
     }
+}
 
-    private data class Obomelding(
-        val personId: String,
-        val meldingstype: Meldingstype,
-    ) {
-        val ytelsestype = "DAGPENGER"
-        val kildesystem = "DPSAK"
+fun interface DagpengerStatusKonsument {
+    fun varsle(varsel: DagpengerHendelse)
+}
 
-        enum class Meldingstype {
-            OPPRETT,
-            OPPDATER,
-        }
+class SammensattKonsument(
+    vararg konsument: DagpengerStatusKonsument,
+) : DagpengerStatusKonsument {
+    private val konsumenter = konsument.toSet()
+
+    override fun varsle(varsel: DagpengerHendelse) {
+        konsumenter.forEach { it.varsle(varsel) }
     }
 }

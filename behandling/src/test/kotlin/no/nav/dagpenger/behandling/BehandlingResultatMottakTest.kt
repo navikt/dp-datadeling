@@ -24,7 +24,14 @@ class BehandlingResultatMottakTest {
         BehandlingResultatMottak(
             rapidsConnection = testRapid,
             behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
-            behandlingResultatVarsler = BehandlingResultatVarsler(producerMock, "obo-topic", objectMapper),
+            konsument =
+                SammensattKonsument(
+                    OboDagpengerStatusKonsument(
+                        producer = producerMock,
+                        topic = "obo-topic",
+                        objectMapper = objectMapper,
+                    ),
+                ),
         )
     }
 
@@ -127,5 +134,23 @@ class BehandlingResultatMottakTest {
             jsonmelding["ytelsestype"].asText() shouldBe "DAGPENGER"
             jsonmelding["kildesystem"].asText() shouldBe "DPSAK"
         }
+    }
+
+    @Test
+    fun `vi mapper førteTil til riktig meldingstype`() {
+        DagpengerHendelse.fraFørteTil("123", "Innvilgelse").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPRETT
+        DagpengerHendelse.fraFørteTil("123", "Revurdering").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPDATER
+    }
+
+    @Test
+    fun `vi kan varsle flere konsumenter via abstraksjonen`() {
+        val konsument1 = mockk<DagpengerStatusKonsument>(relaxed = true)
+        val konsument2 = mockk<DagpengerStatusKonsument>(relaxed = true)
+        val varsler = SammensattKonsument(konsument1, konsument2)
+        val varsel = DagpengerHendelse(ident = "123", meldingstype = DagpengerHendelse.Meldingstype.OPPRETT)
+
+        varsler.varsle(varsel)
+        verify(exactly = 1) { konsument1.varsle(varsel) }
+        verify(exactly = 1) { konsument2.varsle(varsel) }
     }
 }
