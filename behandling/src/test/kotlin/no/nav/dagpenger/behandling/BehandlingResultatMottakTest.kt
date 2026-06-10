@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.endring_v1
+import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.ferietillegg
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.innvilgelse_v1
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -140,6 +141,16 @@ class BehandlingResultatMottakTest {
     fun `vi mapper førteTil til riktig meldingstype`() {
         DagpengerHendelse.fraFørteTil("123", "Innvilgelse").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPRETT
         DagpengerHendelse.fraFørteTil("123", "Revurdering").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPDATER
+    }
+
+    @Test
+    fun `vi hopper over ferietillegg`() {
+        testRapid.sendTestMessage(ferietillegg)
+
+        verify(exactly = 0) {
+            behandlingResultatRepositoryPostgresql.lagre(any(), any(), any(), any(), any(), any())
+            producerMock.send(any())
+        }
     }
 
     @Test

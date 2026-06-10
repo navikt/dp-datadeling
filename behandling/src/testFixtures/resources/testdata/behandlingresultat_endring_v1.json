@@ -1,6 +1,7 @@
 {
   "@event_name" : "behandlingsresultat",
   "behandlingId" : "019b4a51-6ef8-7714-8f5f-924a23137d03",
+  "regelverk" : "Dagpenger",
   "behandletHendelse" : {
     "datatype" : "UUID",
     "id" : "0b4981e6-ae62-497f-8c11-7d9bd6769d5b",

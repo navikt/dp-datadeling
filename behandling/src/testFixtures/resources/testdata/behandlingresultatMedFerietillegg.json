@@ -1,0 +1,257 @@
+{
+  "@id": "0e42e04a-9334-46f1-9806-4d0b8bf9ecc4",
+  "ident": "24878097749",
+  "førteTil": "Innvilgelse",
+  "opprettet": "2026-05-18T10:33:04.809721",
+  "regelverk": "Ferietillegg",
+  "@opprettet": "2026-05-18T14:52:10.869353209",
+  "automatisk": false,
+  "sistEndret": "2026-05-18T14:52:10.86398112",
+  "@event_name": "behandlingsresultat",
+  "behandletAv": [
+    {
+      "rolle": "saksbehandler",
+      "behandler": {
+        "ident": "Z993034"
+      }
+    }
+  ],
+  "behandlingId": "019e3a37-a124-7bc6-9ba2-2e929ee6c72e",
+  "opplysninger": [
+    {
+      "navn": "hendelseType",
+      "datatype": "tekst",
+      "perioder": [
+        {
+          "id": "019e3a37-a124-7bc6-9ba2-2e929ee6c72c",
+          "type": "Faktum",
+          "kilde": {
+            "type": "System",
+            "meldingId": "825f0a57-c3b6-4912-94be-a8c6c8dc6919",
+            "registrert": "2026-05-18T10:33:04.804277"
+          },
+          "verdi": {
+            "verdi": "BeregnFerietilleggHendelse",
+            "datatype": "tekst"
+          },
+          "opprettet": "2026-05-18T10:33:04.804348",
+          "opprinnelse": "Ny",
+          "gyldigFraOgMed": "2026-05-18",
+          "gyldigTilOgMed": "2026-05-18"
+        }
+      ],
+      "opplysningTypeId": "01958ef2-e237-77c4-89e1-de91256e2e4a"
+    },
+    {
+      "navn": "Året som det skal beregnes ferietillegg for",
+      "datatype": "heltall",
+      "perioder": [
+        {
+          "id": "019e3a37-a124-7bc6-9ba2-2e929ee6c72d",
+          "type": "Faktum",
+          "kilde": {
+            "type": "System",
+            "meldingId": "825f0a57-c3b6-4912-94be-a8c6c8dc6919",
+            "registrert": "2026-05-18T10:33:04.804277"
+          },
+          "verdi": {
+            "verdi": 2025,
+            "datatype": "heltall"
+          },
+          "opprettet": "2026-05-18T10:33:04.804373",
+          "opprinnelse": "Ny",
+          "gyldigFraOgMed": "2025-01-01"
+        }
+      ],
+      "opplysningTypeId": "019d7695-7c15-74b7-a3af-7c82e47c2a20"
+    },
+    {
+      "navn": "Antall dager som må være forbrukt for at man skal ha krav på ferietillegg",
+      "datatype": "heltall",
+      "perioder": [
+        {
+          "id": "019e3a37-a126-7666-82f1-0c1f6ccc76f6",
+          "type": "Faktum",
+          "verdi": {
+            "verdi": 41,
+            "datatype": "heltall"
+          },
+          "opprettet": "2026-05-18T10:33:04.806015",
+          "opprinnelse": "Ny"
+        }
+      ],
+      "opplysningTypeId": "019d7232-0fe1-79fa-8a87-b6937fe67079"
+    },
+    {
+      "navn": "Prosent for ferietillegg",
+      "datatype": "desimaltall",
+      "perioder": [
+        {
+          "id": "019e3a37-a4b5-7c28-8d33-9bb4ecd1992a",
+          "type": "Faktum",
+          "verdi": {
+            "verdi": 9.5,
+            "datatype": "desimaltall"
+          },
+          "opprettet": "2026-05-18T10:33:05.717607",
+          "opprinnelse": "Ny"
+        }
+      ],
+      "opplysningTypeId": "019d7231-aecf-7b19-a027-5c25fb5f45be"
+    },
+    {
+      "navn": "Sum utbetalt for et år",
+      "datatype": "penger",
+      "perioder": [
+        {
+          "id": "019e3a75-a81c-771a-8a03-96b64937f44b",
+          "type": "Faktum",
+          "kilde": {
+            "type": "System",
+            "meldingId": "b9340168-a57f-496c-9ce5-c5726a692faa",
+            "registrert": "2026-05-18T11:40:49.736795"
+          },
+          "verdi": {
+            "verdi": 42364,
+            "datatype": "penger"
+          },
+          "opprettet": "2026-05-18T11:40:49.820823",
+          "utledetAv": {
+            "regel": {
+              "navn": "innhentMed"
+            },
+            "versjon": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-behandling:2026.05.15-14.34-76db146",
+            "opplysninger": [
+              "019e3a37-a124-7bc6-9ba2-2e929ee6c72d"
+            ]
+          },
+          "opprinnelse": "Ny",
+          "gyldigFraOgMed": "2025-01-01"
+        }
+      ],
+      "opplysningTypeId": "019d7231-85a1-7ef5-a58e-1909ecdb4127"
+    },
+    {
+      "navn": "Beløp på ferietillegg",
+      "datatype": "penger",
+      "perioder": [
+        {
+          "id": "019e3a75-a81d-7893-9360-2623b5148be5",
+          "type": "Faktum",
+          "verdi": {
+            "verdi": 4024.58,
+            "datatype": "penger"
+          },
+          "opprettet": "2026-05-18T11:40:49.821221",
+          "utledetAv": {
+            "regel": {
+              "navn": "Multiplikasjon"
+            },
+            "versjon": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-behandling:2026.05.15-14.34-76db146",
+            "opplysninger": [
+              "019e3a37-a4b5-7c28-8d33-9bb4ecd1992a",
+              "019e3a75-a81c-771a-8a03-96b64937f44b"
+            ]
+          },
+          "opprinnelse": "Ny",
+          "gyldigFraOgMed": "2025-01-01"
+        }
+      ],
+      "opplysningTypeId": "019d7231-50cb-7940-873b-969d1b9dab7e"
+    },
+    {
+      "navn": "Antall dager forbrukte i opptjeningsåret",
+      "datatype": "heltall",
+      "perioder": [
+        {
+          "id": "019e3b1a-437b-7e88-a0df-d384bd1678a3",
+          "type": "Faktum",
+          "kilde": {
+            "type": "System",
+            "meldingId": "dc75a171-aa94-41b4-a2ec-8a56dd02c310",
+            "registrert": "2026-05-18T14:40:37.383238"
+          },
+          "verdi": {
+            "verdi": 49,
+            "datatype": "heltall"
+          },
+          "opprettet": "2026-05-18T14:40:37.499022",
+          "utledetAv": {
+            "regel": {
+              "navn": "innhentMed"
+            },
+            "versjon": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-behandling:2026.05.18-12.22-60744aa",
+            "opplysninger": [
+              "019e3a37-a124-7bc6-9ba2-2e929ee6c72d"
+            ]
+          },
+          "opprinnelse": "Ny",
+          "gyldigFraOgMed": "2025-01-01"
+        }
+      ],
+      "opplysningTypeId": "019d7231-ddc0-7059-a631-7d4d06b974de"
+    },
+    {
+      "navn": "Har krav på ferietillegg",
+      "datatype": "boolsk",
+      "perioder": [
+        {
+          "id": "019e3b1a-437b-7e88-a0df-d384bd1678a4",
+          "type": "Faktum",
+          "verdi": {
+            "verdi": true,
+            "datatype": "boolsk"
+          },
+          "opprettet": "2026-05-18T14:40:37.499351",
+          "utledetAv": {
+            "regel": {
+              "navn": "StørreEnnEllerLik"
+            },
+            "versjon": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-behandling:2026.05.18-12.22-60744aa",
+            "opplysninger": [
+              "019e3a37-a126-7666-82f1-0c1f6ccc76f6",
+              "019e3b1a-437b-7e88-a0df-d384bd1678a3"
+            ]
+          },
+          "opprinnelse": "Ny",
+          "gyldigFraOgMed": "2025-01-01"
+        }
+      ],
+      "opplysningTypeId": "019d7231-21b8-7d1f-9e3a-314195d9f347"
+    }
+  ],
+  "utbetalinger": [
+    {
+      "dato": "2026-05-01",
+      "sats": 4024,
+      "utbetaling": 4024,
+      "opprinnelse": "Ny",
+      "dagpengeType": "Ferietillegg",
+      "meldeperiode": "Ferietillegg-2025"
+    }
+  ],
+  "behandletHendelse": {
+    "id": "019e3a37-6da3-798a-bb6d-91a3bed81270",
+    "type": "Ferietillegg",
+    "skjedde": "2026-05-18",
+    "datatype": "UUID"
+  },
+  "system_read_count": 0,
+  "behandlingskjedeId": "019e3a37-a124-7bc6-9ba2-2e929ee6c72e",
+  "rettighetsperioder": [
+    {
+      "harRett": true,
+      "fraOgMed": "2025-01-01",
+      "opprinnelse": "Ny"
+    }
+  ],
+  "system_participating_services": [
+    {
+      "id": "0e42e04a-9334-46f1-9806-4d0b8bf9ecc4",
+      "time": "2026-05-18T14:52:10.869353209",
+      "image": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-behandling:2026.05.18-12.22-60744aa",
+      "service": "dp-behandling",
+      "instance": "dp-behandling-79967dbcbd-r4b4q"
+    }
+  ]
+}

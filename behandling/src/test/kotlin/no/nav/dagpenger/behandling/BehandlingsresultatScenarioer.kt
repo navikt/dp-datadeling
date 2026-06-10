@@ -40,4 +40,13 @@ object BehandlingsresultatScenarioer {
             .reader()
             .readText()
     }
+
+    val ferietillegg by lazy {
+        requireNotNull(
+            this.javaClass
+                .getResourceAsStream("/testdata/behandlingresultatMedFerietillegg.json"),
+        ) { "Kunne ikke finne testdata/behandlingresultatMedFerietillegg.json" }
+            .reader()
+            .readText()
+    }
 }

@@ -24,7 +24,10 @@ class BehandlingResultatMottak(
     init {
         River(rapidsConnection)
             .apply {
-                precondition { it.requireValue("@event_name", "behandlingsresultat") }
+                precondition {
+                    it.requireValue("@event_name", "behandlingsresultat")
+                    it.forbidValue("regelverk", "Ferietillegg")
+                }
                 validate {
                     it.requireKey(
                         "behandlingId",
