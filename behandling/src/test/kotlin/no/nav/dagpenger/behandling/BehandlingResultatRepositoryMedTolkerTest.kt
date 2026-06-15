@@ -39,6 +39,7 @@ class BehandlingResultatRepositoryMedTolkerTest {
                     "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
                     "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
                     "automatisk": true,
+                    "regelverk" : "Dagpenger",
                     "ident": "12345678901",
                     "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": false}],
                     "opprettet": "2026-03-15T10:00:00",

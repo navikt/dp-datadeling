@@ -7,6 +7,7 @@
     "type" : "Meldekort",
     "skjedde" : "2025-12-23"
   },
+  "regelverk" : "Dagpenger",
   "behandlingskjedeId" : "019b4a51-6ef8-7714-8f5f-924a23137d03",
   "basertPå" : "019b4a51-6ef8-7714-8f5f-924a23137d03",
   "automatisk" : false,
@@ -5545,56 +5546,67 @@
   } ],
   "utbetalinger" : [ {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-21",
     "sats" : 1259,
     "utbetaling" : 719
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-22",
     "sats" : 1259,
     "utbetaling" : 719
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-23",
     "sats" : 1259,
     "utbetaling" : 0
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-24",
     "sats" : 1259,
     "utbetaling" : 0
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-25",
     "sats" : 1259,
     "utbetaling" : 719
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-26",
     "sats" : 1259,
     "utbetaling" : 719
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-27",
     "sats" : 1259,
     "utbetaling" : 719
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-28",
     "sats" : 1259,
     "utbetaling" : 719
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-29",
     "sats" : 1259,
     "utbetaling" : 722
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-06-30",
     "sats" : 1259,
     "utbetaling" : 0
   }, {
     "meldeperiode" : "132264559",
+    "dagpengeType" : "OrdinæreDagpenger",
     "dato" : "2018-07-01",
     "sats" : 1259,
     "utbetaling" : 0

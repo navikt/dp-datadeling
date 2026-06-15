@@ -7,6 +7,7 @@
     "type" : "Manuell",
     "skjedde" : "2018-07-22"
   },
+  "regelverk" : "Dagpenger",
   "behandlingskjedeId" : "019b4a54-08c2-7e39-9a03-01ac6c1a0b68",
   "basertPå" : "019b4a54-08c2-7e39-9a03-01ac6c1a0b68",
   "automatisk" : false,

@@ -23,6 +23,8 @@ tags:
     description: Drodling rundt hvordan vi tror vedtak, eller resultat på behandlinger, skal se ut.
   - name: Dataprodukt
     description: Operasjoner for produksjon av data til dataprodukter.
+  - name: Oppdatering
+    description: Operasjoner for løpende oppdateringer via SSE.
 
 paths:
   /opplysningstyper:
@@ -310,6 +312,15 @@ paths:
         201:
           description: OK
           content: { }
+        409:
+          description: Behandlingen er ikke i korrekt tilstand for godkjenning
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+              examples:
+                ugyldigTilstand:
+                  $ref: '#/components/examples/UgyldigBehandlingstilstandProblem'
         default:
           description: Feil ved godkjenn av behandling
           content:
@@ -443,6 +454,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/Kvittering'
           description: OK
+        409:
+          description: Behandlingen er ikke i riktig tilstand for fjerning av opplysning
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+              examples:
+                redigeringPagar:
+                  $ref: '#/components/examples/RedigeringPågårProblem'
+                ikkeRedigerbar:
+                  $ref: '#/components/examples/BehandlingIkkeRedigerbaresProblem'
+                pafolgende:
+                  $ref: '#/components/examples/PåfølgendePeriodeMåFjernesFørstProblem'
+        422:
+          description: Opplysningen kan ikke redigeres
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+              examples:
+                ikkeRedigerbarOpplysning:
+                  $ref: '#/components/examples/OpplysningIkkeRedigerbaresProblem'
         default:
           description: Feil ved fjerning av opplysning
           content:
@@ -479,6 +512,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/Kvittering'
           description: OK
+        409:
+          description: Behandlingen er ikke i riktig tilstand for redigering
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+              examples:
+                redigeringPagar:
+                  $ref: '#/components/examples/RedigeringPågårProblem'
+                ikkeRedigerbar:
+                  $ref: '#/components/examples/BehandlingIkkeRedigerbaresProblem'
+        422:
+          description: Opplysningen kan ikke legges til
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+              examples:
+                ikkeRedigerbarOpplysning:
+                  $ref: '#/components/examples/OpplysningIkkeRedigerbaresProblem'
+                ugyldigPeriode:
+                  $ref: '#/components/examples/UgyldigPeriodeProblem'
+                kanIkkeEndrePrøvingsdato:
+                  $ref: '#/components/examples/KanIkkeEndrePrøvingsdatoProblem'
+                prøvingsdatoFørSøknadsdato:
+                  $ref: '#/components/examples/PrøvingsdatoFørSøknadsdatoProblem'
         default:
           description: Feil ved redigering av opplysninger
           content:
@@ -558,6 +617,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/HttpProblem'
+        409:
+          description: Behandlingen har en pågående redigering
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+              examples:
+                redigeringPagar:
+                  $ref: '#/components/examples/RedigeringPågårProblem'
 
   /behandling/{behandlingId}/behandlingsresultat:
     parameters:
@@ -582,6 +650,156 @@ paths:
                 $ref: '#/components/schemas/Behandlingsresultat'
         default:
           description: Feil ved uthenting av vedtak
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /oppdateringer/person:
+    parameters:
+      - name: since
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+        description: Start cursor for replay av oppdateringer. Hvis ikke satt brukes Last-Event-ID eller siste oppdatering i scope.
+    post:
+      description: |
+        Strøm av oppdateringer for en person (SSE).
+
+        Domenespesifikke `event`-typer:
+        - `behandling_opprettet`
+        - `behandling_endret_tilstand`
+        - `forslag_til_behandlingsresultat`
+        - `behandlingsresultat`
+        - `behandling_avbrutt`
+        - `avklaring_lukket`
+
+        Tekniske kontroll-events:
+        - `ping` (heartbeat)
+        - `close` (stream må reconnectes, f.eks. reauth)
+      security:
+        - azureAd: [ ]
+      tags:
+        - Oppdatering
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentForesporsel'
+      responses:
+        200:
+          description: OK (text/event-stream)
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                example: |
+                  id: 42
+                  event: behandling_endret_tilstand
+                  data: {"ident":"12345678901","behandlingId":"0195d0dd-ff3a-7127-95b0-77dcc7982a41","forrigeTilstand":"UnderBehandling","gjeldendeTilstand":"TilGodkjenning"}
+        429:
+          description: For mange samtidige oppdateringsstrømmer
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+        default:
+          description: Feil ved oppretting av oppdateringsstrøm
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /oppdateringer/behandling/{behandlingId}:
+    parameters:
+      - name: behandlingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: since
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+        description: Start cursor for replay av oppdateringer. Hvis ikke satt brukes Last-Event-ID eller siste oppdatering i scope.
+    get:
+      description: |
+        Strøm av oppdateringer for en behandling (SSE).
+
+        Domenespesifikke `event`-typer:
+        - `behandling_opprettet`
+        - `behandling_endret_tilstand`
+        - `forslag_til_behandlingsresultat`
+        - `behandlingsresultat`
+        - `behandling_avbrutt`
+        - `avklaring_lukket`
+
+        Tekniske kontroll-events:
+        - `ping` (heartbeat)
+        - `close` (stream må reconnectes, f.eks. reauth)
+      security:
+        - azureAd: [ ]
+      tags:
+        - Oppdatering
+      responses:
+        200:
+          description: OK (text/event-stream)
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                example: |
+                  id: 43
+                  event: avklaring_lukket
+                  data: {"ident":"12345678901","behandlingId":"0195d0dd-ff3a-7127-95b0-77dcc7982a41","avklaringId":"0195d0de-0d95-7cf3-9e4a-d6dcf924f3d1","kode":"MeldekortUavklart"}
+        429:
+          description: For mange samtidige oppdateringsstrømmer
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+        default:
+          description: Feil ved oppretting av oppdateringsstrøm
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+
+  /ferietillegg/generer/{opptjeningsår}:
+    parameters:
+      - name: opptjeningsår
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dryRun
+        in: query
+        schema:
+          type: boolean
+          default: false
+        description: Om vi skal faktisk sende ut meldinger om ferietillegg, eller bare simulere det for å se hva som ville blitt sendt ut
+    post:
+      description: Genererer ferietillegg for alle behandlinger som har utbetaling i det gitte året
+      security:
+        - azureAd: [ ]
+      tags:
+        - Ferietillegg
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FerietilleggKvittering'
+        default:
+          description: Feil ved generering av ferietillegg
           content:
             application/problem+json:
               schema:
@@ -629,8 +847,6 @@ paths:
 
 components:
   schemas:
-
-
     Rekjoring:
       type: object
       required:
@@ -638,10 +854,10 @@ components:
       properties:
         ident:
           $ref: '#/components/schemas/Personident'
-        opplysninger:
+        oppfrisk:
           type: array
           items:
-            $ref: '#/components/schemas/OpplysningsId'
+            $ref: '#/components/schemas/OpplysningTypeId'
 
     IdentForesporsel:
       type: object
@@ -651,6 +867,33 @@ components:
         ident:
           $ref: '#/components/schemas/Personident'
 
+    Oppdatering:
+      type: object
+      required:
+        - id
+        - type
+        - payload
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/OppdateringEventType'
+        payload:
+          type: object
+          description: Hendelsesspesifikk payload (SSE data-felt)
+
+    OppdateringEventType:
+      type: string
+      description: Domenespesifikke SSE event-typer som sendes i oppdateringsstrømmen
+      enum:
+        - behandling_opprettet
+        - behandling_endret_tilstand
+        - forslag_til_behandlingsresultat
+        - behandlingsresultat
+        - behandling_avbrutt
+        - avklaring_lukket
+
     NyBehandling:
       type: object
       required:
@@ -658,6 +901,8 @@ components:
       properties:
         behandlingstype:
           $ref: '#/components/schemas/Behandlingstype'
+        regelverk:
+          $ref: '#/components/schemas/RegelverkType'
         ident:
           $ref: '#/components/schemas/Personident'
         begrunnelse:
@@ -676,6 +921,14 @@ components:
       enum:
         - Revurdering
         - Manuell
+
+    RegelverkType:
+      type: string
+      description: Hvilket regelverk behandlingen skal kjøre under. Dagpenger er default.
+      enum:
+        - Dagpenger
+        - Ferietillegg
+        - Utestengning
 
     NyOpplysning:
       type: object
@@ -735,6 +988,7 @@ components:
       required:
         - behandlingId
         - behandletHendelse
+        - regelverk
         - behandlingskjedeId
         - automatisk
         - ident
@@ -747,6 +1001,9 @@ components:
         behandletHendelse:
           description: Hvilken hendelse som utløste behandlingen
           $ref: '#/components/schemas/Hendelse'
+        regelverk:
+          description: Hvilket regelverk behandlingen kjører under. Dagpenger er default.
+          type: string
         behandlingskjedeId:
           $ref: '#/components/schemas/BehandlingId'
           description: Hvilken behandlingskjede denne behandlingen tilhører. Dette tilsvarer en sammenhengende rettighetsperiode eller sak om du vil.
@@ -904,6 +1161,7 @@ components:
             - synlig
             - redigerbar
             - redigertAvSaksbehandler
+            - kanOppfriskes
             - formål
           properties:
             synlig:
@@ -912,6 +1170,9 @@ components:
               type: boolean
             redigertAvSaksbehandler:
               type: boolean
+            kanOppfriskes:
+              type: boolean
+              description: Indikerer om opplysningen kan oppfriskes (enten hentes inn eller utledes på nytt)
             formål:
               $ref: '#/components/schemas/Formål'
 
@@ -1096,6 +1357,9 @@ components:
         opprettet:
           type: string
           format: date-time
+        type:
+          type: string
+          enum: [ "Faktum", "Hypotese" ]
         opprinnelse:
           $ref: '#/components/schemas/Opprinnelse'
         gyldigFraOgMed:
@@ -1355,7 +1619,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ "Saksbehandler", "System" ]
+          enum: [ "Saksbehandler", "System", "Behovsløser" ]
         registrert:
           type: string
           format: date-time
@@ -1487,6 +1751,7 @@ components:
           type: string
           format: uri
           description: A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced
+      additionalProperties: true
 
     Vedtak:
       type: object
@@ -1764,6 +2029,7 @@ components:
         - dato
         - sats
         - utbetaling
+        - dagpengeType
       properties:
         meldeperiode:
           type: string
@@ -1776,6 +2042,9 @@ components:
           type: integer
         opprinnelse:
           $ref: '#/components/schemas/Opprinnelse'
+        dagpengeType:
+          type: string
+          enum: [ "OrdinæreDagpenger", "Ferietillegg" ]
 
     BehandletAv:
       type: object
@@ -1819,6 +2088,19 @@ components:
           type: string
           format: date
           description: Når hendelsen skjedde på utsiden av vårt system
+
+    FerietilleggKvittering:
+      type: object
+      required:
+        - antallBestilt
+        - opptjeningsår
+      properties:
+        antallBestilt:
+          type: integer
+        opptjeningsår:
+          type: integer
+        tidBrukt:
+          type: string
 
     DatalastKvittering:
       type: object
@@ -1902,6 +2184,72 @@ components:
         - Tap av arbeidstid er minst terskel
         - Utfall etter samordning
         - Oppfyller kravet for gjenopptak av stønadsperiode
+
+  examples:
+    UgyldigBehandlingstilstandProblem:
+      summary: Behandlingen er ikke i korrekt tilstand for operasjonen
+      value:
+        type: urn:error:behandling:ugyldig_tilstand
+        title: Behandlingen er ikke i korrekt tilstand for denne operasjonen
+        status: 409
+        nåværendeTilstand: ForslagTilVedtak
+        operasjon: godkjenn
+
+    RedigeringPågårProblem:
+      summary: Behandlingen har en pågående redigering
+      value:
+        type: urn:error:behandling:redigering_pagar
+        title: Behandlingen har en pågående redigering
+        status: 409
+        nåværendeTilstand: Redigert
+
+    BehandlingIkkeRedigerbaresProblem:
+      summary: Behandlingen er ikke i redigerbar tilstand
+      value:
+        type: urn:error:behandling:ikke_redigerbar
+        title: Behandlingen er ikke i redigerbar tilstand
+        status: 409
+        nåværendeTilstand: UnderOpprettelse
+
+    OpplysningIkkeRedigerbaresProblem:
+      summary: Opplysningstypen kan ikke redigeres
+      value:
+        type: urn:error:behandling:opplysning_ikke_redigerbar
+        title: Opplysningstypen kan ikke redigeres
+        status: 422
+        opplysningstype: Prøvingsdato
+
+    UgyldigPeriodeProblem:
+      summary: Til og med dato er før fra og med dato
+      value:
+        type: urn:error:behandling:ugyldig_periode
+        title: Til og med dato kan ikke være før fra og med dato
+        status: 422
+        gyldigFraOgMed: "2024-01-01"
+        gyldigTilOgMed: "2023-01-01"
+
+    PåfølgendePeriodeMåFjernesFørstProblem:
+      summary: Påfølgende perioder må fjernes først
+      value:
+        type: urn:error:behandling:pafolgende_periode_ma_fjernes_forst
+        title: De påfølgende periodene må fjernes først
+        status: 409
+
+    KanIkkeEndrePrøvingsdatoProblem:
+      summary: Kan ikke endre prøvingsdato på behandling basert på tidligere behandling
+      value:
+        type: urn:error:behandling:kan_ikke_endre_provingsdato
+        title: Kan ikke endre prøvingsdato på en behandling som er basert på en tidligere behandling
+        status: 422
+
+    PrøvingsdatoFørSøknadsdatoProblem:
+      summary: Prøvingsdato kan ikke settes før søknadsdato
+      value:
+        type: urn:error:behandling:provingsdato_for_soknadsdato
+        title: Prøvingsdato kan ikke settes før søknadsdato
+        status: 422
+        prøvingsdato: "2024-01-01"
+        søknadsdato: "2024-02-01"
 
   securitySchemes:
     azureAd:
