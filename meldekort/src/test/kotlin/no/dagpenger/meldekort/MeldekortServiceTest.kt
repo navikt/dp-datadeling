@@ -203,23 +203,11 @@ class MeldekortServiceTest {
     }
 
     @Test
-    fun `NoContent fra arena-meldeplikt-adapter gir tom liste`() {
-        val fom = LocalDate.now().minusDays(28)
-        val request = enDatadelingRequest(fom)
-
-        mockResponse(emptyList())
-
-        val response = runBlocking { meldekortService.hentMeldekort(request) }
-
-        assertEquals(0, response.size)
-    }
-
-    @Test
     fun `feil fra arena-meldeplikt-adapter gir exception`() {
         val fom = LocalDate.now().minusDays(42)
         val request = enDatadelingRequest(fom)
 
-        mockResponse(emptyList())
+        mockResponse()
 
         val exception =
             assertThrows<RuntimeException> {
@@ -334,7 +322,7 @@ class MeldekortServiceTest {
     }
 
     private fun mockResponse(
-        meldekortregisterResponse: List<MeldekortDTO>,
+        meldekortregisterResponse: List<MeldekortDTO> = emptyList(),
         meldepliktAdapterInnsendteResponse: List<Rapporteringsperiode> = emptyList(),
         meldepliktAdapterTilUtfyllingResponse: List<Rapporteringsperiode> = emptyList(),
         delayMs: Int = 0,
@@ -355,8 +343,18 @@ class MeldekortServiceTest {
         )
         proxyMockServer.stubFor(
             WireMock
-                .get(WireMock.urlEqualTo("/sendterapporteringsperioder?antallMeldeperioder=1"))
-                .willReturn(
+                .post(WireMock.urlEqualTo("/innsendte-rapporteringsperioder"))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                        {
+                            "fraOgMedDato": "${LocalDate.now().minusDays(14)}",
+                            "tilOgMedDato": null,
+                            "personIdent": "$ident"
+                        }
+                        """.trimIndent(),
+                    ),
+                ).willReturn(
                     WireMock
                         .jsonResponse(
                             jacksonObjectMapper()
@@ -364,17 +362,6 @@ class MeldekortServiceTest {
                                     registerModule(JavaTimeModule())
                                 }.writeValueAsString(meldepliktAdapterInnsendteResponse),
                             200,
-                        ).withFixedDelay(delayMs),
-                ),
-        )
-        proxyMockServer.stubFor(
-            WireMock
-                .get(WireMock.urlEqualTo("/sendterapporteringsperioder?antallMeldeperioder=2"))
-                .willReturn(
-                    WireMock
-                        .jsonResponse(
-                            "",
-                            204,
                         ).withFixedDelay(delayMs),
                 ),
         )
