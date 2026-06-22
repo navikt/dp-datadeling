@@ -114,8 +114,8 @@ class BehandlingResultatRepositoryPostgresql : BehandlingResultatRepository {
                     //language=PostgreSQL
                     """
                     SELECT *
-                    FROM behandlingresultat
-                    WHERE ident = :ident
+                    FROM behandlingresultat 
+                    WHERE ident = :ident AND nødbrems IS NOT TRUE
                     """.trimIndent(),
                     mapOf(
                         "ident" to ident,

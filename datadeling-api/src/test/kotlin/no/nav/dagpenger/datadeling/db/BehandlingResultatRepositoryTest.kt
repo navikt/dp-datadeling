@@ -1,10 +1,13 @@
 package no.nav.dagpenger.datadeling.db
 
 import io.kotest.matchers.shouldBe
+import kotliquery.queryOf
+import kotliquery.sessionOf
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.innvilgelse_v1
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.meldekortBeregning_v1
 import no.nav.dagpenger.datadeling.Postgres.withMigratedDb
+import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
@@ -126,6 +129,43 @@ class BehandlingResultatRepositoryTest {
                 behandling.ident shouldBe ident
                 behandling.behandlingId shouldBe behandlingId2
             }
+        }
+    }
+
+    @Test
+    fun `Nødbremsede behandlinger i dp-sak skal ikke hentes`() {
+        withMigratedDb {
+            val behandlingId = UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d03")
+            val ident = "17373649758"
+            val sakId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000")
+            val opprettetTidspunkt = LocalDateTime.of(2025, 10, 1, 11, 11, 11, 100308000)
+
+            repository.lagre(
+                ident = ident,
+                behandlingId = behandlingId,
+                basertPåId = null,
+                sakId = sakId,
+                json = innvilgelse_v1,
+                opprettetTidspunkt = opprettetTidspunkt,
+            )
+
+            sessionOf(dataSource).use {
+                it.run(
+                    // language=PostgreSQL
+                    queryOf(
+                        """
+                        UPDATE behandlingresultat 
+                        SET nødbrems = TRUE
+                        WHERE behandling_id = :behandlingId
+                        """.trimIndent(),
+                        mapOf(
+                            "behandlingId" to behandlingId,
+                        ),
+                    ).asUpdate,
+                )
+            } shouldBe 1
+
+            repository.hent(ident).size shouldBe 0
         }
     }
 }
