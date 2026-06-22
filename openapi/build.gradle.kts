@@ -1,7 +1,7 @@
 import org.gradle.internal.impldep.com.amazonaws.util.json.Jackson
 
 plugins {
-    id("ch.acanda.gradle.fabrikt") version "1.35.0"
+    id("ch.acanda.gradle.fabrikt") version "1.36.0"
     id("common")
     `java-library`
 }
