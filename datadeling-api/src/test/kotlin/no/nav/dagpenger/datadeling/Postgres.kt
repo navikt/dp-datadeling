@@ -7,7 +7,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 
 internal object Postgres {
     val instance by lazy {
-        PostgreSQLContainer("postgres:15").apply {
+        PostgreSQLContainer("postgres:18.4").apply {
             start()
         }
     }
