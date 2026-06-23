@@ -4,7 +4,9 @@ metadata:
   name: dp-datadeling
   namespace: teamdagpenger
   labels:
-    team: teamdagpenger
+    team: "teamdagpenger"
+    app: "dp-datadeling"
+    subteam: "ramp"
 
 spec:
   image: "{{ image }}"
