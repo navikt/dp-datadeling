@@ -71,27 +71,57 @@ class BehandlingResultatJsonNodeTolkerTest {
                 // language=JSON
                 """
                 {
-                    "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
-                    "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
-                    "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
-                    "automatisk": true,
-                    "regelverk": "Dagpenger",
-                    "ident": "12345678901",
-                    "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": false}],
-                    "opprettet": "2026-03-15T10:00:00",
-                    "sistEndret": "2026-03-15T10:00:00",
-                    "opplysninger": [],
-                    "utbetalinger": [
+                  "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                  "behandletHendelse": {
+                    "datatype": "UUID",
+                    "id": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                    "type": "Søknad",
+                    "skjedde": "2026-03-15"
+                  },
+                  "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                  "automatisk": true,
+                  "regelverk": "Dagpenger",
+                  "ident": "12345678901",
+                  "rettighetsperioder": [
+                    {
+                      "fraOgMed": "2026-01-01",
+                      "harRett": false
+                    }
+                  ],
+                  "opprettet": "2026-03-15T10:00:00",
+                  "sistEndret": "2026-03-15T10:00:00",
+                  "opplysninger": [
+                    {
+                      "opplysningTypeId": "01992956-e349-76b1-8f68-c9d481df3a32",
+                      "navn": "Antall dager som gjenstår",
+                      "datatype": "heltall",
+                      "perioder": [
                         {
-                            "dato": "2026-05-01",
-                            "sats": 4024,
-                            "utbetaling": 4024,
-                            "opprinnelse": "Ny",
-                            "meldeperiode": "Ferietillegg-2025"
+                          "id": "019b4a53-1d7d-70a4-876f-57563365603c",
+                          "opprettet": "2025-12-23T09:28:39.677527",
+                          "opprinnelse": "Ny",
+                          "gyldigFraOgMed": "2018-06-18",
+                          "gyldigTilOgMed": "2018-06-18",
+                          "verdi": {
+                            "verdi": 520,
+                            "enhet": "dager",
+                            "datatype": "heltall"
+                          }
                         }
-                    ],
-                    "behandletAv": [],
-                    "førteTil": "Avslag"
+                      ]
+                    }
+                  ],
+                  "utbetalinger": [
+                    {
+                      "dato": "2026-05-01",
+                      "sats": 4024,
+                      "utbetaling": 4024,
+                      "opprinnelse": "Ny",
+                      "meldeperiode": "Ferietillegg-2025"
+                    }
+                  ],
+                  "behandletAv": [],
+                  "førteTil": "Avslag"
                 }
                 """.trimIndent(),
             )

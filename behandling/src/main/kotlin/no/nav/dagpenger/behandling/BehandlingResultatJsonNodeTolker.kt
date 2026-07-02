@@ -46,8 +46,10 @@ class BehandlingResultatJsonNodeTolker private constructor(
                     }
             }
 
-    override val beregninger: List<BeregnetDag> =
-        json["utbetalinger"].takeIf { !it.isNull || !it.isEmpty }?.map { utbetaling ->
+    override val beregninger: List<BeregnetDag> by lazy {
+        if (json["utbetalinger"] == null) return@lazy emptyList()
+        if (json["utbetalinger"].isEmpty) return@lazy emptyList()
+        json["utbetalinger"]?.map { utbetaling ->
             object : BeregnetDag {
                 override val dato: LocalDate = utbetaling["dato"].asLocalDate()
                 override val sats: Int = utbetaling["sats"].asInt()
@@ -63,6 +65,7 @@ class BehandlingResultatJsonNodeTolker private constructor(
                         ?: throw IllegalStateException("Finner ikke gjenstående dager for dato $dato")
             }
         } ?: emptyList()
+    }
 
     companion object {
         private val RETTIGHETSTYPE_OPPLYSNINGER =
