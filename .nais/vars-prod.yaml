@@ -93,3 +93,4 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"

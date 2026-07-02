@@ -93,6 +93,7 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"
   - application: azure-token-generator
     namespace: nais
     cluster: dev-gcp
