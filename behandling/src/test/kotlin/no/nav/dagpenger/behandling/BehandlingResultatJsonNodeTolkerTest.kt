@@ -1,0 +1,128 @@
+package no.nav.dagpenger.behandling
+
+import com.fasterxml.jackson.databind.JsonNode
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.innvilgelse_v1
+import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.meldekortBeregning_v1
+import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.stans_v1
+import java.time.LocalDate
+import java.util.UUID
+import kotlin.test.Test
+
+class BehandlingResultatJsonNodeTolkerTest {
+    @Test
+    fun `tolke behandlingresultat v1`() {
+        val behandlingResultat: JsonNode = objectMapper.readTree(innvilgelse_v1)
+        val tolker = BehandlingResultatJsonNodeTolker.fra(behandlingResultat)
+
+        tolker.behandlingId shouldBe UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d03")
+        tolker.ident shouldBe "17373649758"
+
+        tolker.rettighetsperioder.size shouldBe 1
+        tolker.rettighetsperioder.first().fraOgMed shouldBe LocalDate.of(2018, 6, 21)
+        tolker.rettighetsperioder.first().tilOgMed shouldBe null
+        tolker.rettighetsperioder.first().harRett shouldBe true
+
+        tolker.rettighetstyper.size shouldBe 1
+        tolker.rettighetstyper.first().type shouldBe Rettighetstype.ORDINÆR
+    }
+
+    @Test
+    fun `tar med alle rettighetsperioder`() {
+        val behandlingResultat: JsonNode = objectMapper.readTree(stans_v1)
+        val tolker = BehandlingResultatJsonNodeTolker.fra(behandlingResultat)
+
+        tolker.behandlingId shouldBe UUID.fromString("019b4a54-0d82-7a74-b0aa-a19d160016f8")
+        tolker.ident shouldBe "10399847102"
+
+        tolker.rettighetsperioder.size shouldBe 2
+        tolker.rettighetsperioder.first { it.harRett }.fraOgMed shouldBe LocalDate.of(2018, 6, 21)
+        tolker.rettighetsperioder.first { it.harRett }.tilOgMed shouldBe LocalDate.of(2018, 7, 21)
+        tolker.rettighetsperioder.first { !it.harRett }.fraOgMed shouldBe LocalDate.of(2018, 7, 22)
+
+        tolker.rettighetstyper.size shouldBe 1
+        tolker.rettighetstyper.first().type shouldBe Rettighetstype.ORDINÆR
+    }
+
+    @Test
+    fun `har utbetalinger`() {
+        val behandlingResultat: JsonNode = objectMapper.readTree(meldekortBeregning_v1)
+        val tolker = BehandlingResultatJsonNodeTolker.fra(behandlingResultat)
+
+        tolker.beregninger.size shouldBe 11
+        tolker.beregninger[0].dato shouldBe LocalDate.of(2018, 6, 21)
+        tolker.beregninger[0].sats shouldBe 1259
+        tolker.beregninger[0].utbetaling shouldBe 719
+        tolker.beregninger[0].gjenståendeDager shouldBe 519
+
+        tolker.beregninger[10].dato shouldBe LocalDate.of(2018, 7, 1)
+        tolker.beregninger[10].sats shouldBe 1259
+        tolker.beregninger[10].utbetaling shouldBe 0
+        tolker.beregninger[10].gjenståendeDager shouldBe 513
+
+        tolker.beregninger.sumOf { it.utbetaling } shouldBe 5036
+    }
+
+    @Test
+    fun `tolererer gammel json uten dagpengeType`() {
+        val gammelJson: JsonNode =
+            objectMapper.readTree(
+                // language=JSON
+                """
+                {
+                    "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                    "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
+                    "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                    "automatisk": true,
+                    "regelverk": "Dagpenger",
+                    "ident": "12345678901",
+                    "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": false}],
+                    "opprettet": "2026-03-15T10:00:00",
+                    "sistEndret": "2026-03-15T10:00:00",
+                    "opplysninger": [],
+                    "utbetalinger": [
+                        {
+                            "dato": "2026-05-01",
+                            "sats": 4024,
+                            "utbetaling": 4024,
+                            "opprinnelse": "Ny",
+                            "meldeperiode": "Ferietillegg-2025"
+                        }
+                    ],
+                    "behandletAv": [],
+                    "førteTil": "Avslag"
+                }
+                """.trimIndent(),
+            )
+
+        shouldNotThrowAny { BehandlingResultatJsonNodeTolker.fra(gammelJson) }
+    }
+
+    @Test
+    fun `tolererer manglende utbetalinger-felt`() {
+        val jsonUtenUtbetalinger: JsonNode =
+            objectMapper.readTree(
+                // language=JSON
+                """
+                {
+                    "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                    "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
+                    "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                    "automatisk": true,
+                    "regelverk": "Dagpenger",
+                    "ident": "12345678901",
+                    "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": false}],
+                    "opprettet": "2026-03-15T10:00:00",
+                    "sistEndret": "2026-03-15T10:00:00",
+                    "opplysninger": [],
+                    "behandletAv": [],
+                    "førteTil": "Avslag"
+                }
+                """.trimIndent(),
+            )
+
+        val tolker = BehandlingResultatJsonNodeTolker.fra(jsonUtenUtbetalinger)
+        tolker.beregninger shouldBe emptyList()
+    }
+}
