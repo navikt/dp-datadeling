@@ -11,10 +11,10 @@ class BehandlingResultatTolkerFactoryTest {
     private val objectMapper = jacksonObjectMapper()
 
     @Test
-    fun `skal bruke V1Tolker for eksisterende behandlingsresultater`() {
+    fun `skal bruke JsonNodeTolker for eksisterende behandlingsresultater`() {
         val tolker = factory.hentTolker(objectMapper.readTree(innvilgelse_v1))
 
-        tolker.shouldBeInstanceOf<BehandlingResultatV1Tolker>()
+        tolker.shouldBeInstanceOf<BehandlingResultatJsonNodeTolker>()
         tolker.ident shouldBe "17373649758"
     }
 }
