@@ -58,8 +58,9 @@ class BehandlingResultatJsonNodeTolker private constructor(
                     val verdi = periode["verdi"]?.get("verdi")?.asInt() ?: return@mapNotNull null
                     fraOgMed to verdi
                 }
-                ?: throw IllegalStateException(
+                ?: throw TolkeException(
                     "Finner ikke gjenstående dager-opplysning (mangler opplysningTypeId $GJENSTÅENDE_DAGER_OPPLYSNINGER)",
+                    behandlingId,
                 )
         json["utbetalinger"]?.map { utbetaling ->
             object : BeregnetDag {
@@ -71,8 +72,9 @@ class BehandlingResultatJsonNodeTolker private constructor(
                         .filter { (fraOgMed, _) -> !fraOgMed.isAfter(dato) }
                         .maxByOrNull { (fraOgMed, _) -> fraOgMed }
                         ?.second
-                        ?: throw IllegalStateException(
+                        ?: throw TolkeException(
                             "Finner ikke gjenstående dager for dato $dato — ingen perioder starter på eller før denne datoen",
+                            behandlingId,
                         )
             }
         } ?: emptyList()
@@ -92,3 +94,8 @@ class BehandlingResultatJsonNodeTolker private constructor(
         fun fra(jsonNode: JsonNode): BehandlingResultatJsonNodeTolker = BehandlingResultatJsonNodeTolker(jsonNode)
     }
 }
+
+class TolkeException(
+    melding: String,
+    behandlingId: UUID,
+) : RuntimeException("$melding. Behandlingid $behandlingId")
