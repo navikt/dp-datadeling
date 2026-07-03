@@ -126,7 +126,76 @@ class BehandlingResultatJsonNodeTolkerTest {
                 """.trimIndent(),
             )
 
-        shouldNotThrowAny { BehandlingResultatJsonNodeTolker.fra(gammelJson) }
+        val tolker = BehandlingResultatJsonNodeTolker.fra(gammelJson)
+        shouldNotThrowAny { tolker.beregninger }
+        // Skal bruke siste tilgjengelige gjenstående-dager-periode (2018-06-18 → 520),
+        // selv om utbetalingen er på 2026-05-01
+        tolker.beregninger.single().gjenståendeDager shouldBe 520
+    }
+
+    @Test
+    fun `bruker siste tilgjengelige gjenstående-dager-periode ved manglende eksakt match`() {
+        val json: JsonNode =
+            objectMapper.readTree(
+                // language=JSON
+                """
+                {
+                  "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                  "behandletHendelse": {"datatype": "UUID", "id": "019b4a51-6ef8-7714-8f5f-924a23137d03", "type": "Søknad", "skjedde": "2026-03-15"},
+                  "behandlingskjedeId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                  "automatisk": true,
+                  "regelverk": "Dagpenger",
+                  "ident": "12345678901",
+                  "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": true}],
+                  "opprettet": "2026-03-15T10:00:00",
+                  "sistEndret": "2026-03-15T10:00:00",
+                  "opplysninger": [
+                    {
+                      "opplysningTypeId": "01992956-e349-76b1-8f68-c9d481df3a32",
+                      "navn": "Antall dager som gjenstår",
+                      "datatype": "heltall",
+                      "perioder": [
+                        {
+                          "id": "00000000-0000-0000-0000-000000000001",
+                          "gyldigFraOgMed": "2026-06-01",
+                          "verdi": {"verdi": 89, "datatype": "heltall"}
+                        },
+                        {
+                          "id": "00000000-0000-0000-0000-000000000002",
+                          "gyldigFraOgMed": "2026-06-02",
+                          "verdi": {"verdi": 90, "datatype": "heltall"}
+                        }
+                      ]
+                    }
+                  ],
+                  "utbetalinger": [
+                    {"dato": "2026-06-01", "sats": 1000, "utbetaling": 1000},
+                    {"dato": "2026-06-02", "sats": 1000, "utbetaling": 1000},
+                    {"dato": "2026-06-03", "sats": 1000, "utbetaling": 0}
+                  ],
+                  "behandletAv": [],
+                  "førteTil": "Endring"
+                }
+                """.trimIndent(),
+            )
+
+        val tolker = BehandlingResultatJsonNodeTolker.fra(json)
+        // 2026-06-15 har ingen eksakt match — skal velge siste periode før dato: 2026-06-10 → 90 dager
+        with(tolker.beregninger[0]) {
+            dato.toString() shouldBe "2026-06-01"
+            gjenståendeDager shouldBe 89
+            utbetaling shouldBe 1000
+        }
+        with(tolker.beregninger[1]) {
+            dato.toString() shouldBe "2026-06-02"
+            gjenståendeDager shouldBe 90
+            utbetaling shouldBe 1000
+        }
+        with(tolker.beregninger[2]) {
+            dato.toString() shouldBe "2026-06-03"
+            gjenståendeDager shouldBe 90
+            utbetaling shouldBe 0
+        }
     }
 
     @Test

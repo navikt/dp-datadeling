@@ -49,20 +49,31 @@ class BehandlingResultatJsonNodeTolker private constructor(
     override val beregninger: List<BeregnetDag> by lazy {
         if (json["utbetalinger"] == null) return@lazy emptyList()
         if (json["utbetalinger"].isEmpty) return@lazy emptyList()
+        val gjenståendeDagerPerioder =
+            json["opplysninger"]
+                .find { it["opplysningTypeId"].asText() == GJENSTÅENDE_DAGER_OPPLYSNINGER.toString() }
+                ?.get("perioder")
+                ?.mapNotNull { periode ->
+                    val fraOgMed = periode["gyldigFraOgMed"]?.asOptionalLocalDate() ?: return@mapNotNull null
+                    val verdi = periode["verdi"]?.get("verdi")?.asInt() ?: return@mapNotNull null
+                    fraOgMed to verdi
+                }
+                ?: throw IllegalStateException(
+                    "Finner ikke gjenstående dager-opplysning (mangler opplysningTypeId $GJENSTÅENDE_DAGER_OPPLYSNINGER)",
+                )
         json["utbetalinger"]?.map { utbetaling ->
             object : BeregnetDag {
                 override val dato: LocalDate = utbetaling["dato"].asLocalDate()
                 override val sats: Int = utbetaling["sats"].asInt()
                 override val utbetaling: Int = utbetaling["utbetaling"].asInt()
                 override val gjenståendeDager: Int =
-                    json["opplysninger"]
-                        .find { it["opplysningTypeId"].asText() == GJENSTÅENDE_DAGER_OPPLYSNINGER.toString() }
-                        ?.get("perioder")
-                        ?.find { it["gyldigFraOgMed"]?.asOptionalLocalDate() == dato }
-                        ?.get("verdi")
-                        ?.get("verdi")
-                        ?.asInt()
-                        ?: throw IllegalStateException("Finner ikke gjenstående dager for dato $dato")
+                    gjenståendeDagerPerioder
+                        .filter { (fraOgMed, _) -> !fraOgMed.isAfter(dato) }
+                        .maxByOrNull { (fraOgMed, _) -> fraOgMed }
+                        ?.second
+                        ?: throw IllegalStateException(
+                            "Finner ikke gjenstående dager for dato $dato — ingen perioder starter på eller før denne datoen",
+                        )
             }
         } ?: emptyList()
     }
