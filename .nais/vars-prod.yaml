@@ -92,5 +92,4 @@ inbounds:
     cluster: prod-gcp
     permissions:
       roles:
-        - "rettighetsperioder"
         - "beregninger"
