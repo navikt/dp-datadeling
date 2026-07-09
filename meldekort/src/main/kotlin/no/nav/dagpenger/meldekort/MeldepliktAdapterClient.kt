@@ -5,7 +5,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -19,8 +20,6 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.ktor.client.defaultHttpClient
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import kotlin.math.ceil
 
 class MeldepliktAdapterClient(
     private val dpMeldepliktAdapterUrl: String,
@@ -55,26 +54,26 @@ class MeldepliktAdapterClient(
         withContext(Dispatchers.IO) {
             if (fraOgMed > LocalDate.now()) return@withContext emptyList()
 
-            val ukerSidenStart = ChronoUnit.WEEKS.between(fraOgMed, LocalDate.now())
-            val antallMeldeperioder = ceil(ukerSidenStart.toDouble() / 2).toInt()
+            logger.info { "Henter innsendte meldekort fra Arena" }
+            sikkerlogger.info { "Henter innsendte meldekort fra Arena for ident $ident" }
 
-            logger.info { "Henter $antallMeldeperioder innsendte meldekort fra Arena" }
-            sikkerlogger.info { "Henter $antallMeldeperioder innsendte meldekort fra Arena for ident $ident" }
+            val request =
+                DatadelingRequestDTO(
+                    personIdent = ident,
+                    fraOgMedDato = fraOgMed,
+                    tilOgMedDato = null,
+                )
+
             val response =
                 defaultHttpClient
-                    .get("$dpMeldepliktAdapterUrl/sendterapporteringsperioder") {
+                    .post("$dpMeldepliktAdapterUrl/innsendte-rapporteringsperioder") {
                         bearerAuth(tokenProvider.invoke())
                         header(HttpHeaders.Accept, ContentType.Application.Json)
                         header(HttpHeaders.ContentType, ContentType.Application.Json)
-                        header("ident", ident)
-                        parameter("antallMeldeperioder", antallMeldeperioder)
+                        setBody(request)
                     }.also {
                         logger.info { "Kall til adapter for å hente innsendte meldekort ga status ${it.status}" }
                     }
-
-            if (response.status == HttpStatusCode.NoContent) {
-                return@withContext emptyList()
-            }
 
             if (!response.status.isSuccess()) {
                 val body = response.bodyAsText()
