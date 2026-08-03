@@ -1,5 +1,5 @@
 plugins {
-    id("ch.acanda.gradle.fabrikt") version "1.38.1"
+    id("ch.acanda.gradle.fabrikt") version "1.39.1"
     id("common")
     `java-test-fixtures`
 }
