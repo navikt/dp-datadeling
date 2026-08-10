@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.behandling.kontrakt.v1.models.Behandlingsresultatv1DTO
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.collections.map
 
 class BehandlingResultatV1Tolker(
     private val dto: Behandlingsresultatv1DTO,
@@ -61,11 +61,21 @@ class BehandlingResultatV1Tolker(
                         }?.verdi
                         ?.let { verdi ->
                             (verdi as? no.nav.dagpenger.behandling.kontrakt.v1.models.HeltallVerdiv1DTO)?.verdi
-                        } ?: throw IllegalStateException("Finner ikke gjenstående dager for dato ${utbetalingDto.dato}")
+                        } ?: innvilgetDager().also { logger.warn { "Finner ikke gjenstående dager for dato ${utbetalingDto.dato}" } }
             }
         }
 
+    // Fallback for behandlinger hvor vi ikke har satt gjenstående dager for dager som ikke førte til forbruk
+    private fun innvilgetDager(): Int =
+        dto.opplysninger
+            .firstOrNull { it.opplysningTypeId == INNVILGET_ANTALL_DAGER_OPPLYSNING }
+            ?.perioder
+            ?.firstOrNull()
+            ?.let { (it.verdi as? no.nav.dagpenger.behandling.kontrakt.v1.models.HeltallVerdiv1DTO)?.verdi }
+            ?: throw IllegalStateException("Finner ikke antall innvilgede dager")
+
     companion object {
+        private val logger = KotlinLogging.logger { }
         private val objectMapper =
             jacksonObjectMapper()
                 .registerKotlinModule()
@@ -84,6 +94,7 @@ class BehandlingResultatV1Tolker(
             )
 
         private val GJENSTÅENDE_DAGER_OPPLYSNINGER = UUID.fromString("01992956-e349-76b1-8f68-c9d481df3a32")
+        private val INNVILGET_ANTALL_DAGER_OPPLYSNING = UUID.fromString("0194881f-943d-77a7-969c-147999f15457")
 
         fun fra(jsonNode: JsonNode): BehandlingResultatV1Tolker {
             val dto = objectMapper.treeToValue(jsonNode, Behandlingsresultatv1DTO::class.java)
