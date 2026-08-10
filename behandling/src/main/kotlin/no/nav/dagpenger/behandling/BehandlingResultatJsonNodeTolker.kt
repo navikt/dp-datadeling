@@ -3,6 +3,8 @@ package no.nav.dagpenger.behandling
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.asOptionalLocalDate
+import com.github.navikt.tbd_libs.rapids_and_rivers.toUUID
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.LocalDate
 import java.util.UUID
 
@@ -72,13 +74,24 @@ class BehandlingResultatJsonNodeTolker private constructor(
                         .filter { (fraOgMed, _) -> !fraOgMed.isAfter(dato) }
                         .maxByOrNull { (fraOgMed, _) -> fraOgMed }
                         ?.second
-                        ?: throw TolkeException(
-                            "Finner ikke gjenstående dager for dato $dato — ingen perioder starter på eller før denne datoen",
-                            behandlingId,
-                        )
+                        ?: innvilgetDager().also {
+                            logger.warn {
+                                "Finner ikke gjenstående dager for dato $dato — ingen perioder starter på eller før denne datoen"
+                            }
+                        }
             }
         } ?: emptyList()
     }
+
+    // Fallback for behandlinger hvor vi ikke har satt gjenstående dager for dager som ikke førte til forbruk
+    private fun innvilgetDager(): Int =
+        json["opplysninger"]
+            .firstOrNull { it["opplysningTypeId"].asText().toUUID() == INNVILGET_ANTALL_DAGER_OPPLYSNING }
+            ?.let { opplysning ->
+                opplysning["perioder"].firstOrNull()?.let { periode ->
+                    periode["verdi"]["verdi"].asInt()
+                }
+            } ?: throw IllegalStateException("Finner ikke antall innvilgede dager")
 
     companion object {
         private val RETTIGHETSTYPE_OPPLYSNINGER =
@@ -90,6 +103,8 @@ class BehandlingResultatJsonNodeTolker private constructor(
             )
 
         private val GJENSTÅENDE_DAGER_OPPLYSNINGER = UUID.fromString("01992956-e349-76b1-8f68-c9d481df3a32")
+        private val INNVILGET_ANTALL_DAGER_OPPLYSNING = UUID.fromString("0194881f-943d-77a7-969c-147999f15457")
+        private val logger = KotlinLogging.logger { }
 
         fun fra(jsonNode: JsonNode): BehandlingResultatJsonNodeTolker = BehandlingResultatJsonNodeTolker(jsonNode)
     }
