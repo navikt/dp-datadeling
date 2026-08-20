@@ -55,6 +55,12 @@ inbounds:
         - "rettighetsperioder"
         - "beregninger"
         - "meldekort"
+  - application: dp-innsyn
+    namespace: teamdagpenger
+    cluster: prod-gcp
+    permissions:
+      roles:
+        - "rettighetsperioder"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: prod-gcp
