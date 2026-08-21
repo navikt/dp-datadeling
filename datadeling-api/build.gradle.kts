@@ -27,7 +27,7 @@ dependencies {
     implementation("com.github.navikt.tbd-libs:naisful-app:20260616.1253")
 
     // Prometheus open metrics
-    implementation("io.prometheus:prometheus-metrics-core:1.4.2")
+    implementation("io.prometheus:prometheus-metrics-core:1.8.0")
 
     // OpenTelemetry
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.1.0")
