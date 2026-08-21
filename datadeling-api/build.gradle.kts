@@ -47,7 +47,7 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:2025.12.19-08.15.2e150cd55270")
     implementation(libs.rapids.and.rivers)
     implementation("no.nav.dagpenger:aktivitetslogg:20251016.40.a3c526")
-    implementation("io.ktor:ktor-server-metrics:3.3.1")
+    implementation("io.ktor:ktor-server-metrics:3.5.2")
 
     // Test
     testImplementation(libs.ktor.server.test.host)
