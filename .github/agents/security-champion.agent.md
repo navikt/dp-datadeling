@@ -96,7 +96,7 @@ The Golden Path (from [sikkerhet.nav.no](https://sikkerhet.nav.no/docs/goldenpat
 
 ### Priority 2: Scanning Tools
 
-- [ ] **Dependabot** - Enable for dependency vulnerabilities, patch regularly
+- [ ] **dp-renovate** - Enable for dependency vulnerabilities, patch regularly
 - [ ] **Static analysis** - Analyze code and fix findings
 - [ ] **Trivy** - Docker image scanning for vulnerabilities and leaked secrets
 - [ ] **Scheduled workflows** - New vulnerabilities appear even without code changes
@@ -577,7 +577,7 @@ sealed class ValidationResult {
 Nais automatically scans for vulnerabilities using:
 
 - **Trivy**: Container image scanning
-- **Dependabot**: Dependency updates
+- **dp-renovate**: Dependency updates
 - **Snyk**: Vulnerability alerts
 
 ### Keeping Dependencies Updated
@@ -788,7 +788,7 @@ Use this checklist for security reviews. Specialized agents can help with specif
 - [ ] Nav-Call-Id tracing implemented
 
 ## Security Scanning
-- [ ] Dependency scanning enabled (Dependabot/Snyk)
+- [ ] Dependency scanning enabled (dp-renovate/Snyk)
 - [ ] Container scanning enabled (Trivy)
 - [ ] No critical/high vulnerabilities
 
@@ -909,14 +909,14 @@ Security features must be accessible:
 
 From [sikkerhet.nav.no/docs/verktoy](https://sikkerhet.nav.no/docs/verktoy/):
 
-| Tool | Purpose | Docs |
-|------|---------|------|
-| **Chainguard** | Secure Docker base images | [chainguard-dockerimages](https://sikkerhet.nav.no/docs/verktoy/chainguard-dockerimages) |
-| **Dependabot** | Dependency scanning | [dependabot](https://sikkerhet.nav.no/docs/verktoy/dependabot) |
-| **GitHub Advanced Security** | Code scanning, secret detection | [github-advanced-security](https://sikkerhet.nav.no/docs/verktoy/github-advanced-security) |
-| **NAIS Console & Dependency-Track** | Risk analysis | [nais-console-dp-track](https://sikkerhet.nav.no/docs/verktoy/nais-console-dp-track) |
-| **Trivy** | Container image scanning | [trivy](https://sikkerhet.nav.no/docs/verktoy/trivy) |
-| **zizmor** | GitHub Actions scanning | [zizmor](https://sikkerhet.nav.no/docs/verktoy/zizmor) |
+| Tool                                | Purpose | Docs                                                                                       |
+|-------------------------------------|---------|--------------------------------------------------------------------------------------------|
+| **Chainguard**                      | Secure Docker base images | [chainguard-dockerimages](https://sikkerhet.nav.no/docs/verktoy/chainguard-dockerimages)   |
+| **dp-renovate**                     | Dependency scanning | [dp-renovate](https://github.com/navikt/dp-renovate)                                       |
+| **GitHub Advanced Security**        | Code scanning, secret detection | [github-advanced-security](https://sikkerhet.nav.no/docs/verktoy/github-advanced-security) |
+| **NAIS Console & Dependency-Track** | Risk analysis | [nais-console-dp-track](https://sikkerhet.nav.no/docs/verktoy/nais-console-dp-track)       |
+| **Trivy**                           | Container image scanning | [trivy](https://sikkerhet.nav.no/docs/verktoy/trivy)                                       |
+| **zizmor**                          | GitHub Actions scanning | [zizmor](https://sikkerhet.nav.no/docs/verktoy/zizmor)                                     |
 
 ### Reference Implementations in navikt
 
