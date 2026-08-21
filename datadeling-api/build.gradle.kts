@@ -30,7 +30,7 @@ dependencies {
     implementation("io.prometheus:prometheus-metrics-core:1.8.0")
 
     // OpenTelemetry
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.1.0")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.31.0")
     implementation("io.opentelemetry:opentelemetry-api:1.65.0")
 
     // Jackson
@@ -47,7 +47,7 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:2026.05.04-10.36.d489859941f7")
     implementation(libs.rapids.and.rivers)
     implementation("no.nav.dagpenger:aktivitetslogg:20251016.40.a3c526")
-    implementation("io.ktor:ktor-server-metrics:3.5.2")
+    implementation("io.ktor:ktor-server-metrics:${libs.versions.ktor.get()}")
 
     // Test
     testImplementation(libs.ktor.server.test.host)
