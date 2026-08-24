@@ -1,10 +1,10 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.innvilgelse_v1
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.meldekortBeregning_v1
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.stans_v1
+import tools.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.datadeling.e2e
 
-import com.fasterxml.jackson.databind.node.ObjectNode
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -37,6 +36,7 @@ import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import tools.jackson.databind.node.ObjectNode
 import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -132,7 +132,7 @@ class RessursE2ETest {
                 }
 
                 ressursUrl.fetchRessursResponse(client) {
-                    this["status"].asText() shouldBe RessursStatus.FERDIG.name
+                    this["status"].asString() shouldBe RessursStatus.FERDIG.name
                     this.toString() shouldEqualJson
                         """
                         {
@@ -204,7 +204,7 @@ class RessursE2ETest {
                 }
 
                 ressursUrl.fetchRessursResponse(client) {
-                    this["status"].asText() shouldBe RessursStatus.FEILET.name
+                    this["status"].asString() shouldBe RessursStatus.FEILET.name
                 }
             }
         }

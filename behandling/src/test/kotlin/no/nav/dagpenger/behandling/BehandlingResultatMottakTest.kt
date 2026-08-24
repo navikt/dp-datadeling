@@ -82,10 +82,10 @@ class BehandlingResultatMottakTest {
             key() shouldBe "17373649758"
             topic() shouldBe "obo-topic"
             val jsonmelding = objectMapper.readTree(value())
-            jsonmelding["personId"].asText() shouldBe "17373649758"
-            jsonmelding["meldingstype"].asText() shouldBe "OPPRETT"
-            jsonmelding["ytelsestype"].asText() shouldBe "DAGPENGER"
-            jsonmelding["kildesystem"].asText() shouldBe "DPSAK"
+            jsonmelding["personId"].asString() shouldBe "17373649758"
+            jsonmelding["meldingstype"].asString() shouldBe "OPPRETT"
+            jsonmelding["ytelsestype"].asString() shouldBe "DAGPENGER"
+            jsonmelding["kildesystem"].asString() shouldBe "DPSAK"
         }
     }
 
@@ -130,10 +130,10 @@ class BehandlingResultatMottakTest {
             key() shouldBe "17373649758"
             topic() shouldBe "obo-topic"
             val jsonmelding = objectMapper.readTree(value())
-            jsonmelding["personId"].asText() shouldBe "17373649758"
-            jsonmelding["meldingstype"].asText() shouldBe "OPPDATER"
-            jsonmelding["ytelsestype"].asText() shouldBe "DAGPENGER"
-            jsonmelding["kildesystem"].asText() shouldBe "DPSAK"
+            jsonmelding["personId"].asString() shouldBe "17373649758"
+            jsonmelding["meldingstype"].asString() shouldBe "OPPDATER"
+            jsonmelding["ytelsestype"].asString() shouldBe "DAGPENGER"
+            jsonmelding["kildesystem"].asString() shouldBe "DPSAK"
         }
     }
 

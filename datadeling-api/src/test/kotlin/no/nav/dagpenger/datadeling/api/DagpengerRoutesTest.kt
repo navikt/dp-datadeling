@@ -147,8 +147,8 @@ class DagpengerRoutesTest {
                 ).apply {
                     status shouldBe HttpStatusCode.OK
                     val body = objectMapper.readTree(bodyAsText())
-                    body["personIdent"].asText() shouldBe "12345678901"
-                    body["forsteDato"].asText() shouldBe "2026-03-15"
+                    body["personIdent"].asString() shouldBe "12345678901"
+                    body["forsteDato"].asString() shouldBe "2026-03-15"
                 }
         }
     }
@@ -168,7 +168,7 @@ class DagpengerRoutesTest {
                 ).apply {
                     status shouldBe HttpStatusCode.OK
                     val body = objectMapper.readTree(bodyAsText())
-                    body["personIdent"].asText() shouldBe "12345678901"
+                    body["personIdent"].asString() shouldBe "12345678901"
                     body.has("forsteDato") shouldBe true
                     body["forsteDato"].isNull shouldBe true
                 }

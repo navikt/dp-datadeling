@@ -48,20 +48,27 @@ class BehandlingResultatMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val behandlingId = UUID.fromString(packet["behandlingId"].asText())
+        val behandlingId = UUID.fromString(packet["behandlingId"].asString())
 
         withLoggingContext(
             "behandlingId" to behandlingId.toString(),
         ) {
             logg.info { "Mottok nytt behandling resultat." }
             val json = packet.toJson()
-            val ident = packet["ident"].asText()
+            val ident = packet["ident"].asString()
             val opprettetTidspunkt = packet["@opprettet"].asLocalDateTime()
-            val basertPåId = packet["basertPå"].textValue()?.let { UUID.fromString(it) }
+            val basertPåId =
+                if (packet["basertPå"].isMissingNode) {
+                    null
+                } else {
+                    packet["basertPå"]
+                        .asString()
+                        .let { UUID.fromString(it) }
+                }
 
             // dette er en midlertidig sjekk for å unngå lagring av rene avslag før de skal bo hos oss
             val rettighetsperioder: List<Rettighetsperiode> =
-                packet["rettighetsperioder"].map {
+                packet["rettighetsperioder"].toList().map {
                     object : Rettighetsperiode {
                         override val fraOgMed: LocalDate = it["fraOgMed"].asLocalDate()
                         override val tilOgMed: LocalDate? = it["tilOgMed"]?.asOptionalLocalDate()
@@ -73,7 +80,7 @@ class BehandlingResultatMottak(
                 return@withLoggingContext
             }
 
-            val sakId: UUID = packet["behandlingskjedeId"].asText().let { UUID.fromString(it) }
+            val sakId: UUID = packet["behandlingskjedeId"].asString().let { UUID.fromString(it) }
             behandlingResultatRepository.lagre(
                 ident = ident,
                 behandlingId = behandlingId,
@@ -86,7 +93,7 @@ class BehandlingResultatMottak(
             konsument.varsle(
                 DagpengerHendelse.fraFørteTil(
                     ident = ident,
-                    førteTil = packet["førteTil"].asText(),
+                    førteTil = packet["førteTil"].asString(),
                 ),
             )
         }

@@ -1,7 +1,5 @@
 package no.dagpenger.meldekort
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import kotlinx.coroutines.runBlocking
@@ -23,6 +21,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
@@ -345,10 +344,7 @@ class MeldekortServiceTest {
                 .willReturn(
                     WireMock
                         .jsonResponse(
-                            jacksonObjectMapper()
-                                .apply {
-                                    registerModule(JavaTimeModule())
-                                }.writeValueAsString(meldekortregisterResponse),
+                            ObjectMapper().writeValueAsString(meldekortregisterResponse),
                             200,
                         ).withFixedDelay(delayMs),
                 ),
@@ -359,10 +355,7 @@ class MeldekortServiceTest {
                 .willReturn(
                     WireMock
                         .jsonResponse(
-                            jacksonObjectMapper()
-                                .apply {
-                                    registerModule(JavaTimeModule())
-                                }.writeValueAsString(meldepliktAdapterInnsendteResponse),
+                            ObjectMapper().writeValueAsString(meldepliktAdapterInnsendteResponse),
                             200,
                         ).withFixedDelay(delayMs),
                 ),
@@ -384,10 +377,7 @@ class MeldekortServiceTest {
                 .willReturn(
                     WireMock
                         .jsonResponse(
-                            jacksonObjectMapper()
-                                .apply {
-                                    registerModule(JavaTimeModule())
-                                }.writeValueAsString(meldepliktAdapterTilUtfyllingResponse),
+                            ObjectMapper().writeValueAsString(meldepliktAdapterTilUtfyllingResponse),
                             200,
                         ).withFixedDelay(delayMs),
                 ),

@@ -35,7 +35,6 @@ dependencies {
 
     // Jackson
     implementation(libs.bundles.jackson)
-    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:${libs.versions.jackson.get()}")
 
     // Log
     implementation(libs.kotlin.logging)

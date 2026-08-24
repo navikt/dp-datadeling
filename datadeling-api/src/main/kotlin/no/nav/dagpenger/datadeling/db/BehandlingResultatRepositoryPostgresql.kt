@@ -1,11 +1,11 @@
 package no.nav.dagpenger.datadeling.db
 
-import com.fasterxml.jackson.databind.JsonNode
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.behandling.BehandlingResultatRepository
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.objectMapper
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.util.UUID
 

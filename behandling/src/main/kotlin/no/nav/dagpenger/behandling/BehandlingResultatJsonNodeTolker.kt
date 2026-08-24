@@ -1,10 +1,10 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.asOptionalLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.toUUID
 import io.github.oshai.kotlinlogging.KotlinLogging
+import tools.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.util.UUID
 
@@ -16,11 +16,11 @@ import java.util.UUID
 class BehandlingResultatJsonNodeTolker private constructor(
     private val json: JsonNode,
 ) : BehandlingResultat {
-    override val ident: String = json["ident"].asText()
-    override val behandlingId: UUID = UUID.fromString(json["behandlingId"].asText())
+    override val ident: String = json["ident"].asString()
+    override val behandlingId: UUID = UUID.fromString(json["behandlingId"].asString())
 
     override val rettighetsperioder: List<Rettighetsperiode> =
-        json["rettighetsperioder"].map { node ->
+        json["rettighetsperioder"].toList().map { node ->
             object : Rettighetsperiode {
                 override val fraOgMed: LocalDate = node["fraOgMed"].asLocalDate()
                 override val tilOgMed: LocalDate? = node["tilOgMed"]?.asOptionalLocalDate()
@@ -31,9 +31,9 @@ class BehandlingResultatJsonNodeTolker private constructor(
     override val rettighetstyper: List<Rettighetstyper> =
         json["opplysninger"]
             .filter { opplysning ->
-                UUID.fromString(opplysning["opplysningTypeId"].asText()) in RETTIGHETSTYPE_OPPLYSNINGER.keys
+                UUID.fromString(opplysning["opplysningTypeId"].asString()) in RETTIGHETSTYPE_OPPLYSNINGER.keys
             }.flatMap { opplysning ->
-                val type = RETTIGHETSTYPE_OPPLYSNINGER[UUID.fromString(opplysning["opplysningTypeId"].asText())]!!
+                val type = RETTIGHETSTYPE_OPPLYSNINGER[UUID.fromString(opplysning["opplysningTypeId"].asString())]!!
                 opplysning["perioder"]
                     .filter { periode ->
                         periode["verdi"]?.get("verdi")?.asBoolean() == true
@@ -51,9 +51,10 @@ class BehandlingResultatJsonNodeTolker private constructor(
     override val beregninger: List<BeregnetDag> by lazy {
         if (json["utbetalinger"] == null) return@lazy emptyList()
         if (json["utbetalinger"].isEmpty) return@lazy emptyList()
+
         val gjenståendeDagerPerioder =
             json["opplysninger"]
-                .find { it["opplysningTypeId"].asText() == GJENSTÅENDE_DAGER_OPPLYSNINGER.toString() }
+                .find { it["opplysningTypeId"].asString() == GJENSTÅENDE_DAGER_OPPLYSNINGER.toString() }
                 ?.get("perioder")
                 ?.mapNotNull { periode ->
                     val fraOgMed = periode["gyldigFraOgMed"]?.asOptionalLocalDate() ?: return@mapNotNull null
@@ -64,7 +65,8 @@ class BehandlingResultatJsonNodeTolker private constructor(
                     "Finner ikke gjenstående dager-opplysning (mangler opplysningTypeId $GJENSTÅENDE_DAGER_OPPLYSNINGER)",
                     behandlingId,
                 )
-        json["utbetalinger"]?.map { utbetaling ->
+
+        json["utbetalinger"]?.toList()?.map { utbetaling ->
             object : BeregnetDag {
                 override val dato: LocalDate = utbetaling["dato"].asLocalDate()
                 override val sats: Int = utbetaling["sats"].asInt()
@@ -86,7 +88,7 @@ class BehandlingResultatJsonNodeTolker private constructor(
     // Fallback for behandlinger hvor vi ikke har satt gjenstående dager for dager som ikke førte til forbruk
     private fun innvilgetDager(): Int =
         json["opplysninger"]
-            .firstOrNull { it["opplysningTypeId"].asText().toUUID() == INNVILGET_ANTALL_DAGER_OPPLYSNING }
+            .firstOrNull { it["opplysningTypeId"].asString().toUUID() == INNVILGET_ANTALL_DAGER_OPPLYSNING }
             ?.let { opplysning ->
                 opplysning["perioder"].firstOrNull()?.let { periode ->
                     periode["verdi"]["verdi"].asInt()

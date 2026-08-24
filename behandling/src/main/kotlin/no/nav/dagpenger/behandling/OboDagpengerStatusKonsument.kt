@@ -1,8 +1,8 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
+import tools.jackson.databind.ObjectMapper
 
 /**
  * OBO er eneste konsument i dag, men ligger bak en egen adapter for å holde domeneflyten konsument-uavhengig.
