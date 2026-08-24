@@ -30,7 +30,7 @@ dependencies {
     implementation("io.prometheus:prometheus-metrics-core:1.8.0")
 
     // OpenTelemetry
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.31.0")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.31.1")
     implementation("io.opentelemetry:opentelemetry-api:1.65.0")
 
     // Jackson
