@@ -162,10 +162,6 @@ paths:
       summary: Dagpengestatus i ny løsning
       description: |-
         Returnerer om en person er i ny dagpengeløsning (DP-sak), og fra når.
-
-        Per nå returneres kun innvilgede vedtak. Avslag vil inkluderes
-        når dp-sak overtar eierskap for avslagsvedtak (fase 2).
-
         Brukes av Arena for overlappskontroll ved behandling av dagpenger.
 
         Dersom personen ikke finnes i ny løsning returneres forsteDato som null.
