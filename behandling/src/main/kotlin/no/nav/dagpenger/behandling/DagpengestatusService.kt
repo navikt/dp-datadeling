@@ -13,16 +13,9 @@ class DagpengestatusService(
             forsteDato =
                 dagpengestatusRepository
                     .hent(request.personIdent)
-                    .mapNotNull { it.tidligsteInnvilgelseDato() }
+                    .mapNotNull { it.tidligsteVirkningsDato() }
                     .minOrNull(),
         )
 
-    private fun BehandlingResultat.tidligsteInnvilgelseDato(): LocalDate? =
-        rettighetsperioder.filter { it.harRett }.minByOrNull { it.fraOgMed }?.fraOgMed
-
-    private fun BehandlingResultat.tidligsteAvslagDato(): LocalDate? =
-        rettighetsperioder.filter { !it.harRett }.minByOrNull { it.fraOgMed }?.fraOgMed
-
-    // Fase 2: bytt til denne — innvilgelse trumfer, fall tilbake til avslag
-    private fun BehandlingResultat.tidligsteDagpengedato(): LocalDate? = tidligsteInnvilgelseDato() ?: tidligsteAvslagDato()
+    private fun BehandlingResultat.tidligsteVirkningsDato(): LocalDate? = rettighetsperioder.minByOrNull { it.fraOgMed }?.fraOgMed
 }

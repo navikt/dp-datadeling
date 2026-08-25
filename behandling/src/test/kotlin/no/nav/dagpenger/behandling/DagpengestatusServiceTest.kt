@@ -13,16 +13,6 @@ class DagpengestatusServiceTest {
     private val service = DagpengestatusService(DagpengestatusRepository(repository))
 
     @Test
-    fun `returnerer første innvilgelse-dato fra behandlingsresultat`() {
-        every { repository.hent("12345678901") } returns
-            listOf(lagInnvilgelseJson("2026-03-15"))
-
-        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
-
-        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
-    }
-
-    @Test
     fun `returnerer null dato når ingen behandlingsresultat finnes`() {
         every { repository.hent("12345678901") } returns emptyList()
 
@@ -33,37 +23,33 @@ class DagpengestatusServiceTest {
     }
 
     @Test
-    fun `ignorerer avslag`() {
-        every { repository.hent("12345678901") } returns
-            listOf(lagAvslagJson("2026-01-01"))
-
-        service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901")).forsteDato shouldBe null
-    }
-
-    @Test
-    fun `returnerer tidligste dato blant flere innvilgelser`() {
+    fun `returnerer tidligste dato blant flere innvilgelser og avslag der første er avslag`() {
         every { repository.hent("12345678901") } returns
             listOf(
                 lagInnvilgelseJson("2026-05-01"),
                 lagInnvilgelseJson("2026-03-15"),
+                lagAvslagJson("2026-04-15"),
+                lagAvslagJson("2024-04-15"),
             )
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDato shouldBe LocalDate.of(2024, 4, 15)
     }
 
     @Test
-    fun `returnerer innvilgelse selv om avslag også finnes`() {
+    fun `returnerer tidligste dato blant flere innvilgelser og avslag der første er innvilgelse`() {
         every { repository.hent("12345678901") } returns
             listOf(
-                lagAvslagJson("2026-01-01"),
+                lagInnvilgelseJson("2026-05-01"),
                 lagInnvilgelseJson("2026-03-15"),
+                lagAvslagJson("2026-04-15"),
+                lagInnvilgelseJson("2024-04-15"),
             )
 
         val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
 
-        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
+        resultat.forsteDato shouldBe LocalDate.of(2024, 4, 15)
     }
 
     private val testObjectMapper = jacksonObjectMapper()
