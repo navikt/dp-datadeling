@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.avslag_v1
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.endring_v1
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.ferietillegg
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.innvilgelse_v1
@@ -138,9 +139,59 @@ class BehandlingResultatMottakTest {
     }
 
     @Test
-    fun `vi mapper førteTil til riktig meldingstype`() {
+    fun `vi lagrer rene avslag og sender avslag-signal til arbeidsrettet oppfoelging`() {
+        val ident = slot<String>()
+        val behandlingId = slot<UUID>()
+        val basertPåId = slot<UUID?>()
+        val sakId = slot<UUID>()
+        val json = slot<String>()
+        val opprettetTidspunkt = slot<LocalDateTime>()
+        val utgåendeMelding = slot<ProducerRecord<String, String>>()
+
+        every {
+            behandlingResultatRepositoryPostgresql.lagre(
+                ident = capture(ident),
+                behandlingId = capture(behandlingId),
+                basertPåId = captureNullable(basertPåId),
+                sakId = capture(sakId),
+                json = capture(json),
+                opprettetTidspunkt = capture(opprettetTidspunkt),
+            )
+        } returns Unit
+
+        every {
+            producerMock.send(capture(utgåendeMelding))
+        } returns mockk()
+
+        testRapid.sendTestMessage(avslag_v1)
+
+        verify(exactly = 1) {
+            behandlingResultatRepositoryPostgresql.lagre(any(), any(), any(), any(), any(), any())
+        }
+
+        behandlingId.captured shouldBe UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d05")
+        basertPåId.captured shouldBe null
+        ident.captured shouldBe "17373649758"
+        sakId.captured shouldBe UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d05")
+        opprettetTidspunkt.captured shouldBe LocalDateTime.parse("2025-12-23T09:26:50.618236")
+
+        with(utgåendeMelding.captured) {
+            key() shouldBe "17373649758"
+            topic() shouldBe "obo-topic"
+            val jsonmelding = objectMapper.readTree(value())
+            jsonmelding["personId"].asString() shouldBe "17373649758"
+            jsonmelding["meldingstype"].asString() shouldBe "AVSLAG"
+            jsonmelding["ytelsestype"].asString() shouldBe "DAGPENGER"
+            jsonmelding["kildesystem"].asString() shouldBe "DPSAK"
+        }
+    }
+
+    @Test
+    fun `vi mapper foerteTil til riktig meldingstype`() {
         DagpengerHendelse.fraFørteTil("123", "Innvilgelse").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPRETT
+        DagpengerHendelse.fraFørteTil("123", "Avslag").meldingstype shouldBe DagpengerHendelse.Meldingstype.AVSLAG
         DagpengerHendelse.fraFørteTil("123", "Revurdering").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPDATER
+        DagpengerHendelse.fraFørteTil("123", "Stans").meldingstype shouldBe DagpengerHendelse.Meldingstype.OPPDATER
     }
 
     @Test
