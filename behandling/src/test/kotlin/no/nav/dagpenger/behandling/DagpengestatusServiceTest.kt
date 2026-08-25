@@ -1,10 +1,10 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.datadeling.models.DagpengestatusRequestDTO
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.time.LocalDate
 import kotlin.test.Test
 

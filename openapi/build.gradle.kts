@@ -33,7 +33,7 @@ ktlint {
 }
 
 dependencies {
-    implementation(libs.jackson.annotation)
+    implementation(libs.bundles.jackson)
 }
 
 fabrikt {

@@ -9,6 +9,6 @@ internal class LegacySøknadsmelding(
         const val SØKNAD_ID_NØKKEL = "søknadsData.brukerBehandlingId"
     }
 
-    override val søknadId = packet[SØKNAD_ID_NØKKEL].asText()
+    override val søknadId = packet[SØKNAD_ID_NØKKEL].asString()
     override val kanal = Søknad.Kanal.Digital
 }

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.datadeling.api.ressurs
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -9,6 +8,7 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.DatadelingResponseAfpDTO
 import no.nav.dagpenger.datadeling.objectMapper
 import org.intellij.lang.annotations.Language
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource

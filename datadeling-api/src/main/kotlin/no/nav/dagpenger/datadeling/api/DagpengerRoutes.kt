@@ -69,7 +69,12 @@ private fun Route.meldekortRoute(meldekortService: MeldekortService) {
 }
 
 private val dagpengestatusObjectMapper =
-    objectMapper.copy().setDefaultPropertyInclusion(ALWAYS)
+    objectMapper
+        .rebuild()
+        .changeDefaultPropertyInclusion { incl ->
+            incl.withContentInclusion(ALWAYS)
+            incl.withValueInclusion(ALWAYS)
+        }.build()
 
 private fun Route.dagpengestatusRoute(dagpengestatusService: DagpengestatusService) {
     route("/dagpengestatus") {

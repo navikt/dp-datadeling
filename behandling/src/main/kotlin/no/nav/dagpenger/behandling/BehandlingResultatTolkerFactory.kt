@@ -1,7 +1,7 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
+import tools.jackson.databind.JsonNode
 
 private val logger = KotlinLogging.logger {}
 

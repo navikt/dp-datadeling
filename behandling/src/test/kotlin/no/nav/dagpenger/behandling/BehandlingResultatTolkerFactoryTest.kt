@@ -1,11 +1,11 @@
 package no.nav.dagpenger.behandling
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.dagpenger.behandling.BehandlingsresultatScenarioer.meldekortBeregning_v1
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 class BehandlingResultatTolkerFactoryTest {
     private val factory = standardTolkerFactory

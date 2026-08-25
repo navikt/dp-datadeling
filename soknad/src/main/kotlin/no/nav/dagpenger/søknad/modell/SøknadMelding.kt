@@ -7,10 +7,10 @@ import java.time.LocalDateTime
 internal abstract class SøknadMelding(
     packet: JsonMessage,
 ) {
-    val ident = packet["fødselsnummer"].asText()
-    val journalpostId: String = packet["journalpostId"].asText()
-    val skjemaKode = packet["skjemaKode"].asText()
-    val søknadsType = Søknad.SøknadsType.valueOf(packet["type"].asText())
+    val ident = packet["fødselsnummer"].asString()
+    val journalpostId: String = packet["journalpostId"].asString()
+    val skjemaKode = packet["skjemaKode"].asString()
+    val søknadsType = Søknad.SøknadsType.valueOf(packet["type"].asString())
     val datoRegistrert: LocalDateTime = packet["datoRegistrert"].asLocalDateTime()
     abstract val søknadId: String?
     abstract val kanal: Søknad.Kanal

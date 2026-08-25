@@ -21,7 +21,7 @@ class LeaderElector(
                 defaultHttpClient
                     .request(electorPathUrl())
                     .bodyAsText()
-                    .let { objectMapper.readTree(it).get("name").asText() }
+                    .let { objectMapper.readTree(it).get("name").asString() }
             val hostname: String = getLocalHost().hostName
             hostname == leaderName
         }
