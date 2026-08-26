@@ -139,14 +139,13 @@ class BehandlingResultatMottakTest {
     }
 
     @Test
-    fun `vi lagrer rene avslag og sender avslag-signal til arbeidsrettet oppfoelging`() {
+    fun `vi lagrer rene avslag, men varsler ikke arbeidsrettet oppfoelging`() {
         val ident = slot<String>()
         val behandlingId = slot<UUID>()
         val basertPåId = slot<UUID?>()
         val sakId = slot<UUID>()
         val json = slot<String>()
         val opprettetTidspunkt = slot<LocalDateTime>()
-        val utgåendeMelding = slot<ProducerRecord<String, String>>()
 
         every {
             behandlingResultatRepositoryPostgresql.lagre(
@@ -158,10 +157,6 @@ class BehandlingResultatMottakTest {
                 opprettetTidspunkt = capture(opprettetTidspunkt),
             )
         } returns Unit
-
-        every {
-            producerMock.send(capture(utgåendeMelding))
-        } returns mockk()
 
         testRapid.sendTestMessage(avslag_v1)
 
@@ -175,15 +170,28 @@ class BehandlingResultatMottakTest {
         sakId.captured shouldBe UUID.fromString("019b4a51-6ef8-7714-8f5f-924a23137d05")
         opprettetTidspunkt.captured shouldBe LocalDateTime.parse("2025-12-23T09:26:50.618236")
 
-        with(utgåendeMelding.captured) {
-            key() shouldBe "17373649758"
-            topic() shouldBe "obo-topic"
-            val jsonmelding = objectMapper.readTree(value())
-            jsonmelding["personId"].asString() shouldBe "17373649758"
-            jsonmelding["meldingstype"].asString() shouldBe "AVSLAG"
-            jsonmelding["ytelsestype"].asString() shouldBe "DAGPENGER"
-            jsonmelding["kildesystem"].asString() shouldBe "DPSAK"
+        verify(exactly = 0) { producerMock.send(any()) }
+    }
+
+    @Test
+    fun `Obo-konsumenten filtrerer bort avslag, men slipper gjennom oevrige meldingstyper`() {
+        val utgåendeMeldinger = mutableListOf<ProducerRecord<String, String>>()
+        every { producerMock.send(capture(utgåendeMeldinger)) } returns mockk()
+
+        val konsument =
+            OboDagpengerStatusKonsument(
+                producer = producerMock,
+                topic = "obo-topic",
+                objectMapper = objectMapper,
+            )
+
+        DagpengerHendelse.Meldingstype.entries.forEach { meldingstype ->
+            konsument.varsle(DagpengerHendelse(ident = "17373649758", meldingstype = meldingstype))
         }
+
+        utgåendeMeldinger.map {
+            objectMapper.readTree(it.value())["meldingstype"].asString()
+        } shouldBe listOf("OPPRETT", "OPPDATER")
     }
 
     @Test

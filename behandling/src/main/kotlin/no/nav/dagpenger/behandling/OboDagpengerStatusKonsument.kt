@@ -13,18 +13,22 @@ class OboDagpengerStatusKonsument(
     private val objectMapper: ObjectMapper,
 ) : DagpengerStatusKonsument {
     override fun varsle(varsel: DagpengerHendelse) {
-        producer.send(
-            ProducerRecord(
-                topic,
-                varsel.ident,
-                objectMapper.writeValueAsString(
-                    OboMelding(
-                        personId = varsel.ident,
-                        meldingstype = varsel.meldingstype,
+        if (varsel.meldingstype == DagpengerHendelse.Meldingstype.AVSLAG) {
+            // Ignorer avslag, da det ikke er relevant for OBO ennå
+        } else {
+            producer.send(
+                ProducerRecord(
+                    topic,
+                    varsel.ident,
+                    objectMapper.writeValueAsString(
+                        OboMelding(
+                            personId = varsel.ident,
+                            meldingstype = varsel.meldingstype,
+                        ),
                     ),
                 ),
-            ),
-        )
+            )
+        }
     }
 
     private data class OboMelding(
