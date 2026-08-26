@@ -23,6 +23,56 @@ class DagpengestatusServiceTest {
     }
 
     @Test
+    fun `returnerer avslagsdato når personen kun har ett avslag`() {
+        every { repository.hent("12345678901") } returns
+            listOf(lagAvslagJson("2026-01-01"))
+
+        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
+
+        resultat.forsteDato shouldBe LocalDate.of(2026, 1, 1)
+    }
+
+    @Test
+    fun `returnerer innvilgelsesdato når personen kun har én innvilgelse`() {
+        every { repository.hent("12345678901") } returns
+            listOf(lagInnvilgelseJson("2026-03-15"))
+
+        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
+
+        resultat.forsteDato shouldBe LocalDate.of(2026, 3, 15)
+    }
+
+    @Test
+    fun `avslag foran innvilgelse i samme behandling gir avslagsdatoen`() {
+        every { repository.hent("12345678901") } returns
+            listOf(
+                lagBehandlingsresultatMedPerioderJson(
+                    "2025-01-01" to false,
+                    "2025-06-01" to true,
+                ),
+            )
+
+        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
+
+        resultat.forsteDato shouldBe LocalDate.of(2025, 1, 1)
+    }
+
+    @Test
+    fun `stans etter innvilgelse endrer ikke forsteDato`() {
+        every { repository.hent("12345678901") } returns
+            listOf(
+                lagBehandlingsresultatMedPerioderJson(
+                    "2018-06-21" to true,
+                    "2018-07-22" to false,
+                ),
+            )
+
+        val resultat = service.hentDagpengestatus(DagpengestatusRequestDTO("12345678901"))
+
+        resultat.forsteDato shouldBe LocalDate.of(2018, 6, 21)
+    }
+
+    @Test
     fun `returnerer tidligste dato blant flere innvilgelser og avslag der første er avslag`() {
         every { repository.hent("12345678901") } returns
             listOf(
@@ -57,6 +107,18 @@ class DagpengestatusServiceTest {
     private fun lagInnvilgelseJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Innvilgelse", fraOgMed, true))
 
     private fun lagAvslagJson(fraOgMed: String) = testObjectMapper.readTree(lagBehandlingsresultatJson("Avslag", fraOgMed, false))
+
+    private fun lagBehandlingsresultatMedPerioderJson(vararg perioder: Pair<String, Boolean>) =
+        testObjectMapper.readTree(
+            lagBehandlingsresultatJson("Innvilgelse", "1970-01-01", true)
+                .replace(
+                    """"rettighetsperioder": [{"fraOgMed": "1970-01-01", "harRett": true}]""",
+                    """"rettighetsperioder": [""" +
+                        perioder.joinToString(", ") { (fraOgMed, harRett) ->
+                            """{"fraOgMed": "$fraOgMed", "harRett": $harRett}"""
+                        } + "]",
+                ),
+        )
 
     private fun lagBehandlingsresultatJson(
         førteTil: String,
