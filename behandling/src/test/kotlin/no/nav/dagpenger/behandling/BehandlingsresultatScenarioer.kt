@@ -11,6 +11,15 @@ object BehandlingsresultatScenarioer {
             .readText()
     }
 
+    val avslag_v1 by lazy {
+        requireNotNull(
+            this.javaClass
+                .getResourceAsStream("/testdata/behandlingresultatAvslag_v1.json"),
+        ) { "Kunne ikke finne testdata/behandlingresultatAvslag_v1.json" }
+            .reader()
+            .readText()
+    }
+
     val endring_v1 by lazy {
         requireNotNull(
             this.javaClass

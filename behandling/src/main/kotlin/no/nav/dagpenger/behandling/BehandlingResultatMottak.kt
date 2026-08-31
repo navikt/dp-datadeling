@@ -2,16 +2,13 @@ package no.nav.dagpenger.behandling
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
-import com.github.navikt.tbd_libs.rapids_and_rivers.asOptionalLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
-import java.time.LocalDate
 import java.util.UUID
 
 private val logg = KotlinLogging.logger {}
@@ -66,20 +63,6 @@ class BehandlingResultatMottak(
                         .let { UUID.fromString(it) }
                 }
 
-            // dette er en midlertidig sjekk for å unngå lagring av rene avslag før de skal bo hos oss
-            val rettighetsperioder: List<Rettighetsperiode> =
-                packet["rettighetsperioder"].toList().map {
-                    object : Rettighetsperiode {
-                        override val fraOgMed: LocalDate = it["fraOgMed"].asLocalDate()
-                        override val tilOgMed: LocalDate? = it["tilOgMed"]?.asOptionalLocalDate()
-                        override val harRett: Boolean = it["harRett"].asBoolean()
-                    }
-                }
-            if (rettighetsperioder.size == 1 && !rettighetsperioder.first().harRett) {
-                logg.info { "Behandlingsresultat har kun ett avslag, lagrer ikke." }
-                return@withLoggingContext
-            }
-
             val sakId: UUID = packet["behandlingskjedeId"].asString().let { UUID.fromString(it) }
             behandlingResultatRepository.lagre(
                 ident = ident,
@@ -107,6 +90,7 @@ data class DagpengerHendelse(
     enum class Meldingstype {
         OPPRETT,
         OPPDATER,
+        AVSLAG,
     }
 
     companion object {
@@ -119,6 +103,7 @@ data class DagpengerHendelse(
                 meldingstype =
                     when (førteTil) {
                         "Innvilgelse" -> Meldingstype.OPPRETT
+                        "Avslag" -> Meldingstype.AVSLAG
                         else -> Meldingstype.OPPDATER
                     },
             )
