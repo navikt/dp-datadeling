@@ -61,6 +61,7 @@ inbounds:
     permissions:
       roles:
         - "rettighetsperioder"
+        - "beregninger"
   - application: tilleggsstonader-integrasjoner
     namespace: tilleggsstonader
     cluster: prod-gcp
