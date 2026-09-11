@@ -31,7 +31,7 @@ dependencies {
 
     // OpenTelemetry
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.31.1")
-    implementation("io.opentelemetry:opentelemetry-api:1.65.0")
+    implementation("io.opentelemetry:opentelemetry-api:1.66.0")
 
     // Jackson
     implementation(libs.bundles.jackson)
