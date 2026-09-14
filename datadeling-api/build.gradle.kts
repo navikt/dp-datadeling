@@ -23,9 +23,6 @@ dependencies {
     implementation("io.ktor:ktor-server-metrics-micrometer:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
 
-    // Naisful app
-    implementation("com.github.navikt.tbd-libs:naisful-app:20260827.1253")
-
     // Prometheus open metrics
     implementation("io.prometheus:prometheus-metrics-core:1.8.0")
 
@@ -50,7 +47,6 @@ dependencies {
 
     // Test
     testImplementation(libs.ktor.server.test.host)
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:20260827.1253")
     testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2Version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
     testImplementation(libs.testcontainer.postgresql)

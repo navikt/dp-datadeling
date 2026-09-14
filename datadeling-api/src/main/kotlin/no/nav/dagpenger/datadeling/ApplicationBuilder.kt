@@ -2,14 +2,8 @@ package no.nav.dagpenger.datadeling
 
 import com.github.navikt.tbd_libs.kafka.AivenConfig
 import com.github.navikt.tbd_libs.kafka.ConsumerProducerFactory
-import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.micrometer.core.instrument.Clock
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import io.prometheus.metrics.model.registry.PrometheusRegistry
-import io.prometheus.metrics.tracer.initializer.SpanContextSupplier
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,21 +29,12 @@ import no.nav.dagpenger.meldekort.MeldepliktAdapterClient
 import no.nav.dagpenger.søknad.SøknadMottak
 import no.nav.dagpenger.søknad.SøknadRepository
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.slf4j.LoggerFactory
 
 private val log = KotlinLogging.logger {}
 
 internal class ApplicationBuilder(
     configuration: Map<String, String>,
 ) : RapidsConnection.StatusListener {
-    private val meterRegistry =
-        PrometheusMeterRegistry(
-            PrometheusConfig.DEFAULT,
-            PrometheusRegistry.defaultRegistry,
-            Clock.SYSTEM,
-            SpanContextSupplier.getSpanContext(),
-        )
-
     private val behandlingResultatRepositoryPostgresql = BehandlingResultatRepositoryPostgresql()
     private val config = Config.appConfig
     private val meldekortregisterClient = MeldekortregisterClient(Config.dpMeldekortregisterUrl, Config.dpMeldekortregisterTokenProvider)
@@ -74,25 +59,15 @@ internal class ApplicationBuilder(
                 configuration,
                 consumerProducerFactory = consumerProducerFactory,
                 builder = {
-                    withKtor { preStopHook, rapid ->
-                        naisApp(
-                            meterRegistry = meterRegistry,
-                            objectMapper = objectMapper,
-                            applicationLogger = LoggerFactory.getLogger("ApplicationLogger"),
-                            callLogger = LoggerFactory.getLogger("CallLogger"),
-                            aliveCheck = rapid::isReady,
-                            readyCheck = rapid::isReady,
-                            preStopHook = preStopHook::handlePreStopRequest,
-                        ) {
-                            datadelingApi(
-                                config = config,
-                                perioderService = perioderService,
-                                meldekortService = meldekortService,
-                                beregningerService = beregningerService,
-                                dagpengestatusService = dagpengestatusService,
-                                ressursService = ressursService,
-                            )
-                        }
+                    withKtorModule {
+                        datadelingApi(
+                            config = config,
+                            perioderService = perioderService,
+                            meldekortService = meldekortService,
+                            beregningerService = beregningerService,
+                            dagpengestatusService = dagpengestatusService,
+                            ressursService = ressursService,
+                        )
                     }
                 },
             ).apply {

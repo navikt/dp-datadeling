@@ -1,17 +1,14 @@
 package no.nav.dagpenger.datadeling.api
 
-import com.github.navikt.tbd_libs.naisful.test.TestContext
-import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.ktor.server.application.Application
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import no.nav.dagpenger.behandling.BeregningerService
 import no.nav.dagpenger.behandling.DagpengestatusService
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
-import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
@@ -85,17 +82,12 @@ object TestApplication {
 
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
-        test: suspend TestContext.() -> Unit,
+        test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         try {
             setup()
-            return naisfulTestApp(
-                {
-                    apply { moduleFunction() }
-                },
-                objectMapper,
-                PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            ) {
+            testApplication {
+                application { moduleFunction() }
                 test()
             }
         } finally {
@@ -109,7 +101,7 @@ object TestApplication {
         beregningerService: BeregningerService = mockk(relaxed = true),
         dagpengestatusService: DagpengestatusService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
-        test: suspend TestContext.() -> Unit,
+        test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
             datadelingApi(

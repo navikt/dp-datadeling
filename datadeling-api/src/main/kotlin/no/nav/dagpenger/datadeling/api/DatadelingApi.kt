@@ -1,6 +1,10 @@
 package no.nav.dagpenger.datadeling.api
 
+import io.ktor.http.ContentType
+import io.ktor.serialization.jackson3.JacksonConverter
 import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.behandling.BeregningerService
@@ -12,6 +16,7 @@ import no.nav.dagpenger.datadeling.api.config.authentication
 import no.nav.dagpenger.datadeling.api.plugins.configureConsumerContext
 import no.nav.dagpenger.datadeling.api.plugins.configureMetrics
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
+import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.meldekort.MeldekortService
 
 fun Application.datadelingApi(
@@ -22,6 +27,11 @@ fun Application.datadelingApi(
     dagpengestatusService: DagpengestatusService,
     ressursService: RessursService,
 ) {
+    // ContentNegotiation var tidligere satt opp av naisApp(); må installeres her nå som
+    // vi kjører på ktor-appen RapidApplication setter opp selv.
+    install(ContentNegotiation) {
+        register(ContentType.Application.Json, JacksonConverter(objectMapper))
+    }
     authentication(config)
     configureConsumerContext()
     configureMetrics()
