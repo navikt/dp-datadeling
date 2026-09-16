@@ -24,7 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
 
     // Prometheus open metrics
-    implementation("io.prometheus:prometheus-metrics-core:1.8.0")
+    implementation("io.prometheus:prometheus-metrics-core:1.9.0")
 
     // OpenTelemetry
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.31.1")
