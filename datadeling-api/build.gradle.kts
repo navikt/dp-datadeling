@@ -40,7 +40,7 @@ dependencies {
     implementation(libs.bundles.postgres)
 
     // Nav
-    implementation("no.nav.dagpenger:oauth2-klient:2026.10.05-18.24.72dfe9185852")
+    implementation("no.nav.dagpenger:oauth2-klient:2026.10.08-18.23.f84047ea6970")
     implementation(libs.rapids.and.rivers)
     implementation("no.nav.dagpenger:aktivitetslogg:20251016.40.a3c526")
     implementation("io.ktor:ktor-server-metrics:${libs.versions.ktor.get()}")
