@@ -1,4 +1,4 @@
-val mockOauth2Version = "6.0.7"
+val mockOauth2Version = "6.0.8"
 
 plugins {
     id("common")
