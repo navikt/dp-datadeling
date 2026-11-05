@@ -6,7 +6,9 @@ metadata:
   labels:
     team: "teamdagpenger"
     app: "dp-datadeling"
-    subteam: "ramp"
+    subteam: felles
+    okonomisystem: "false"
+    fagsystem: dagpenger
 
 spec:
   image: "{{ image }}"
