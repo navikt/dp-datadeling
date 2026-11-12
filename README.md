@@ -66,4 +66,4 @@ Hvert subdomene har en egen modul.
 
 ## Henvendelser
 
-Opprett et issue her på GitHub. Nav-ansatte kan også bruke Slack-kanalen #team-dagpenger-data.
+Opprett et issue her på GitHub. Nav-ansatte kan også bruke Slack-kanalen #team-dagpenger-datadeling.
