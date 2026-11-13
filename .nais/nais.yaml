@@ -58,6 +58,7 @@ spec:
     outbound:
       rules:
         - application: dp-meldekortregister
+        - application: dp-meldekort
         - application: dp-arena-meldeplikt-adapter
         - application: logging
           namespace: nais-system
