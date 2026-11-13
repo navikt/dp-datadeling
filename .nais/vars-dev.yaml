@@ -5,8 +5,8 @@ db_tier: "db-f1-micro"
 ingresses:
   - https://dp-datadeling.ekstern.dev.nav.no
   - https://dp-datadeling.intern.dev.nav.no
-dpMeldekortregisterHost: dp-meldekortregister.teamdagpenger
-dpMeldekortregisterScope: api://dev-gcp.teamdagpenger.dp-meldekortregister/.default
+dpMeldekortregisterHost: dp-meldekort.teamdagpenger
+dpMeldekortregisterScope: api://dev-gcp.teamdagpenger.dp-meldekort/.default
 dpMeldepliktAdapterHost: dp-arena-meldeplikt-adapter.teamdagpenger
 dpMeldepliktAdapterScope: api://dev-gcp.teamdagpenger.dp-arena-meldeplikt-adapter/.default
 dpProxyHost: dp-proxy.dev-fss-pub.nais.io
