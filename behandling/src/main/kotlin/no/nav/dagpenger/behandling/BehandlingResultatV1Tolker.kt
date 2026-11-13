@@ -37,14 +37,34 @@ class BehandlingResultatV1Tolker(
                     .filter { periode ->
                         (periode.verdi as? no.nav.dagpenger.behandling.kontrakt.v1.models.BoolskVerdiv1DTO)?.verdi == true
                     }.map { periode ->
-                        object : Rettighetstyper {
-                            override val type: Rettighetstype =
-                                RETTIGHETSTYPE_OPPLYSNINGER[opplysning.opplysningTypeId]!!
-                            override val fraOgMed: LocalDate = periode.gyldigFraOgMed ?: LocalDate.MIN
-                            override val tilOgMed: LocalDate = periode.gyldigTilOgMed ?: LocalDate.MAX
-                        }
+                        Rettighetstypeperiode(
+                            type = RETTIGHETSTYPE_OPPLYSNINGER.getValue(opplysning.opplysningTypeId),
+                            fraOgMed = periode.gyldigFraOgMed ?: LocalDate.MIN,
+                            tilOgMed = periode.gyldigTilOgMed ?: LocalDate.MAX,
+                        )
                     }
+            }.let { særtyper ->
+                (særtyper + ordinærePerioder(særtyper)).sortedBy { it.fraOgMed }
             }
+
+    private fun ordinærePerioder(særtyper: List<Rettighetstyper>): List<Rettighetstyper> =
+        buildList {
+            var fraOgMed = LocalDate.MIN
+            for (særtype in særtyper.sortedBy { it.fraOgMed }) {
+                if (fraOgMed.isBefore(særtype.fraOgMed)) {
+                    add(Rettighetstypeperiode(Rettighetstype.ORDINÆR, fraOgMed, særtype.fraOgMed.minusDays(1)))
+                }
+                if (særtype.tilOgMed == LocalDate.MAX) return@buildList
+                fraOgMed = maxOf(fraOgMed, særtype.tilOgMed.plusDays(1))
+            }
+            add(Rettighetstypeperiode(Rettighetstype.ORDINÆR, fraOgMed, LocalDate.MAX))
+        }
+
+    private data class Rettighetstypeperiode(
+        override val type: Rettighetstype,
+        override val fraOgMed: LocalDate,
+        override val tilOgMed: LocalDate,
+    ) : Rettighetstyper
 
     override val beregninger: List<BeregnetDag> =
         dto.utbetalinger.map { utbetalingDto ->
@@ -94,7 +114,6 @@ class BehandlingResultatV1Tolker(
         // Mapping fra opplysningTypeId til rettighetstype
         private val RETTIGHETSTYPE_OPPLYSNINGER =
             mapOf(
-                UUID.fromString("0194881f-9444-7a73-a458-0af81c034d8a") to Rettighetstype.ORDINÆR,
                 UUID.fromString("0194881f-9444-7a73-a458-0af81c034d86") to Rettighetstype.PERMITTERING,
                 UUID.fromString("0194881f-9444-7a73-a458-0af81c034d87") to Rettighetstype.LØNNSGARANTI,
                 UUID.fromString("0194881f-9444-7a73-a458-0af81c034d88") to Rettighetstype.FISK,
