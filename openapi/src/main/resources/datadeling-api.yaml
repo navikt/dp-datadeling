@@ -110,8 +110,8 @@ paths:
   /dagpenger/datadeling/v1/perioder:
     post:
       description: |-
-       Perioder er såkalte betingede perioder (rettighetsperioder) for Dagpenger. Bruker har rett til Dagpenger i disse periodene 
-        gitt at andre betingelser er oppfylt (Melder seg til Nav hver 14. dag pt).
+        Perioder er såkalte betingede perioder (rettighetsperioder) for Dagpenger. Bruker har rett til Dagpenger i disse periodene 
+         gitt at andre betingelser er oppfylt (Melder seg til Nav hver 14. dag pt).
       tags:
         - Internt
         - Rettighetsperioder
@@ -182,7 +182,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DagpengestatusResponse'
       security:
-        - azure: []
+        - azure: [ ]
 
   /dagpenger/datadeling/v1/meldekort:
     post:
@@ -206,6 +206,48 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meldekort'
+      security:
+        - azure: [ ]
+
+  /dagpenger/datadeling/v1/sak:
+    post:
+      description: |-
+        Returnerer sak
+      tags:
+        - Internt
+        - Sak
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatadelingRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullSak'
+      security:
+        - azure: [ ]
+
+  /dagpenger/datadeling/v1/sak/{sakId}:
+    post:
+      description: |-
+        Returnerer sak basert på sakId
+      tags:
+        - Internt
+        - Sak
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TynnSak'
       security:
         - azure: [ ]
 
@@ -516,6 +558,102 @@ components:
             Null dersom personen ikke finnes i ny løsning.
             Denne datoen angir fra når personen ikke lenger skal
             behandles for dagpenger i Arena.
+
+    BehandlingId:
+      type: string
+      format: uuid
+
+    TynnSak:
+      description: En sak, det vil si en sammenhengende behandlingskjede med tilhørende status og behandlingshistorikk
+      type: object
+      required:
+        - sakId
+        - status
+      properties:
+        sakId:
+          $ref: '#/components/schemas/BehandlingId'
+        status:
+          $ref: '#/components/schemas/SakStatus'
+
+    FullSak:
+      description: En sak, det vil si en sammenhengende behandlingskjede med tilhørende status og behandlingshistorikk
+      type: object
+      required:
+        - sakId
+        - status
+        - behandlinger
+      properties:
+        sakId:
+          $ref: '#/components/schemas/BehandlingId'
+        status:
+          $ref: '#/components/schemas/SakStatus'
+        meldekort:
+          description: Alle behandlinger i saken, i kjedet rekkefølge (nyeste først)
+          type: array
+          items:
+            $ref: '#/components/schemas/Meldekort'
+        # TODO: Kan vi slå sammen beregninger inn i meldekort?
+        beregninger:
+          description: Alle beregninger, per dag
+          type: array
+          items:
+            $ref: '#/components/schemas/BeregnetDag'
+
+    SakStatus:
+      description: Gjeldende status for saken, basert på siste ferdigstilte behandling
+      type: object
+      required:
+        - harLøpendeRett
+        - sistEndret
+      properties:
+        ytelsesstatus:
+          $ref: '#/components/schemas/Ytelsesstatus'
+        harLøpendeRett:
+          description: Om bruker har en løpende rett på dagpenger i dag
+          type: boolean
+        fraOgMed:
+          description: Fra og med dato for gjeldende rettighetsperiode
+          type: string
+          format: date
+        tilOgMed:
+          description: Til og med dato for gjeldende rettighetsperiode, hvis den er avsluttet
+          type: string
+          format: date
+        sisteMeldeperiode:
+          $ref: '#/components/schemas/LukketPeriode'
+        gjenståendeDager:
+          description: Antall gjenstående dager med rett på dagpenger
+          type: integer
+        gjenståendeSanksjon:
+          description: Antall gjenstående dager med sanksjon
+          type: integer
+        gjenståendeTidsbegrensetBortfall:
+          description: Antall gjenstående dager med tidsbegrenset bortfall
+          type: integer
+        sistEndret:
+          description: Tidspunktet siste ferdigstilte behandling i saken ble ferdig
+          type: string
+          format: date-time
+
+    Ytelsesstatus:
+      type: string
+      enum:
+        - TilBehandling
+        - Loepende
+        - Avsluttet
+
+    LukketPeriode:
+      type: object
+      required:
+        - fraOgMed
+        - tilOgMed
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+        tilOgMed:
+          type: string
+          format: date
 
   securitySchemes:
     maskinporten:
