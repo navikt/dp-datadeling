@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.kotlin.logging)
     implementation(libs.bundles.jackson)
 
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.rapids.and.rivers.test)
