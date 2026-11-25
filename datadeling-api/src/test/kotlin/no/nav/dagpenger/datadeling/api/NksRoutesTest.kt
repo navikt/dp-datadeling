@@ -115,12 +115,12 @@ class NksRoutesTest {
         }
 
     @Test
-    fun `fields=meldekort tar med meldekort men ikke beregninger`() =
+    fun `include=meldekort tar med meldekort men ikke beregninger`() =
         testEndepunkter(nksSakService = nksSakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
             coEvery { meldekortService.hentMeldekort(any()) } returns listOf(etMeldekort("mk-1"))
 
-            val body = client.testPost("$sakerUrl?fields=meldekort", enDatadelingRequest(), token).bodyAsText()
+            val body = client.testPost("$sakerUrl?include=meldekort", enDatadelingRequest(), token).bodyAsText()
 
             val sak = objectMapper.readTree(body)[0]
             sak["meldekort"].elementer().map { it["id"].asText() } shouldBe listOf("mk-1")
@@ -128,11 +128,11 @@ class NksRoutesTest {
         }
 
     @Test
-    fun `fields=beregninger tar med beregninger men ikke meldekort`() =
+    fun `include=beregninger tar med beregninger men ikke meldekort`() =
         testEndepunkter(nksSakService = nksSakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
 
-            val body = client.testPost("$sakerUrl?fields=beregninger", enDatadelingRequest(), token).bodyAsText()
+            val body = client.testPost("$sakerUrl?include=beregninger", enDatadelingRequest(), token).bodyAsText()
 
             val sak = objectMapper.readTree(body)[0]
             sak.has("meldekort") shouldBe false
@@ -143,12 +143,12 @@ class NksRoutesTest {
         }
 
     @Test
-    fun `fields=meldekort,beregninger tar med begge`() =
+    fun `include=meldekort,beregninger tar med begge`() =
         testEndepunkter(nksSakService = nksSakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
             coEvery { meldekortService.hentMeldekort(any()) } returns listOf(etMeldekort("mk-1"))
 
-            val body = client.testPost("$sakerUrl?fields=meldekort,beregninger", enDatadelingRequest(), token).bodyAsText()
+            val body = client.testPost("$sakerUrl?include=meldekort,beregninger", enDatadelingRequest(), token).bodyAsText()
 
             val sak = objectMapper.readTree(body)[0]
             sak["meldekort"].size() shouldBe 1
@@ -187,7 +187,7 @@ class NksRoutesTest {
             coEvery { meldekortService.hentMeldekort(any()) } returns emptyList()
 
             @Language("JSON")
-            client.testPost("$sakerUrl?fields=meldekort,beregninger", enDatadelingRequest(), token).bodyAsText() shouldEqualJson
+            client.testPost("$sakerUrl?include=meldekort,beregninger", enDatadelingRequest(), token).bodyAsText() shouldEqualJson
                 """
                 [
                   {
@@ -255,7 +255,7 @@ class NksRoutesTest {
             every { repository.hentSaker(any()) } returns
                 listOf(Sak(sakId, listOf(SakBehandling(opprettet, behandling(perioder = listOf(periode(fra, til)))))))
 
-            val response = client.testPost("$sakerUrl?fields=beregninger", enDatadelingRequest(), token)
+            val response = client.testPost("$sakerUrl?include=beregninger", enDatadelingRequest(), token)
 
             response.status shouldBe HttpStatusCode.OK
             @Language("JSON")
@@ -299,7 +299,7 @@ class NksRoutesTest {
             every { repository.hentSak(sakId) } returns enLøpendeSak()
             coEvery { meldekortService.hentMeldekort(any()) } returns listOf(etMeldekort("mk-1"))
 
-            val response = client.testGet("$sakerUrl/$sakId?fields=meldekort,beregninger", token)
+            val response = client.testGet("$sakerUrl/$sakId?include=meldekort,beregninger", token)
 
             response.status shouldBe HttpStatusCode.OK
             val sak = objectMapper.readTree(response.bodyAsText())
@@ -310,7 +310,7 @@ class NksRoutesTest {
         }
 
     @Test
-    fun `henter enkelt sak uten fields som tynn sak`() =
+    fun `henter enkelt sak uten include som tynn sak`() =
         testEndepunkter(nksSakService = nksSakService) {
             every { repository.hentSak(sakId) } returns enLøpendeSak()
 
@@ -388,13 +388,13 @@ class NksRoutesTest {
         }
 
     @Test
-    fun `returnerer 400 for ugyldig fields-verdi`() =
+    fun `returnerer 400 for ugyldig include-verdi`() =
         testEndepunkter(nksSakService = nksSakService) {
             every { repository.hentSaker(any()) } returns emptyList()
 
-            client.testPost("$sakerUrl?fields=meldekort,ugyldig", enDatadelingRequest(), token).status shouldBe
+            client.testPost("$sakerUrl?include=meldekort,ugyldig", enDatadelingRequest(), token).status shouldBe
                 HttpStatusCode.BadRequest
-            client.testGet("$sakerUrl/$sakId?fields=ugyldig", token).status shouldBe HttpStatusCode.BadRequest
+            client.testGet("$sakerUrl/$sakId?include=ugyldig", token).status shouldBe HttpStatusCode.BadRequest
         }
 
     private fun JsonNode.elementer() = (0 until size()).map { this[it] }

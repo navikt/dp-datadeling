@@ -12,7 +12,7 @@ import io.ktor.server.routing.route
 import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
-import no.nav.dagpenger.datadeling.models.NksSakFeltDTO
+import no.nav.dagpenger.datadeling.models.NksSakInkluderDTO
 import java.util.UUID
 
 /**
@@ -24,14 +24,14 @@ fun Route.nksRoutes(nksSakService: NksSakService) {
         route("/dagpenger/datadeling/v1/nks/saker") {
             kreverTilgang(Tilgangsrolle.nks)
             post {
-                val felter = call.valgteFelter() ?: return@post call.respond(HttpStatusCode.BadRequest)
+                val inkluder = call.valgteInkluder() ?: return@post call.respond(HttpStatusCode.BadRequest)
                 val request = call.receive<DatadelingRequestDTO>()
-                call.respond(HttpStatusCode.OK, nksSakService.hentSaker(request, felter))
+                call.respond(HttpStatusCode.OK, nksSakService.hentSaker(request, inkluder))
             }
             get("/{sakId}") {
-                val felter = call.valgteFelter() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                val inkluder = call.valgteInkluder() ?: return@get call.respond(HttpStatusCode.BadRequest)
                 val sakId = call.sakId() ?: return@get call.respond(HttpStatusCode.BadRequest)
-                val sak = nksSakService.hentSak(sakId, felter)
+                val sak = nksSakService.hentSak(sakId, inkluder)
                 if (sak == null) call.respond(HttpStatusCode.NotFound) else call.respond(HttpStatusCode.OK, sak)
             }
         }
@@ -40,13 +40,13 @@ fun Route.nksRoutes(nksSakService: NksSakService) {
 
 private fun RoutingCall.sakId(): UUID? = runCatching { UUID.fromString(parameters["sakId"]) }.getOrNull()
 
-// Returnerer null hvis fields inneholder ukjente verdier
-private fun RoutingCall.valgteFelter(): Set<NksSakFeltDTO>? {
+// Returnerer null hvis include inneholder ukjente verdier
+private fun RoutingCall.valgteInkluder(): Set<NksSakInkluderDTO>? {
     val verdier =
-        request.queryParameters["fields"]
+        request.queryParameters["include"]
             ?.split(",")
             ?.map { it.trim() }
             ?.filter { it.isNotEmpty() } ?: return emptySet()
-    val felter = verdier.map { NksSakFeltDTO.fromValue(it) }
-    return if (felter.any { it == null }) null else felter.filterNotNull().toSet()
+    val inkluder = verdier.map { NksSakInkluderDTO.fromValue(it) }
+    return if (inkluder.any { it == null }) null else inkluder.filterNotNull().toSet()
 }

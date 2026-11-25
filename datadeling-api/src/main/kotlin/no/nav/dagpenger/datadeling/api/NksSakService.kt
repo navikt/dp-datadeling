@@ -11,7 +11,7 @@ import no.nav.dagpenger.datadeling.models.NksGjenstaaendeDTO
 import no.nav.dagpenger.datadeling.models.NksRettighetsperiodeDTO
 import no.nav.dagpenger.datadeling.models.NksSakAvsluttetDTO
 import no.nav.dagpenger.datadeling.models.NksSakDTO
-import no.nav.dagpenger.datadeling.models.NksSakFeltDTO
+import no.nav.dagpenger.datadeling.models.NksSakInkluderDTO
 import no.nav.dagpenger.datadeling.models.NksSakLoependeDTO
 import no.nav.dagpenger.datadeling.models.NksSakTilBehandlingDTO
 import no.nav.dagpenger.datadeling.models.SoknadDTO
@@ -42,7 +42,7 @@ class NksSakService(
 ) {
     suspend fun hentSaker(
         request: DatadelingRequestDTO,
-        felter: Set<NksSakFeltDTO>,
+        inkluder: Set<NksSakInkluderDTO>,
     ): List<NksSakDTO> {
         val saker = behandlinger.hentSaker(request.personIdent)
         val søknadsbehandlingerPerSak =
@@ -53,21 +53,21 @@ class NksSakService(
                     it.sakId != null
                 }.groupBy { it.sakId!! }
 
-        val medResultat = saker.map { it.tilDTO(felter, søknadsbehandlingerPerSak[it.sakId].orEmpty()) }
+        val medResultat = saker.map { it.tilDTO(inkluder, søknadsbehandlingerPerSak[it.sakId].orEmpty()) }
         val barePåSøknad =
             søknadsbehandlingerPerSak
                 .filterKeys { sakId -> saker.none { it.sakId == sakId } }
-                .map { (sakId, søknadsbehandlinger) -> sakUtenResultat(sakId, søknadsbehandlinger, felter) }
+                .map { (sakId, søknadsbehandlinger) -> sakUtenResultat(sakId, søknadsbehandlinger, inkluder) }
         return medResultat + barePåSøknad
     }
 
     suspend fun hentSak(
         sakId: UUID,
-        felter: Set<NksSakFeltDTO>,
+        inkluder: Set<NksSakInkluderDTO>,
     ): NksSakDTO? {
         val søknadsbehandlinger = søknadBehandlingGraf.søknaderForSak(sakId).flatMap { it.søknadsbehandlinger }
-        return behandlinger.hentSak(sakId)?.tilDTO(felter, søknadsbehandlinger)
-            ?: søknadsbehandlinger.takeIf { it.isNotEmpty() }?.let { sakUtenResultat(sakId, it, felter) }
+        return behandlinger.hentSak(sakId)?.tilDTO(inkluder, søknadsbehandlinger)
+            ?: søknadsbehandlinger.takeIf { it.isNotEmpty() }?.let { sakUtenResultat(sakId, it, inkluder) }
     }
 
     private fun List<Søknadsbehandling>.tilDTO() =
@@ -91,20 +91,20 @@ class NksSakService(
     private fun sakUtenResultat(
         sakId: UUID,
         søknadsbehandlinger: List<Søknadsbehandling>,
-        felter: Set<NksSakFeltDTO>,
+        inkluder: Set<NksSakInkluderDTO>,
     ) = NksSakTilBehandlingDTO(
         sakId = sakId,
         soknader = søknadsbehandlinger.tilDTO(),
-        meldekort = if (NksSakFeltDTO.MELDEKORT in felter) emptyList() else null,
+        meldekort = if (NksSakInkluderDTO.MELDEKORT in inkluder) emptyList() else null,
     )
 
     private suspend fun Sak.tilDTO(
-        felter: Set<NksSakFeltDTO>,
+        inkluder: Set<NksSakInkluderDTO>,
         søknadsbehandlinger: List<Søknadsbehandling>,
     ): NksSakDTO {
         val soknader = søknadsbehandlinger.takeIf { it.isNotEmpty() }?.tilDTO()
-        val meldekort = if (NksSakFeltDTO.MELDEKORT in felter) hentMeldekort() else null
-        val beregninger = if (NksSakFeltDTO.BEREGNINGER in felter) beregninger.map { it.tilDTO() } else null
+        val meldekort = if (NksSakInkluderDTO.MELDEKORT in inkluder) hentMeldekort() else null
+        val beregninger = if (NksSakInkluderDTO.BEREGNINGER in inkluder) beregninger.map { it.tilDTO() } else null
 
         return when (status()) {
             SakStatus.TIL_BEHANDLING -> {

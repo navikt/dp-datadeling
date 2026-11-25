@@ -213,21 +213,21 @@ paths:
     post:
       description: |-
         Lister alle saker for en person. Responsen er tynn som standard;
-        bruk `fields` for å ta med meldekort og/eller beregninger.
+        bruk `include` for å ta med meldekort og/eller beregninger.
       tags:
         - Internt
         - NKS
       parameters:
-        - name: fields
+        - name: include
           in: query
           required: false
           style: form
           explode: false
-          description: Kommaseparert liste over tunge felt som skal tas med i svaret. Uten dette returneres kun sakId, status og statusens egne felt.
+          description: Kommaseparert liste over relaterte data som skal tas med i svaret. Uten dette returneres kun sakId, status og statusens egne felt.
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/NksSakFelt'
+              $ref: '#/components/schemas/NksSakInkluder'
       requestBody:
         required: true
         content:
@@ -250,7 +250,7 @@ paths:
     get:
       description: |-
         Henter én sak. Svaret er tynt som standard;
-        bruk `fields` for å ta med meldekort og/eller beregninger.
+        bruk `include` for å ta med meldekort og/eller beregninger.
       tags:
         - Internt
         - NKS
@@ -260,16 +260,16 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/SakId'
-        - name: fields
+        - name: include
           in: query
           required: false
           style: form
           explode: false
-          description: Kommaseparert liste over tunge felt som skal tas med i svaret. Uten dette returneres kun sakId, status og statusens egne felt.
+          description: Kommaseparert liste over relaterte data som skal tas med i svaret. Uten dette returneres kun sakId, status og statusens egne felt.
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/NksSakFelt'
+              $ref: '#/components/schemas/NksSakInkluder'
       responses:
         200:
           description: OK
@@ -594,7 +594,7 @@ components:
       type: string
       format: uuid
 
-    NksSakFelt:
+    NksSakInkluder:
       type: string
       enum:
         - meldekort
@@ -655,7 +655,7 @@ components:
           items:
             $ref: '#/components/schemas/Soknad'
         meldekort:
-          description: Meldekort i saken (nyeste først). Kun med fields=meldekort
+          description: Meldekort i saken (nyeste først). Kun med include=meldekort
           type: array
           items:
             $ref: '#/components/schemas/Meldekort'
@@ -691,7 +691,7 @@ components:
               items:
                 $ref: '#/components/schemas/NksRettighetsperiode'
             beregninger:
-              description: Beregninger per dag. Kun med fields=beregninger
+              description: Beregninger per dag. Kun med include=beregninger
               type: array
               items:
                 $ref: '#/components/schemas/BeregnetDag'
@@ -723,7 +723,7 @@ components:
               items:
                 $ref: '#/components/schemas/NksRettighetsperiode'
             beregninger:
-              description: Beregninger per dag. Kun med fields=beregninger
+              description: Beregninger per dag. Kun med include=beregninger
               type: array
               items:
                 $ref: '#/components/schemas/BeregnetDag'
