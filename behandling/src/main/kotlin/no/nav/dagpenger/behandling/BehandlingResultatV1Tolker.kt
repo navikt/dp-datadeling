@@ -65,6 +65,16 @@ class BehandlingResultatV1Tolker(
             }
         }
 
+    override val gjenståendeSanksjon: Int? get() = laveste(GJENSTÅENDE_SANKSJON_OPPLYSNING)
+    override val gjenståendeTidsbegrensetBortfall: Int? get() = laveste(GJENSTÅENDE_TIDSBEGRENSET_BORTFALL_OPPLYSNING)
+
+    private fun laveste(opplysningTypeId: UUID): Int? =
+        dto.opplysninger
+            .find { it.opplysningTypeId == opplysningTypeId }
+            ?.perioder
+            ?.mapNotNull { (it.verdi as? no.nav.dagpenger.behandling.kontrakt.v1.models.HeltallVerdiv1DTO)?.verdi }
+            ?.minOrNull()
+
     // Fallback for behandlinger hvor vi ikke har satt gjenstående dager for dager som ikke førte til forbruk
     private fun innvilgetDager(): Int =
         dto.opplysninger
@@ -101,6 +111,8 @@ class BehandlingResultatV1Tolker(
             )
 
         private val GJENSTÅENDE_DAGER_OPPLYSNINGER = UUID.fromString("01992956-e349-76b1-8f68-c9d481df3a32")
+        private val GJENSTÅENDE_SANKSJON_OPPLYSNING = UUID.fromString("76d9c243-228b-4359-9550-1ebbb7ba5cb5")
+        private val GJENSTÅENDE_TIDSBEGRENSET_BORTFALL_OPPLYSNING = UUID.fromString("019df7d6-5159-7290-b8a1-9fc9edc58579")
         private val INNVILGET_ANTALL_DAGER_OPPLYSNING = UUID.fromString("0194881f-943d-77a7-969c-147999f15457")
 
         fun fra(jsonNode: JsonNode): BehandlingResultatV1Tolker {

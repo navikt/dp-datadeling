@@ -105,21 +105,25 @@ class NksSakService(
         val soknader = søknadsbehandlinger.takeIf { it.isNotEmpty() }?.tilDTO()
         val meldekort = if (NksSakFeltDTO.MELDEKORT in felter) hentMeldekort() else null
         val beregninger = if (NksSakFeltDTO.BEREGNINGER in felter) beregninger.map { it.tilDTO() } else null
-        val fraOgMed = fraOgMed
 
         return when (status()) {
-            SakStatus.TIL_BEHANDLING -> NksSakTilBehandlingDTO(sakId = sakId, soknader = soknader, meldekort = meldekort)
-            SakStatus.LOEPENDE ->
+            SakStatus.TIL_BEHANDLING -> {
+                NksSakTilBehandlingDTO(sakId = sakId, soknader = soknader, meldekort = meldekort)
+            }
+
+            SakStatus.LOEPENDE -> {
                 NksSakLoependeDTO(
                     sakId = sakId,
                     soknader = soknader,
                     meldekort = meldekort,
                     beregninger = beregninger,
                     rettighetsperioder = rettighetsperioderDTO(),
-                    gjenstående = gjenståendeDager?.let { NksGjenstaaendeDTO(dager = it) },
+                    gjenstående = gjenstående(),
                     sistEndret = sistEndret,
                 )
-            SakStatus.AVSLUTTET ->
+            }
+
+            SakStatus.AVSLUTTET -> {
                 NksSakAvsluttetDTO(
                     sakId = sakId,
                     soknader = soknader,
@@ -128,8 +132,20 @@ class NksSakService(
                     rettighetsperioder = rettighetsperioderDTO(),
                     sistEndret = sistEndret,
                 )
+            }
         }
     }
+
+    private fun Sak.gjenstående(): NksGjenstaaendeDTO? =
+        listOf(gjenståendeDager, gjenståendeSanksjon, gjenståendeTidsbegrensetBortfall)
+            .takeIf { alle -> alle.any { it != null } }
+            ?.let {
+                NksGjenstaaendeDTO(
+                    dager = gjenståendeDager,
+                    sanksjon = gjenståendeSanksjon,
+                    tidsbegrensetBortfall = gjenståendeTidsbegrensetBortfall,
+                )
+            }
 
     private fun Sak.rettighetsperioderDTO() =
         rettighetsperioder.map { NksRettighetsperiodeDTO(fraOgMed = it.fraOgMed, tilOgMed = it.tilOgMed, harRett = it.harRett) }

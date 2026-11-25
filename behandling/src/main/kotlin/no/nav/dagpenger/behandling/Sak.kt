@@ -48,13 +48,17 @@ class Sak(
     // Alle beregninger i saken. Tolkes først når de leses, og bør derfor bare brukes når de er etterspurt.
     val beregninger: List<BeregnetDag> by lazy { behandlinger.flatMap { it.resultat.beregninger }.sortedBy { it.dato } }
 
-    // Kun siste behandling, og null hvis gamle data ikke lar seg tolke
+    // Teller nedover, så laveste verdi i siste behandling er gjeldende. Null hvis gamle data ikke lar seg tolke
     val gjenståendeDager: Int? by lazy {
         runCatching {
             sisteBehandling.resultat.beregninger
-                .maxByOrNull { it.dato }
-                ?.gjenståendeDager
+                .minOfOrNull { it.gjenståendeDager }
         }.getOrNull()
+    }
+
+    val gjenståendeSanksjon: Int? by lazy { runCatching { sisteBehandling.resultat.gjenståendeSanksjon }.getOrNull() }
+    val gjenståendeTidsbegrensetBortfall: Int? by lazy {
+        runCatching { sisteBehandling.resultat.gjenståendeTidsbegrensetBortfall }.getOrNull()
     }
 
     fun status(): SakStatus =

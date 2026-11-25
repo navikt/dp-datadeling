@@ -9,6 +9,10 @@ interface BehandlingResultat {
     val rettighetsperioder: List<Rettighetsperiode>
     val rettighetstyper: List<Rettighetstyper>
     val beregninger: List<BeregnetDag>
+
+    // Opplysningene kan mangle i behandlingsresultatet, og teller nedover. Laveste verdi er gjeldende.
+    val gjenståendeSanksjon: Int? get() = null
+    val gjenståendeTidsbegrensetBortfall: Int? get() = null
 }
 
 interface Rettighetsperiode {

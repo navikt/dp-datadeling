@@ -134,6 +134,44 @@ class BehandlingResultatJsonNodeTolkerTest {
     }
 
     @Test
+    fun `leser laveste gjenstående sanksjon og tidsbegrenset bortfall, og null når de mangler`() {
+        fun json(opplysninger: String) =
+            objectMapper.readTree(
+                // language=JSON
+                """
+                {
+                  "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                  "ident": "12345678901",
+                  "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": true}],
+                  "opplysninger": [$opplysninger]
+                }
+                """.trimIndent(),
+            )
+
+        fun opplysning(
+            id: String,
+            vararg verdier: Int,
+        ): String {
+            val perioder = verdier.joinToString(",") { """{"verdi": {"verdi": $it, "datatype": "heltall"}}""" }
+            return """{"opplysningTypeId": "$id", "perioder": [$perioder]}"""
+        }
+
+        val med =
+            BehandlingResultatJsonNodeTolker.fra(
+                json(
+                    opplysning("76d9c243-228b-4359-9550-1ebbb7ba5cb5", 10, 7) + "," +
+                        opplysning("019df7d6-5159-7290-b8a1-9fc9edc58579", 4, 2),
+                ),
+            )
+        med.gjenståendeSanksjon shouldBe 7
+        med.gjenståendeTidsbegrensetBortfall shouldBe 2
+
+        val uten = BehandlingResultatJsonNodeTolker.fra(json(""))
+        uten.gjenståendeSanksjon shouldBe null
+        uten.gjenståendeTidsbegrensetBortfall shouldBe null
+    }
+
+    @Test
     fun `bruker siste tilgjengelige gjenstående-dager-periode ved manglende eksakt match`() {
         val json: JsonNode =
             objectMapper.readTree(
