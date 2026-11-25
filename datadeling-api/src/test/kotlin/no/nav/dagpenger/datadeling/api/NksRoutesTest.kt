@@ -60,7 +60,7 @@ class NksRoutesTest {
         utfall: String? = null,
     ) = Søknadsbehandling(søknadId, sakId, innsendt, tilstand, utfall)
 
-    private val token get() = issueAzureToken(azpRoles = listOf(Tilgangsrolle.rettighetsperioder.name))
+    private val token get() = issueAzureToken(azpRoles = listOf(Tilgangsrolle.nks.name))
 
     private val sakerUrl = "/dagpenger/datadeling/v1/nks/saker"
 
@@ -104,12 +104,10 @@ class NksRoutesTest {
                   {
                     "status": "Løpende",
                     "sakId": "$sakId",
-                    "harRett": true,
                     "rettighetsperioder": [
                       { "fraOgMed": "${idag.minusDays(30)}", "harRett": true }
                     ],
-                    "fraOgMed": "${idag.minusDays(30)}",
-                    "gjenståendeDager": 258,
+                    "gjenstående": { "dager": 258 },
                     "sistEndret": "2024-03-01T12:00:00"
                   }
                 ]
@@ -222,7 +220,7 @@ class NksRoutesTest {
         }
 
     @Test
-    fun `pause i løpende sak er Løpende med harRett false`() =
+    fun `pause i løpende sak er Løpende med siste rettighetsperiode uten rett`() =
         testEndepunkter(nksSakService = nksSakService) {
             val pause =
                 Sak(
@@ -245,32 +243,8 @@ class NksRoutesTest {
             val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
 
             sak["status"].asText() shouldBe "Løpende"
-            sak["harRett"].asBoolean() shouldBe false
-            sak["fraOgMed"].asText() shouldBe "${idag.minusDays(10)}"
-        }
-
-    @Test
-    fun `løpende sak uten sluttdato har ikke tilOgMed`() =
-        testEndepunkter(nksSakService = nksSakService) {
-            every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
-
-            val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
-
-            sak["status"].asText() shouldBe "Løpende"
-            sak.has("tilOgMed") shouldBe false
-        }
-
-    @Test
-    fun `løpende sak med sluttdato frem i tid har tilOgMed`() =
-        testEndepunkter(nksSakService = nksSakService) {
-            val sluttdato = idag.plusDays(10)
-            every { repository.hentSaker(any()) } returns
-                listOf(Sak(sakId, listOf(SakBehandling(opprettet, behandling(perioder = listOf(periode(idag.minusDays(30), sluttdato)))))))
-
-            val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
-
-            sak["status"].asText() shouldBe "Løpende"
-            sak["tilOgMed"].asText() shouldBe "$sluttdato"
+            sak["rettighetsperioder"].last()["harRett"].asBoolean() shouldBe false
+            sak["rettighetsperioder"].size() shouldBe 2
         }
 
     @Test
@@ -291,8 +265,6 @@ class NksRoutesTest {
                   {
                     "status": "Avsluttet",
                     "sakId": "$sakId",
-                    "fraOgMed": "$fra",
-                    "tilOgMed": "$til",
                     "rettighetsperioder": [
                       { "fraOgMed": "$fra", "tilOgMed": "$til", "harRett": true }
                     ],

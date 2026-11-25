@@ -7,6 +7,7 @@ import no.nav.dagpenger.behandling.overlapper
 import no.nav.dagpenger.behandling.tilDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
+import no.nav.dagpenger.datadeling.models.NksGjenstaaendeDTO
 import no.nav.dagpenger.datadeling.models.NksRettighetsperiodeDTO
 import no.nav.dagpenger.datadeling.models.NksSakAvsluttetDTO
 import no.nav.dagpenger.datadeling.models.NksSakDTO
@@ -114,11 +115,8 @@ class NksSakService(
                     soknader = soknader,
                     meldekort = meldekort,
                     beregninger = beregninger,
-                    harRett = harRett,
                     rettighetsperioder = rettighetsperioderDTO(),
-                    fraOgMed = fraOgMed!!,
-                    tilOgMed = tilOgMed,
-                    gjenståendeDager = gjenståendeDager,
+                    gjenstående = gjenståendeDager?.let { NksGjenstaaendeDTO(dager = it) },
                     sistEndret = sistEndret,
                 )
             SakStatus.AVSLUTTET ->
@@ -127,8 +125,6 @@ class NksSakService(
                     soknader = soknader,
                     meldekort = meldekort,
                     beregninger = beregninger,
-                    fraOgMed = fraOgMed!!,
-                    tilOgMed = tilOgMed!!,
                     rettighetsperioder = rettighetsperioderDTO(),
                     sistEndret = sistEndret,
                 )

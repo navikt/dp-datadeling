@@ -679,8 +679,6 @@ components:
         - type: object
           required:
             - status
-            - harRett
-            - fraOgMed
             - rettighetsperioder
             - sistEndret
           properties:
@@ -692,33 +690,15 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/NksRettighetsperiode'
-            harRett:
-              description: Om bruker har rett på dagpenger i gjeldende periode. False betyr pause i en ellers løpende sak
-              type: boolean
             beregninger:
               description: Beregninger per dag. Kun med fields=beregninger
               type: array
               items:
                 $ref: '#/components/schemas/BeregnetDag'
-            fraOgMed:
-              description: Fra og med dato for gjeldende rettighetsperiode
-              type: string
-              format: date
-            tilOgMed:
-              description: Til og med dato for gjeldende rettighetsperiode, hvis den er kjent
-              type: string
-              format: date
             sisteMeldeperiode:
               $ref: '#/components/schemas/LukketPeriode'
-            gjenståendeDager:
-              description: Antall gjenstående dager med rett på dagpenger
-              type: integer
-            gjenståendeSanksjon:
-              description: Antall gjenstående dager med sanksjon
-              type: integer
-            gjenståendeTidsbegrensetBortfall:
-              description: Antall gjenstående dager med tidsbegrenset bortfall
-              type: integer
+            gjenstående:
+              $ref: '#/components/schemas/NksGjenstaaende'
             sistEndret:
               description: Tidspunktet siste ferdigstilte behandling i saken ble ferdig
               type: string
@@ -731,8 +711,6 @@ components:
         - type: object
           required:
             - status
-            - fraOgMed
-            - tilOgMed
             - rettighetsperioder
             - sistEndret
           properties:
@@ -749,15 +727,23 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/BeregnetDag'
-            fraOgMed:
-              type: string
-              format: date
-            tilOgMed:
-              type: string
-              format: date
             sistEndret:
               type: string
               format: date-time
+
+    NksGjenstaaende:
+      description: Gjenstående dager i rettigheten
+      type: object
+      properties:
+        dager:
+          description: Antall gjenstående dager med rett på dagpenger
+          type: integer
+        sanksjon:
+          description: Antall gjenstående dager med sanksjon
+          type: integer
+        tidsbegrensetBortfall:
+          description: Antall gjenstående dager med tidsbegrenset bortfall
+          type: integer
 
     NksRettighetsperiode:
       type: object
