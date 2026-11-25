@@ -9,4 +9,5 @@ enum class Tilgangsrolle {
     meldekort,
     beregninger,
     dagpengestatus,
+    nks,
 }

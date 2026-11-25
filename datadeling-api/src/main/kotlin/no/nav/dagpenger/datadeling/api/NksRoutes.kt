@@ -22,7 +22,7 @@ import java.util.UUID
 fun Route.nksRoutes(nksSakService: NksSakService) {
     authenticate("azure") {
         route("/dagpenger/datadeling/v1/nks/saker") {
-            kreverTilgang(Tilgangsrolle.rettighetsperioder)
+            kreverTilgang(Tilgangsrolle.nks)
             post {
                 val felter = call.valgteFelter() ?: return@post call.respond(HttpStatusCode.BadRequest)
                 val request = call.receive<DatadelingRequestDTO>()
