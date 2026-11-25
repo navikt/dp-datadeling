@@ -7,6 +7,7 @@ import no.nav.dagpenger.behandling.overlapper
 import no.nav.dagpenger.behandling.tilDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
+import no.nav.dagpenger.datadeling.models.NksRettighetsperiodeDTO
 import no.nav.dagpenger.datadeling.models.NksSakAvsluttetDTO
 import no.nav.dagpenger.datadeling.models.NksSakDTO
 import no.nav.dagpenger.datadeling.models.NksSakFeltDTO
@@ -29,7 +30,7 @@ import java.util.UUID
  * kommer fra soknadsbehandling, og utfall er førteTil fra søknadsbehandling_ferdig. En søknad uten soknadsbehandling-rad er
  * Innsendt, men har ikke sak_id og vises derfor ikke i sak-lister.
  *
- * Status: gjeldende eller åpen harRett-periode i siste behandling gir Loepende, og når alle harRett-perioder er slutt gir
+ * Status: gjeldende eller åpen harRett-periode i siste behandling gir Løpende, og når alle harRett-perioder er slutt gir
  * det Avsluttet (se Sak). Alt annet er TilBehandling: ingen behandlingsresultat ennå, avslag, bare fremtidige perioder,
  * eller avbrutte/trukne søknadsbehandlinger.
  */
@@ -113,6 +114,8 @@ class NksSakService(
                     soknader = soknader,
                     meldekort = meldekort,
                     beregninger = beregninger,
+                    harRett = harRett,
+                    rettighetsperioder = rettighetsperioderDTO(),
                     fraOgMed = fraOgMed!!,
                     tilOgMed = tilOgMed,
                     gjenståendeDager = gjenståendeDager,
@@ -126,10 +129,14 @@ class NksSakService(
                     beregninger = beregninger,
                     fraOgMed = fraOgMed!!,
                     tilOgMed = tilOgMed!!,
+                    rettighetsperioder = rettighetsperioderDTO(),
                     sistEndret = sistEndret,
                 )
         }
     }
+
+    private fun Sak.rettighetsperioderDTO() =
+        rettighetsperioder.map { NksRettighetsperiodeDTO(fraOgMed = it.fraOgMed, tilOgMed = it.tilOgMed, harRett = it.harRett) }
 
     // Meldekort har ingen sakstilknytning, så de avgrenses til overlapp med sakens periode
     private suspend fun Sak.hentMeldekort(): List<MeldekortDTO> {

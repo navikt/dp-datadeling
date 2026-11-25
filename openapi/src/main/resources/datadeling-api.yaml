@@ -610,7 +610,7 @@ components:
         propertyName: status
         mapping:
           TilBehandling: '#/components/schemas/NksSakTilBehandling'
-          Loepende: '#/components/schemas/NksSakLoepende'
+          Løpende: '#/components/schemas/NksSakLoepende'
           Avsluttet: '#/components/schemas/NksSakAvsluttet'
 
     Soknad:
@@ -679,12 +679,22 @@ components:
         - type: object
           required:
             - status
+            - harRett
             - fraOgMed
+            - rettighetsperioder
             - sistEndret
           properties:
             status:
               type: string
-              enum: [Loepende]
+              enum: [Løpende]
+            rettighetsperioder:
+              description: Alle rettighetsperioder i saken, sortert på fraOgMed, inkludert perioder uten rett (pause)
+              type: array
+              items:
+                $ref: '#/components/schemas/NksRettighetsperiode'
+            harRett:
+              description: Om bruker har rett på dagpenger i gjeldende periode. False betyr pause i en ellers løpende sak
+              type: boolean
             beregninger:
               description: Beregninger per dag. Kun med fields=beregninger
               type: array
@@ -723,11 +733,17 @@ components:
             - status
             - fraOgMed
             - tilOgMed
+            - rettighetsperioder
             - sistEndret
           properties:
             status:
               type: string
               enum: [Avsluttet]
+            rettighetsperioder:
+              description: Alle rettighetsperioder i saken, sortert på fraOgMed, inkludert perioder uten rett (pause)
+              type: array
+              items:
+                $ref: '#/components/schemas/NksRettighetsperiode'
             beregninger:
               description: Beregninger per dag. Kun med fields=beregninger
               type: array
@@ -742,6 +758,21 @@ components:
             sistEndret:
               type: string
               format: date-time
+
+    NksRettighetsperiode:
+      type: object
+      required:
+        - fraOgMed
+        - harRett
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+        tilOgMed:
+          type: string
+          format: date
+        harRett:
+          type: boolean
 
     LukketPeriode:
       type: object

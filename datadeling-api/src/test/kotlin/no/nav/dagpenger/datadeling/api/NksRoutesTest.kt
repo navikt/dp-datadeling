@@ -102,8 +102,12 @@ class NksRoutesTest {
                 """
                 [
                   {
-                    "status": "Loepende",
+                    "status": "Løpende",
                     "sakId": "$sakId",
+                    "harRett": true,
+                    "rettighetsperioder": [
+                      { "fraOgMed": "${idag.minusDays(30)}", "harRett": true }
+                    ],
                     "fraOgMed": "${idag.minusDays(30)}",
                     "gjenståendeDager": 258,
                     "sistEndret": "2024-03-01T12:00:00"
@@ -210,11 +214,39 @@ class NksRoutesTest {
                 )
 
             val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
-            sak["status"].asString() shouldBe "Loepende"
+            sak["status"].asString() shouldBe "Løpende"
             sak["soknader"].elementer().map { it["soknadId"].asString() } shouldBe listOf("$søknadId", "$eldre")
             sak["soknader"][0]["tilstand"].asString() shouldBe "UnderBehandling"
             sak["soknader"][0].has("utfall") shouldBe false
             sak["soknader"][1]["utfall"].asString() shouldBe "Innvilgelse"
+        }
+
+    @Test
+    fun `pause i løpende sak er Løpende med harRett false`() =
+        testEndepunkter(nksSakService = nksSakService) {
+            val pause =
+                Sak(
+                    sakId,
+                    listOf(
+                        SakBehandling(
+                            opprettet,
+                            behandling(
+                                perioder =
+                                    listOf(
+                                        periode(idag.minusDays(60), idag.minusDays(11)),
+                                        periode(idag.minusDays(10), null, harRett = false),
+                                    ),
+                            ),
+                        ),
+                    ),
+                )
+            every { repository.hentSaker(any()) } returns listOf(pause)
+
+            val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
+
+            sak["status"].asText() shouldBe "Løpende"
+            sak["harRett"].asBoolean() shouldBe false
+            sak["fraOgMed"].asText() shouldBe "${idag.minusDays(10)}"
         }
 
     @Test
@@ -224,7 +256,7 @@ class NksRoutesTest {
 
             val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
 
-            sak["status"].asText() shouldBe "Loepende"
+            sak["status"].asText() shouldBe "Løpende"
             sak.has("tilOgMed") shouldBe false
         }
 
@@ -237,7 +269,7 @@ class NksRoutesTest {
 
             val sak = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
 
-            sak["status"].asText() shouldBe "Loepende"
+            sak["status"].asText() shouldBe "Løpende"
             sak["tilOgMed"].asText() shouldBe "$sluttdato"
         }
 
@@ -261,6 +293,9 @@ class NksRoutesTest {
                     "sakId": "$sakId",
                     "fraOgMed": "$fra",
                     "tilOgMed": "$til",
+                    "rettighetsperioder": [
+                      { "fraOgMed": "$fra", "tilOgMed": "$til", "harRett": true }
+                    ],
                     "sistEndret": "2024-03-01T12:00:00",
                     "beregninger": []
                   }
@@ -283,7 +318,7 @@ class NksRoutesTest {
             val saker = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())
 
             saker.elementer().map { it["sakId"].asText() to it["status"].asText() } shouldBe
-                listOf("$sakId" to "Loepende", "$annenSakId" to "Avsluttet")
+                listOf("$sakId" to "Løpende", "$annenSakId" to "Avsluttet")
         }
 
     @Test
@@ -296,7 +331,7 @@ class NksRoutesTest {
 
             response.status shouldBe HttpStatusCode.OK
             val sak = objectMapper.readTree(response.bodyAsText())
-            sak["status"].asText() shouldBe "Loepende"
+            sak["status"].asText() shouldBe "Løpende"
             sak["sakId"].asText() shouldBe "$sakId"
             sak["meldekort"].size() shouldBe 1
             sak["beregninger"].size() shouldBe 2
