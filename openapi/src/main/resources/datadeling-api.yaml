@@ -613,13 +613,13 @@ components:
           Loepende: '#/components/schemas/NksSakLoepende'
           Avsluttet: '#/components/schemas/NksSakAvsluttet'
 
-    NksSoknad:
-      description: Siste søknad om dagpenger for saken, med informasjon om den fortsatt er til behandling
+    Soknad:
+      description: En søknad om dagpenger i saken. Tilstand går fra Innsendt via UnderBehandling til Ferdig eller Avbrutt.
       type: object
       required:
         - soknadId
         - innsendt
-        - underBehandling
+        - tilstand
       properties:
         soknadId:
           type: string
@@ -628,9 +628,19 @@ components:
           description: Tidspunktet søknaden ble innsendt
           type: string
           format: date-time
-        underBehandling:
-          description: Om søknaden fortsatt ligger til behandling (false når den er ferdigbehandlet eller avbrutt)
-          type: boolean
+        tilstand:
+          $ref: '#/components/schemas/SoknadTilstand'
+        utfall:
+          description: Hva søknadsbehandlingen førte til (for eksempel Innvilgelse). Kun når tilstand er Ferdig.
+          type: string
+
+    SoknadTilstand:
+      type: string
+      enum:
+        - Innsendt
+        - UnderBehandling
+        - Ferdig
+        - Avbrutt
 
     NksSakBase:
       type: object
@@ -639,6 +649,11 @@ components:
       properties:
         sakId:
           $ref: '#/components/schemas/SakId'
+        soknader:
+          description: Søknader i saken (nyeste først)
+          type: array
+          items:
+            $ref: '#/components/schemas/Soknad'
         meldekort:
           description: Meldekort i saken (nyeste først). Kun med fields=meldekort
           type: array
@@ -646,19 +661,16 @@ components:
             $ref: '#/components/schemas/Meldekort'
 
     NksSakTilBehandling:
-      description: Saken har en søknad til behandling, og det finnes ingen ferdigstilt rettighet å utlede status fra
+      description: Saken har ingen rettighetsperiode (ennå). Gjelder også saker uten behandlingsresultat og saker som ikke ga rett til dagpenger. Se soknader for søknadenes tilstand.
       allOf:
         - $ref: '#/components/schemas/NksSakBase'
         - type: object
           required:
             - status
-            - soknad
           properties:
             status:
               type: string
               enum: [TilBehandling]
-            soknad:
-              $ref: '#/components/schemas/NksSoknad'
 
     NksSakLoepende:
       description: Bruker har løpende rett på dagpenger
@@ -673,9 +685,6 @@ components:
             status:
               type: string
               enum: [Loepende]
-            soknad:
-              description: Siste søknad i saken, for eksempel en ny søknad som ligger til behandling
-              $ref: '#/components/schemas/NksSoknad'
             beregninger:
               description: Beregninger per dag. Kun med fields=beregninger
               type: array
