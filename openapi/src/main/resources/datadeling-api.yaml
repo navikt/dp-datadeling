@@ -209,13 +209,25 @@ paths:
       security:
         - azure: [ ]
 
-  /dagpenger/datadeling/v1/sak:
+  /dagpenger/datadeling/v1/nks/saker:
     post:
       description: |-
-        Returnerer sak
+        Lister alle saker for en person. Responsen er tynn som standard;
+        bruk `fields` for å ta med meldekort og/eller beregninger.
       tags:
         - Internt
-        - Sak
+        - NKS
+      parameters:
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          description: Kommaseparert liste over tunge felt som skal tas med i svaret. Uten dette returneres kun sakId, status og statusens egne felt.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/NksSakFelt'
       requestBody:
         required: true
         content:
@@ -228,26 +240,45 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FullSak'
+                type: array
+                items:
+                  $ref: '#/components/schemas/NksSak'
       security:
         - azure: [ ]
 
-  /dagpenger/datadeling/v1/sak/{sakId}:
-    post:
+  /dagpenger/datadeling/v1/nks/saker/{sakId}:
+    get:
       description: |-
-        Returnerer sak basert på sakId
+        Henter én sak. Svaret er tynt som standard;
+        bruk `fields` for å ta med meldekort og/eller beregninger.
       tags:
         - Internt
-        - Sak
+        - NKS
+      parameters:
+        - name: sakId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/SakId'
+        - name: fields
+          in: query
+          required: false
+          style: form
+          explode: false
+          description: Kommaseparert liste over tunge felt som skal tas med i svaret. Uten dette returneres kun sakId, status og statusens egne felt.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/NksSakFelt'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TynnSak'
+                $ref: '#/components/schemas/NksSak'
+        404:
+          description: Saken finnes ikke
       security:
         - azure: [ ]
 
@@ -559,88 +590,124 @@ components:
             Denne datoen angir fra når personen ikke lenger skal
             behandles for dagpenger i Arena.
 
-    BehandlingId:
+    SakId:
       type: string
       format: uuid
 
-    TynnSak:
-      description: En sak, det vil si en sammenhengende behandlingskjede med tilhørende status og behandlingshistorikk
-      type: object
-      required:
-        - sakId
-        - status
-      properties:
-        sakId:
-          $ref: '#/components/schemas/BehandlingId'
-        status:
-          $ref: '#/components/schemas/SakStatus'
+    NksSakFelt:
+      type: string
+      enum:
+        - meldekort
+        - beregninger
 
-    FullSak:
-      description: En sak, det vil si en sammenhengende behandlingskjede med tilhørende status og behandlingshistorikk
+    NksSak:
+      description: En sak, det vil si en sammenhengende behandlingskjede. Diskriminert på `status`.
+      oneOf:
+        - $ref: '#/components/schemas/NksSakTilBehandling'
+        - $ref: '#/components/schemas/NksSakLoepende'
+        - $ref: '#/components/schemas/NksSakAvsluttet'
+      discriminator:
+        propertyName: status
+        mapping:
+          TilBehandling: '#/components/schemas/NksSakTilBehandling'
+          Loepende: '#/components/schemas/NksSakLoepende'
+          Avsluttet: '#/components/schemas/NksSakAvsluttet'
+
+    NksSakBase:
       type: object
       required:
         - sakId
-        - status
-        - behandlinger
       properties:
         sakId:
-          $ref: '#/components/schemas/BehandlingId'
-        status:
-          $ref: '#/components/schemas/SakStatus'
+          $ref: '#/components/schemas/SakId'
         meldekort:
-          description: Alle behandlinger i saken, i kjedet rekkefølge (nyeste først)
+          description: Meldekort i saken (nyeste først). Kun med fields=meldekort
           type: array
           items:
             $ref: '#/components/schemas/Meldekort'
-        # TODO: Kan vi slå sammen beregninger inn i meldekort?
-        beregninger:
-          description: Alle beregninger, per dag
-          type: array
-          items:
-            $ref: '#/components/schemas/BeregnetDag'
 
-    SakStatus:
-      description: Gjeldende status for saken, basert på siste ferdigstilte behandling
-      type: object
-      required:
-        - harLøpendeRett
-        - sistEndret
-      properties:
-        ytelsesstatus:
-          $ref: '#/components/schemas/Ytelsesstatus'
-        harLøpendeRett:
-          description: Om bruker har en løpende rett på dagpenger i dag
-          type: boolean
-        fraOgMed:
-          description: Fra og med dato for gjeldende rettighetsperiode
-          type: string
-          format: date
-        tilOgMed:
-          description: Til og med dato for gjeldende rettighetsperiode, hvis den er avsluttet
-          type: string
-          format: date
-        sisteMeldeperiode:
-          $ref: '#/components/schemas/LukketPeriode'
-        gjenståendeDager:
-          description: Antall gjenstående dager med rett på dagpenger
-          type: integer
-        gjenståendeSanksjon:
-          description: Antall gjenstående dager med sanksjon
-          type: integer
-        gjenståendeTidsbegrensetBortfall:
-          description: Antall gjenstående dager med tidsbegrenset bortfall
-          type: integer
-        sistEndret:
-          description: Tidspunktet siste ferdigstilte behandling i saken ble ferdig
-          type: string
-          format: date-time
+    NksSakTilBehandling:
+      description: Saken er under førstegangsbehandling, og det finnes ingen ferdigstilt behandling å utlede status fra
+      allOf:
+        - $ref: '#/components/schemas/NksSakBase'
+        - type: object
+          required:
+            - status
+          properties:
+            status:
+              type: string
+              enum: [TilBehandling]
 
-    Ytelsesstatus:
-      type: string
-      enum:
-        - TilBehandling
-        - Loepende
-        - Avsluttet
+    NksSakLoepende:
+      description: Bruker har løpende rett på dagpenger
+      allOf:
+        - $ref: '#/components/schemas/NksSakBase'
+        - type: object
+          required:
+            - status
+            - fraOgMed
+            - sistEndret
+          properties:
+            status:
+              type: string
+              enum: [Loepende]
+            beregninger:
+              description: Beregninger per dag. Kun med fields=beregninger
+              type: array
+              items:
+                $ref: '#/components/schemas/BeregnetDag'
+            fraOgMed:
+              description: Fra og med dato for gjeldende rettighetsperiode
+              type: string
+              format: date
+            tilOgMed:
+              description: Til og med dato for gjeldende rettighetsperiode, hvis den er kjent
+              type: string
+              format: date
+            sisteMeldeperiode:
+              $ref: '#/components/schemas/LukketPeriode'
+            gjenståendeDager:
+              description: Antall gjenstående dager med rett på dagpenger
+              type: integer
+            gjenståendeSanksjon:
+              description: Antall gjenstående dager med sanksjon
+              type: integer
+            gjenståendeTidsbegrensetBortfall:
+              description: Antall gjenstående dager med tidsbegrenset bortfall
+              type: integer
+            sistEndret:
+              description: Tidspunktet siste ferdigstilte behandling i saken ble ferdig
+              type: string
+              format: date-time
+
+    NksSakAvsluttet:
+      description: Rettigheten er avsluttet
+      allOf:
+        - $ref: '#/components/schemas/NksSakBase'
+        - type: object
+          required:
+            - status
+            - fraOgMed
+            - tilOgMed
+            - sistEndret
+          properties:
+            status:
+              type: string
+              enum: [Avsluttet]
+            beregninger:
+              description: Beregninger per dag. Kun med fields=beregninger
+              type: array
+              items:
+                $ref: '#/components/schemas/BeregnetDag'
+            fraOgMed:
+              type: string
+              format: date
+            tilOgMed:
+              type: string
+              format: date
+            sistEndret:
+              type: string
+              format: date-time
 
     LukketPeriode:
       type: object
