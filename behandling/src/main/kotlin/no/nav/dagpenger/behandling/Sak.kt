@@ -14,10 +14,11 @@ class SakBehandling(
 /**
  * En sak er en sammenhengende behandlingskjede i dp-sak, identifisert av sakId (behandlingskjedeId).
  * Status utledes kun fra siste behandling i saken, ut fra rettighetsperiodene med harRett:
- * - Loepende: en periode er gyldig i dag (eller åpen). Den perioden er sakens gjeldende periode.
+ * - Løpende: en periode er gyldig i dag (eller åpen). Den perioden er sakens gjeldende periode. Har perioden harRett=false
+ *   og saken ellers har rett-perioder, er det en pause i en løpende sak.
  * - Avsluttet: alle periodene er slutt. Perioden som sluttet sist er gjeldende periode.
  * - TilBehandling: ellers, det vil si ingen perioder, eller bare fremtidige perioder uten at noen gjelder i dag.
- *   Saken har da ingen gjeldende periode, og hull før en fremtidig periode gir dermed aldri Loepende.
+ *   Saken har da ingen gjeldende periode, og hull før en fremtidig periode gir dermed aldri Løpende.
  */
 class Sak(
     val sakId: UUID,
@@ -28,7 +29,7 @@ class Sak(
     private val perioder = sisteBehandling.resultat.rettighetsperioder.filter { it.harRett }
 
     private val periodeIDag =
-        perioder
+        sisteBehandling.resultat.rettighetsperioder
             .filter {
                 it.fraOgMed <= idag && (it.tilOgMed == null || it.tilOgMed!! >= idag)
             }.maxByOrNull { it.fraOgMed }
@@ -38,6 +39,8 @@ class Sak(
     val ident: String get() = sisteBehandling.resultat.ident
     val sistEndret: LocalDateTime get() = sisteBehandling.opprettet
 
+    val rettighetsperioder get() = sisteBehandling.resultat.rettighetsperioder.sortedBy { it.fraOgMed }
+    val harRett: Boolean get() = gjeldendePeriode?.harRett ?: false
     private val gjeldendePeriode get() = periodeIDag ?: sisteAvsluttedePeriode
     val fraOgMed: LocalDate? get() = gjeldendePeriode?.fraOgMed
     val tilOgMed: LocalDate? get() = gjeldendePeriode?.tilOgMed
@@ -56,7 +59,7 @@ class Sak(
 
     fun status(): SakStatus =
         when {
-            periodeIDag != null -> SakStatus.LOEPENDE
+            periodeIDag != null && (periodeIDag.harRett || perioder.isNotEmpty()) -> SakStatus.LOEPENDE
             sisteAvsluttedePeriode != null -> SakStatus.AVSLUTTET
             else -> SakStatus.TIL_BEHANDLING
         }
