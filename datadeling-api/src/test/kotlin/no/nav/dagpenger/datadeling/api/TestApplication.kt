@@ -101,6 +101,7 @@ object TestApplication {
         beregningerService: BeregningerService = mockk(relaxed = true),
         dagpengestatusService: DagpengestatusService = mockk(relaxed = true),
         ressursService: RessursService = mockk(relaxed = true),
+        nksSakService: NksSakService = mockk(relaxed = true),
         test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         withMockAuthServerAndTestApplication(moduleFunction = {
@@ -110,6 +111,7 @@ object TestApplication {
                 beregningerService = beregningerService,
                 dagpengestatusService = dagpengestatusService,
                 ressursService = ressursService,
+                nksSakService = nksSakService,
             )
         }) {
             test()

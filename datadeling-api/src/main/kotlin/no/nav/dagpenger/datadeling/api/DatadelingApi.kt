@@ -26,6 +26,7 @@ fun Application.datadelingApi(
     beregningerService: BeregningerService,
     dagpengestatusService: DagpengestatusService,
     ressursService: RessursService,
+    nksSakService: NksSakService,
 ) {
     // ContentNegotiation var tidligere satt opp av naisApp(); må installeres her nå som
     // vi kjører på ktor-appen RapidApplication setter opp selv.
@@ -41,5 +42,6 @@ fun Application.datadelingApi(
         afpPrivatRoutes(ressursService, perioderService)
         dagpengerRoutes(perioderService, meldekortService, dagpengestatusService)
         beregningerRoutes(beregningerService)
+        nksRoutes(nksSakService)
     }
 }

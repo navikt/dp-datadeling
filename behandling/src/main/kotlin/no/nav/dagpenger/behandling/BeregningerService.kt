@@ -50,18 +50,17 @@ class BeregningerService(
         }
 
     private fun hentDpSakBeregninger(ident: String): List<BeregnetDagDTO> =
-        dpSakRepository.hent(ident).flatMap { behandling ->
-            behandling.beregninger.map { beregning ->
-                BeregnetDagDTO(
-                    fraOgMed = beregning.dato,
-                    tilOgMed = beregning.dato,
-                    sats = beregning.sats,
-                    utbetaltBeløp = beregning.utbetaling,
-                    gjenståendeDager = beregning.gjenståendeDager,
-                    kilde = FagsystemDTO.DP_SAK,
-                )
-            }
-        }
+        dpSakRepository.hent(ident).flatMap { behandling -> behandling.beregninger.map { it.tilDTO() } }
 }
+
+fun BeregnetDag.tilDTO() =
+    BeregnetDagDTO(
+        fraOgMed = dato,
+        tilOgMed = dato,
+        sats = sats,
+        utbetaltBeløp = utbetaling,
+        gjenståendeDager = gjenståendeDager,
+        kilde = FagsystemDTO.DP_SAK,
+    )
 
 infix fun ClosedRange<LocalDate>.overlapper(b: ClosedRange<LocalDate>): Boolean = start <= b.endInclusive && b.start <= endInclusive

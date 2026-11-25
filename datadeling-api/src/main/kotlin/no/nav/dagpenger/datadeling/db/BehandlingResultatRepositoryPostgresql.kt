@@ -3,6 +3,7 @@ package no.nav.dagpenger.datadeling.db
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.behandling.BehandlingResultatRepository
+import no.nav.dagpenger.behandling.LagretBehandlingResultat
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.datadeling.objectMapper
 import tools.jackson.databind.JsonNode
@@ -123,6 +124,44 @@ class BehandlingResultatRepositoryPostgresql : BehandlingResultatRepository {
                 ).map { row ->
                     row.binaryStream("json_data").let { objectMapper.readTree(it) }
                 }.asList,
+            )
+        }
+
+    override fun hentMedSak(ident: String): List<LagretBehandlingResultat> =
+        hentLagrede(
+            //language=PostgreSQL
+            "SELECT sak_id, opprettet, json_data FROM behandlingresultat WHERE ident = :param AND nødbrems IS NOT TRUE",
+            ident,
+        )
+
+    override fun hentMedSakId(sakId: UUID): List<LagretBehandlingResultat> =
+        hentLagrede(
+            //language=PostgreSQL
+            "SELECT sak_id, opprettet, json_data FROM behandlingresultat WHERE sak_id = :param AND nødbrems IS NOT TRUE",
+            sakId,
+        )
+
+    override fun hentMedBehandlingId(behandlingId: UUID): LagretBehandlingResultat? =
+        hentLagrede(
+            //language=PostgreSQL
+            "SELECT sak_id, opprettet, json_data FROM behandlingresultat WHERE behandling_id = :param AND nødbrems IS NOT TRUE",
+            behandlingId,
+        ).singleOrNull()
+
+    private fun hentLagrede(
+        sql: String,
+        param: Any,
+    ): List<LagretBehandlingResultat> =
+        sessionOf(dataSource).use { session ->
+            session.run(
+                queryOf(sql, mapOf("param" to param))
+                    .map { row ->
+                        LagretBehandlingResultat(
+                            sakId = row.uuid("sak_id"),
+                            opprettet = row.localDateTime("opprettet"),
+                            json = row.binaryStream("json_data").let { objectMapper.readTree(it) },
+                        )
+                    }.asList,
             )
         }
 }

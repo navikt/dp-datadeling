@@ -30,4 +30,16 @@ interface BehandlingResultatRepository {
     )
 
     fun hent(ident: String): List<JsonNode>
+
+    fun hentMedSak(ident: String): List<LagretBehandlingResultat>
+
+    fun hentMedSakId(sakId: UUID): List<LagretBehandlingResultat>
+
+    fun hentMedBehandlingId(behandlingId: UUID): LagretBehandlingResultat?
 }
+
+data class LagretBehandlingResultat(
+    val sakId: UUID,
+    val opprettet: LocalDateTime,
+    val json: JsonNode,
+)
