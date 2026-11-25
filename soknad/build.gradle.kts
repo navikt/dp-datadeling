@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(path = ":openapi"))
+    api(project(path = ":behandling"))
     implementation(libs.kotlin.logging)
     api(libs.rapids.and.rivers)
 

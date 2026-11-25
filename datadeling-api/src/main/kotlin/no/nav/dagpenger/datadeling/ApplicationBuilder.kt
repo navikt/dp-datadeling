@@ -16,18 +16,24 @@ import no.nav.dagpenger.behandling.OboDagpengerStatusKonsument
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.SammensattKonsument
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
+import no.nav.dagpenger.datadeling.api.NksSakService
 import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.db.BehandlingResultatRepositoryPostgresql
 import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.datadeling.db.SøknadBehandlingGrafPostgresql
 import no.nav.dagpenger.datadeling.db.SøknadRepositoryPostgresql
+import no.nav.dagpenger.datadeling.db.SøknadsbehandlingRepositoryPostgresql
 import no.nav.dagpenger.meldekort.MeldekortService
 import no.nav.dagpenger.meldekort.MeldekortregisterClient
 import no.nav.dagpenger.meldekort.MeldepliktAdapterClient
 import no.nav.dagpenger.søknad.SøknadMottak
 import no.nav.dagpenger.søknad.SøknadRepository
+import no.nav.dagpenger.søknad.SøknadsbehandlingAvbruttMottak
+import no.nav.dagpenger.søknad.SøknadsbehandlingFerdigMottak
+import no.nav.dagpenger.søknad.SøknadsbehandlingOpprettetMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 
 private val log = KotlinLogging.logger {}
@@ -48,6 +54,8 @@ internal class ApplicationBuilder(
     private val dagpengestatusService = DagpengestatusService(DagpengestatusRepository(behandlingResultatRepositoryPostgresql))
     private val meldekortService = MeldekortService(meldekortregisterClient, meldepliktAdapterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
+    private val søknadsbehandlingRepository = SøknadsbehandlingRepositoryPostgresql()
+    private val nksSakService = NksSakService(tolker, meldekortService, SøknadBehandlingGrafPostgresql(tolker))
     private val leaderElector = LeaderElector(config)
     private val ressursDao = RessursDao()
     private val ressursService = RessursService(ressursDao, leaderElector, config.ressurs)
@@ -67,12 +75,16 @@ internal class ApplicationBuilder(
                             beregningerService = beregningerService,
                             dagpengestatusService = dagpengestatusService,
                             ressursService = ressursService,
+                            nksSakService = nksSakService,
                         )
                     }
                 },
             ).apply {
                 // todo: Denne bør fjernes - Vi må høre Team innbyggerflate
                 SøknadMottak(this, søknadRepository)
+                SøknadsbehandlingOpprettetMottak(this, søknadsbehandlingRepository)
+                SøknadsbehandlingFerdigMottak(this, søknadsbehandlingRepository)
+                SøknadsbehandlingAvbruttMottak(this, søknadsbehandlingRepository)
                 BehandlingResultatMottak(
                     rapidsConnection = this,
                     behandlingResultatRepository = behandlingResultatRepositoryPostgresql,
