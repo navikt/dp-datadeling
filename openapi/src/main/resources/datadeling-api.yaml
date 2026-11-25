@@ -613,6 +613,25 @@ components:
           Loepende: '#/components/schemas/NksSakLoepende'
           Avsluttet: '#/components/schemas/NksSakAvsluttet'
 
+    NksSoknad:
+      description: Siste søknad om dagpenger for saken, med informasjon om den fortsatt er til behandling
+      type: object
+      required:
+        - soknadId
+        - innsendt
+        - underBehandling
+      properties:
+        soknadId:
+          type: string
+          format: uuid
+        innsendt:
+          description: Tidspunktet søknaden ble innsendt
+          type: string
+          format: date-time
+        underBehandling:
+          description: Om søknaden fortsatt ligger til behandling (false når den er ferdigbehandlet eller avbrutt)
+          type: boolean
+
     NksSakBase:
       type: object
       required:
@@ -627,16 +646,19 @@ components:
             $ref: '#/components/schemas/Meldekort'
 
     NksSakTilBehandling:
-      description: Saken er under førstegangsbehandling, og det finnes ingen ferdigstilt behandling å utlede status fra
+      description: Saken har en søknad til behandling, og det finnes ingen ferdigstilt rettighet å utlede status fra
       allOf:
         - $ref: '#/components/schemas/NksSakBase'
         - type: object
           required:
             - status
+            - soknad
           properties:
             status:
               type: string
               enum: [TilBehandling]
+            soknad:
+              $ref: '#/components/schemas/NksSoknad'
 
     NksSakLoepende:
       description: Bruker har løpende rett på dagpenger
@@ -651,6 +673,9 @@ components:
             status:
               type: string
               enum: [Loepende]
+            soknad:
+              description: Siste søknad i saken, for eksempel en ny søknad som ligger til behandling
+              $ref: '#/components/schemas/NksSoknad'
             beregninger:
               description: Beregninger per dag. Kun med fields=beregninger
               type: array
