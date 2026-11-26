@@ -230,12 +230,12 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SakInkluder'
-        - name: dato
+        - name: gjelderFor
           in: query
           required: false
           description: |-
-            Kun for `include=opplysninger`. Uten dato returneres alle periodene til hver opplysning.
-            Med dato returneres én verdi per opplysning, den som gjelder på datoen (`null` hvis ingen verdi gjelder).
+            Kun for `include=opplysninger`. Uten gjelderFor returneres alle periodene til hver opplysning.
+            Med gjelderFor returneres én verdi per opplysning, den som gjelder på datoen (`null` hvis ingen verdi gjelder).
             Har ingen effekt uten `include=opplysninger`.
           schema:
             type: string
@@ -282,12 +282,12 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SakInkluder'
-        - name: dato
+        - name: gjelderFor
           in: query
           required: false
           description: |-
-            Kun for `include=opplysninger`. Uten dato returneres alle periodene til hver opplysning.
-            Med dato returneres én verdi per opplysning, den som gjelder på datoen (`null` hvis ingen verdi gjelder).
+            Kun for `include=opplysninger`. Uten gjelderFor returneres alle periodene til hver opplysning.
+            Med gjelderFor returneres én verdi per opplysning, den som gjelder på datoen (`null` hvis ingen verdi gjelder).
             Har ingen effekt uten `include=opplysninger`.
           schema:
             type: string
@@ -776,16 +776,16 @@ components:
 
     Opplysninger:
       description: |-
-        Opplysninger som endrer seg over tid. Formen avhenger av om `dato` er oppgitt:
-        `Perioder` uten dato (alle perioder), `PaaDato` med dato (én verdi per opplysning).
+        Opplysninger som endrer seg over tid. Formen avhenger av om `gjelderFor` er oppgitt:
+        `Perioder` uten gjelderFor (alle perioder), `Enkeltdag` med gjelderFor (én verdi per opplysning).
       oneOf:
         - $ref: '#/components/schemas/OpplysningerPerioder'
-        - $ref: '#/components/schemas/OpplysningerPaaDato'
+        - $ref: '#/components/schemas/OpplysningerEnkeltdag'
       discriminator:
         propertyName: visning
         mapping:
           Perioder: '#/components/schemas/OpplysningerPerioder'
-          PaaDato: '#/components/schemas/OpplysningerPaaDato'
+          Enkeltdag: '#/components/schemas/OpplysningerEnkeltdag'
 
     OpplysningerPerioder:
       type: object
@@ -812,16 +812,16 @@ components:
           items:
             $ref: '#/components/schemas/PeriodisertDesimaltall'
 
-    OpplysningerPaaDato:
+    OpplysningerEnkeltdag:
       type: object
       required:
         - visning
-        - dato
+        - gjelderFor
       properties:
         visning:
           type: string
-          enum: [PaaDato]
-        dato:
+          enum: [Enkeltdag]
+        gjelderFor:
           type: string
           format: date
         antallBarn:

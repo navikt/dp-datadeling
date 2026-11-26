@@ -10,7 +10,7 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.GjenstaaendeDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.datadeling.models.OpplysningerDTO
-import no.nav.dagpenger.datadeling.models.OpplysningerPaaDatoDTO
+import no.nav.dagpenger.datadeling.models.OpplysningerEnkeltdagDTO
 import no.nav.dagpenger.datadeling.models.OpplysningerPerioderDTO
 import no.nav.dagpenger.datadeling.models.PeriodisertDesimaltallDTO
 import no.nav.dagpenger.datadeling.models.PeriodisertHeltallDTO
@@ -158,8 +158,8 @@ class SakService(
                     fastsattVanligArbeidstid.map { PeriodisertDesimaltallDTO(it.fraOgMed, it.tilOgMed, it.verdi) },
             )
         } else {
-            OpplysningerPaaDatoDTO(
-                dato = dato,
+            OpplysningerEnkeltdagDTO(
+                gjelderFor = dato,
                 antallBarn = antallBarn.gjelderPå(dato),
                 dagsats = dagsats.gjelderPå(dato),
                 fastsattVanligArbeidstid = fastsattVanligArbeidstid.gjelderPå(dato),

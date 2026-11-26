@@ -47,9 +47,9 @@ private class ValgtDato(
     val verdi: LocalDate?,
 )
 
-// Returnerer null hvis dato ikke er en gyldig dato (yyyy-MM-dd)
+// Returnerer null hvis gjelderFor ikke er en gyldig dato (yyyy-MM-dd)
 private fun RoutingCall.valgtDato(): ValgtDato? {
-    val dato = request.queryParameters["dato"] ?: return ValgtDato(null)
+    val dato = request.queryParameters["gjelderFor"] ?: return ValgtDato(null)
     return runCatching { LocalDate.parse(dato) }.getOrNull()?.let { ValgtDato(it) }
 }
 

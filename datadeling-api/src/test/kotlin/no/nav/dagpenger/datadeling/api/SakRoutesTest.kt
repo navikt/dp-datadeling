@@ -129,13 +129,13 @@ class SakRoutesTest {
             perioder["opplysninger"]["antallBarn"].elementer().size shouldBe 2
 
             val dato = idag.minusDays(1)
-            val paaDato =
+            val enkeltdag =
                 objectMapper.readTree(
-                    client.testPost("$sakerUrl?include=opplysninger&dato=$dato", enDatadelingRequest(), token).bodyAsText(),
+                    client.testPost("$sakerUrl?include=opplysninger&gjelderFor=$dato", enDatadelingRequest(), token).bodyAsText(),
                 )[0]
-            paaDato["opplysninger"]["visning"].asText() shouldBe "PaaDato"
-            paaDato["opplysninger"]["dato"].asText() shouldBe dato.toString()
-            paaDato["opplysninger"]["antallBarn"].asInt() shouldBe 2
+            enkeltdag["opplysninger"]["visning"].asText() shouldBe "Enkeltdag"
+            enkeltdag["opplysninger"]["gjelderFor"].asText() shouldBe dato.toString()
+            enkeltdag["opplysninger"]["antallBarn"].asInt() shouldBe 2
 
             val utenInclude = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
             utenInclude.has("opplysninger") shouldBe false
@@ -144,7 +144,7 @@ class SakRoutesTest {
     @Test
     fun `ugyldig dato gir 400`() =
         testEndepunkter(sakService = sakService) {
-            client.testPost("$sakerUrl?include=opplysninger&dato=i-går", enDatadelingRequest(), token).status shouldBe
+            client.testPost("$sakerUrl?include=opplysninger&gjelderFor=i-går", enDatadelingRequest(), token).status shouldBe
                 HttpStatusCode.BadRequest
         }
 
