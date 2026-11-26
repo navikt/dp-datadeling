@@ -3,9 +3,15 @@ package no.nav.dagpenger.datadeling.db
 import ch.qos.logback.core.util.OptionHelper.getEnv
 import ch.qos.logback.core.util.OptionHelper.getSystemProperty
 import com.zaxxer.hikari.HikariDataSource
+import io.micrometer.core.instrument.Clock
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.flywaydb.core.internal.configuration.ConfigUtils
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 internal object PostgresDataSourceBuilder {
     const val DB_USERNAME_KEY = "DB_USERNAME"
@@ -24,11 +30,20 @@ internal object PostgresDataSourceBuilder {
             addDataSourceProperty("databaseName", getOrThrow(DB_DATABASE_KEY))
             addDataSourceProperty("user", getOrThrow(DB_USERNAME_KEY))
             addDataSourceProperty("password", getOrThrow(DB_PASSWORD_KEY))
-            maximumPoolSize = 10
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
+            // Default 30 sekund
+            connectionTimeout = 10.seconds.inWholeMilliseconds
+            // Default 5 minutter
+            idleTimeout = 5.minutes.inWholeMilliseconds
+            // Default 2 minutter
+            keepaliveTime = 2.minutes.inWholeMilliseconds
+            // Default 30 minutter
+            maxLifetime = 30.minutes.inWholeMilliseconds
+            metricRegistry =
+                PrometheusMeterRegistry(
+                    PrometheusConfig.DEFAULT,
+                    PrometheusRegistry.defaultRegistry,
+                    Clock.SYSTEM,
+                )
         }
     }
 
