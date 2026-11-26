@@ -13,6 +13,7 @@ import no.nav.dagpenger.datadeling.api.config.Tilgangsrolle
 import no.nav.dagpenger.datadeling.api.plugins.kreverTilgang
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.SakInkluderDTO
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -25,13 +26,15 @@ fun Route.sakRoutes(sakService: SakService) {
             kreverTilgang(Tilgangsrolle.nks)
             post {
                 val inkluder = call.valgteInkluder() ?: return@post call.respond(HttpStatusCode.BadRequest)
+                val dato = call.valgtDato() ?: return@post call.respond(HttpStatusCode.BadRequest)
                 val request = call.receive<DatadelingRequestDTO>()
-                call.respond(HttpStatusCode.OK, sakService.hentSaker(request, inkluder))
+                call.respond(HttpStatusCode.OK, sakService.hentSaker(request, inkluder, dato.verdi))
             }
             get("/{sakId}") {
                 val inkluder = call.valgteInkluder() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                val dato = call.valgtDato() ?: return@get call.respond(HttpStatusCode.BadRequest)
                 val sakId = call.sakId() ?: return@get call.respond(HttpStatusCode.BadRequest)
-                val sak = sakService.hentSak(sakId, inkluder)
+                val sak = sakService.hentSak(sakId, inkluder, dato.verdi)
                 if (sak == null) call.respond(HttpStatusCode.NotFound) else call.respond(HttpStatusCode.OK, sak)
             }
         }
@@ -39,6 +42,16 @@ fun Route.sakRoutes(sakService: SakService) {
 }
 
 private fun RoutingCall.sakId(): UUID? = runCatching { UUID.fromString(parameters["sakId"]) }.getOrNull()
+
+private class ValgtDato(
+    val verdi: LocalDate?,
+)
+
+// Returnerer null hvis dato ikke er en gyldig dato (yyyy-MM-dd)
+private fun RoutingCall.valgtDato(): ValgtDato? {
+    val dato = request.queryParameters["dato"] ?: return ValgtDato(null)
+    return runCatching { LocalDate.parse(dato) }.getOrNull()?.let { ValgtDato(it) }
+}
 
 // Returnerer null hvis include inneholder ukjente verdier
 private fun RoutingCall.valgteInkluder(): Set<SakInkluderDTO>? {

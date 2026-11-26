@@ -172,6 +172,43 @@ class BehandlingResultatJsonNodeTolkerTest {
     }
 
     @Test
+    fun `leser periodiserte opplysninger sortert, og tom liste når de mangler`() {
+        fun json(opplysninger: String) =
+            objectMapper.readTree(
+                // language=JSON
+                """
+                {
+                  "behandlingId": "019b4a51-6ef8-7714-8f5f-924a23137d03",
+                  "ident": "12345678901",
+                  "rettighetsperioder": [{"fraOgMed": "2026-01-01", "harRett": true}],
+                  "opplysninger": [$opplysninger]
+                }
+                """.trimIndent(),
+            )
+
+        val med =
+            BehandlingResultatJsonNodeTolker.fra(
+                json(
+                    """
+                    {"opplysningTypeId": "0194881f-9428-74d5-b160-f63a4c61a23c", "perioder": [
+                      {"gyldigFraOgMed": "2026-03-01", "verdi": {"verdi": 2, "datatype": "heltall"}},
+                      {"gyldigFraOgMed": "2026-01-01", "gyldigTilOgMed": "2026-02-28", "verdi": {"verdi": 1, "datatype": "heltall"}}
+                    ]},
+                    {"opplysningTypeId": "0194881f-9435-72a8-b1ce-9575cbc2a76c", "perioder": [
+                      {"gyldigFraOgMed": "2026-01-01", "verdi": {"verdi": 37.5, "datatype": "desimaltall"}}
+                    ]}
+                    """.trimIndent(),
+                ),
+            )
+        med.antallBarn.map { it.verdi } shouldBe listOf(1, 2)
+        med.antallBarn.gjelderPå(LocalDate.parse("2026-02-10")) shouldBe 1
+        med.antallBarn.gjelderPå(LocalDate.parse("2026-04-01")) shouldBe 2
+        med.antallBarn.gjelderPå(LocalDate.parse("2025-12-01")) shouldBe null
+        med.fastsattVanligArbeidstid.single().verdi shouldBe 37.5
+        med.dagsats shouldBe emptyList()
+    }
+
+    @Test
     fun `bruker siste tilgjengelige gjenstående-dager-periode ved manglende eksakt match`() {
         val json: JsonNode =
             objectMapper.readTree(

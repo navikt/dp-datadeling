@@ -61,6 +61,13 @@ class Sak(
         runCatching { sisteBehandling.resultat.gjenståendeTidsbegrensetBortfall }.getOrNull()
     }
 
+    // Fra siste behandling. Tom liste hvis opplysningen mangler eller ikke lar seg tolke.
+    val antallBarn: List<Periodisert<Int>> by lazy { runCatching { sisteBehandling.resultat.antallBarn }.getOrDefault(emptyList()) }
+    val dagsats: List<Periodisert<Int>> by lazy { runCatching { sisteBehandling.resultat.dagsats }.getOrDefault(emptyList()) }
+    val fastsattVanligArbeidstid: List<Periodisert<Double>> by lazy {
+        runCatching { sisteBehandling.resultat.fastsattVanligArbeidstid }.getOrDefault(emptyList())
+    }
+
     fun status(): SakStatus =
         when {
             periodeIDag != null && (periodeIDag.harRett || perioder.isNotEmpty()) -> SakStatus.LOEPENDE

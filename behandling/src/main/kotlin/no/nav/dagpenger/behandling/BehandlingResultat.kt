@@ -13,7 +13,23 @@ interface BehandlingResultat {
     // Opplysningene kan mangle i behandlingsresultatet, og teller nedover. Laveste verdi er gjeldende.
     val gjenståendeSanksjon: Int? get() = null
     val gjenståendeTidsbegrensetBortfall: Int? get() = null
+
+    // Periodiserte opplysninger, sortert på fraOgMed. Tom liste hvis opplysningen mangler.
+    val antallBarn: List<Periodisert<Int>> get() = emptyList()
+    val dagsats: List<Periodisert<Int>> get() = emptyList()
+    val fastsattVanligArbeidstid: List<Periodisert<Double>> get() = emptyList()
 }
+
+// fraOgMed er null når verdien gjelder fra ubestemt tid tilbake, tilOgMed er null når den ikke har sluttdato
+data class Periodisert<T>(
+    val fraOgMed: LocalDate?,
+    val tilOgMed: LocalDate?,
+    val verdi: T,
+)
+
+// Ved overlapp gjelder den siste perioden
+fun <T> List<Periodisert<T>>.gjelderPå(dato: LocalDate): T? =
+    lastOrNull { (it.fraOgMed == null || it.fraOgMed <= dato) && (it.tilOgMed == null || it.tilOgMed >= dato) }?.verdi
 
 interface Rettighetsperiode {
     val fraOgMed: LocalDate

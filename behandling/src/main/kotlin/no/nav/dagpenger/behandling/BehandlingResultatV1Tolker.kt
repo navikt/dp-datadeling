@@ -3,6 +3,8 @@ package no.nav.dagpenger.behandling
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.behandling.kontrakt.v1.models.Behandlingsresultatv1DTO
+import no.nav.dagpenger.behandling.kontrakt.v1.models.DesimaltallVerdiv1DTO
+import no.nav.dagpenger.behandling.kontrakt.v1.models.HeltallVerdiv1DTO
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.SerializationFeature
@@ -68,6 +70,24 @@ class BehandlingResultatV1Tolker(
     override val gjenståendeSanksjon: Int? get() = laveste(GJENSTÅENDE_SANKSJON_OPPLYSNING)
     override val gjenståendeTidsbegrensetBortfall: Int? get() = laveste(GJENSTÅENDE_TIDSBEGRENSET_BORTFALL_OPPLYSNING)
 
+    override val antallBarn: List<Periodisert<Int>> get() = periodisert(ANTALL_BARN_OPPLYSNING) { (it as? HeltallVerdiv1DTO)?.verdi }
+    override val dagsats: List<Periodisert<Int>> get() = periodisert(SATS_OPPLYSNING) { (it as? HeltallVerdiv1DTO)?.verdi }
+    override val fastsattVanligArbeidstid: List<Periodisert<Double>>
+        get() = periodisert(FASTSATT_VANLIG_ARBEIDSTID_OPPLYSNING) { (it as? DesimaltallVerdiv1DTO)?.verdi }
+
+    private fun <T : Any> periodisert(
+        opplysningTypeId: UUID,
+        tolkVerdi: (Any) -> T?,
+    ): List<Periodisert<T>> =
+        dto.opplysninger
+            .find { it.opplysningTypeId == opplysningTypeId }
+            ?.perioder
+            ?.mapNotNull { periode ->
+                val verdi = periode.verdi?.let(tolkVerdi) ?: return@mapNotNull null
+                Periodisert(periode.gyldigFraOgMed, periode.gyldigTilOgMed, verdi)
+            }?.sortedBy { it.fraOgMed ?: LocalDate.MIN }
+            .orEmpty()
+
     private fun laveste(opplysningTypeId: UUID): Int? =
         dto.opplysninger
             .find { it.opplysningTypeId == opplysningTypeId }
@@ -113,6 +133,9 @@ class BehandlingResultatV1Tolker(
         private val GJENSTÅENDE_DAGER_OPPLYSNINGER = UUID.fromString("01992956-e349-76b1-8f68-c9d481df3a32")
         private val GJENSTÅENDE_SANKSJON_OPPLYSNING = UUID.fromString("76d9c243-228b-4359-9550-1ebbb7ba5cb5")
         private val GJENSTÅENDE_TIDSBEGRENSET_BORTFALL_OPPLYSNING = UUID.fromString("019df7d6-5159-7290-b8a1-9fc9edc58579")
+        private val ANTALL_BARN_OPPLYSNING = UUID.fromString("0194881f-9428-74d5-b160-f63a4c61a23c")
+        private val SATS_OPPLYSNING = UUID.fromString("0194881f-9428-74d5-b160-f63a4c61a24f")
+        private val FASTSATT_VANLIG_ARBEIDSTID_OPPLYSNING = UUID.fromString("0194881f-9435-72a8-b1ce-9575cbc2a76c")
         private val INNVILGET_ANTALL_DAGER_OPPLYSNING = UUID.fromString("0194881f-943d-77a7-969c-147999f15457")
 
         fun fra(jsonNode: JsonNode): BehandlingResultatV1Tolker {

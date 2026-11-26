@@ -3,11 +3,17 @@ package no.nav.dagpenger.datadeling.api
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.Sak
 import no.nav.dagpenger.behandling.SakStatus
+import no.nav.dagpenger.behandling.gjelderPå
 import no.nav.dagpenger.behandling.overlapper
 import no.nav.dagpenger.behandling.tilDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.GjenstaaendeDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
+import no.nav.dagpenger.datadeling.models.OpplysningerDTO
+import no.nav.dagpenger.datadeling.models.OpplysningerPaaDatoDTO
+import no.nav.dagpenger.datadeling.models.OpplysningerPerioderDTO
+import no.nav.dagpenger.datadeling.models.PeriodisertDesimaltallDTO
+import no.nav.dagpenger.datadeling.models.PeriodisertHeltallDTO
 import no.nav.dagpenger.datadeling.models.RettighetsperiodeDTO
 import no.nav.dagpenger.datadeling.models.SakAvsluttetDTO
 import no.nav.dagpenger.datadeling.models.SakDTO
@@ -43,6 +49,7 @@ class SakService(
     suspend fun hentSaker(
         request: DatadelingRequestDTO,
         inkluder: Set<SakInkluderDTO>,
+        dato: LocalDate?,
     ): List<SakDTO> {
         val saker = behandlinger.hentSaker(request.personIdent)
         val søknadsbehandlingerPerSak =
@@ -53,7 +60,7 @@ class SakService(
                     it.sakId != null
                 }.groupBy { it.sakId!! }
 
-        val medResultat = saker.map { it.tilDTO(inkluder, søknadsbehandlingerPerSak[it.sakId].orEmpty()) }
+        val medResultat = saker.map { it.tilDTO(inkluder, dato, søknadsbehandlingerPerSak[it.sakId].orEmpty()) }
         val barePåSøknad =
             søknadsbehandlingerPerSak
                 .filterKeys { sakId -> saker.none { it.sakId == sakId } }
@@ -64,9 +71,10 @@ class SakService(
     suspend fun hentSak(
         sakId: UUID,
         inkluder: Set<SakInkluderDTO>,
+        dato: LocalDate?,
     ): SakDTO? {
         val søknadsbehandlinger = søknadBehandlingGraf.søknaderForSak(sakId).flatMap { it.søknadsbehandlinger }
-        return behandlinger.hentSak(sakId)?.tilDTO(inkluder, søknadsbehandlinger)
+        return behandlinger.hentSak(sakId)?.tilDTO(inkluder, dato, søknadsbehandlinger)
             ?: søknadsbehandlinger.takeIf { it.isNotEmpty() }?.let { sakUtenResultat(sakId, it, inkluder) }
     }
 
@@ -100,11 +108,13 @@ class SakService(
 
     private suspend fun Sak.tilDTO(
         inkluder: Set<SakInkluderDTO>,
+        dato: LocalDate?,
         søknadsbehandlinger: List<Søknadsbehandling>,
     ): SakDTO {
         val soknader = søknadsbehandlinger.takeIf { it.isNotEmpty() }?.tilDTO()
         val meldekort = if (SakInkluderDTO.MELDEKORT in inkluder) hentMeldekort() else null
         val beregninger = if (SakInkluderDTO.BEREGNINGER in inkluder) beregninger.map { it.tilDTO() } else null
+        val opplysninger = if (SakInkluderDTO.OPPLYSNINGER in inkluder) opplysninger(dato) else null
 
         return when (status()) {
             SakStatus.TIL_BEHANDLING -> {
@@ -117,6 +127,7 @@ class SakService(
                     soknader = soknader,
                     meldekort = meldekort,
                     beregninger = beregninger,
+                    opplysninger = opplysninger,
                     rettighetsperioder = rettighetsperioderDTO(),
                     gjenstående = gjenstående(),
                     sistEndret = sistEndret,
@@ -129,12 +140,31 @@ class SakService(
                     soknader = soknader,
                     meldekort = meldekort,
                     beregninger = beregninger,
+                    opplysninger = opplysninger,
                     rettighetsperioder = rettighetsperioderDTO(),
                     sistEndret = sistEndret,
                 )
             }
         }
     }
+
+    // Uten dato alle periodene, med dato bare verdien som gjelder på datoen
+    private fun Sak.opplysninger(dato: LocalDate?): OpplysningerDTO =
+        if (dato == null) {
+            OpplysningerPerioderDTO(
+                antallBarn = antallBarn.map { PeriodisertHeltallDTO(it.fraOgMed, it.tilOgMed, it.verdi) },
+                dagsats = dagsats.map { PeriodisertHeltallDTO(it.fraOgMed, it.tilOgMed, it.verdi) },
+                fastsattVanligArbeidstid =
+                    fastsattVanligArbeidstid.map { PeriodisertDesimaltallDTO(it.fraOgMed, it.tilOgMed, it.verdi) },
+            )
+        } else {
+            OpplysningerPaaDatoDTO(
+                dato = dato,
+                antallBarn = antallBarn.gjelderPå(dato),
+                dagsats = dagsats.gjelderPå(dato),
+                fastsattVanligArbeidstid = fastsattVanligArbeidstid.gjelderPå(dato),
+            )
+        }
 
     private fun Sak.gjenstående(): GjenstaaendeDTO? =
         listOf(gjenståendeDager, gjenståendeSanksjon, gjenståendeTidsbegrensetBortfall)

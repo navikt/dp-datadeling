@@ -10,6 +10,7 @@ import io.mockk.mockk
 import no.nav.dagpenger.behandling.BehandlingResultat
 import no.nav.dagpenger.behandling.BehandlingResultatRepositoryMedTolker
 import no.nav.dagpenger.behandling.BeregnetDag
+import no.nav.dagpenger.behandling.Periodisert
 import no.nav.dagpenger.behandling.Rettighetsperiode
 import no.nav.dagpenger.behandling.Rettighetstyper
 import no.nav.dagpenger.behandling.Sak
@@ -112,6 +113,39 @@ class SakRoutesTest {
                   }
                 ]
                 """.trimIndent()
+        }
+
+    @Test
+    fun `include=opplysninger gir perioder, og med dato kun verdien som gjelder`() =
+        testEndepunkter(sakService = sakService) {
+            val sak = enLøpendeSak()
+            every { repository.hentSaker(any()) } returns listOf(sak)
+
+            val perioder =
+                objectMapper.readTree(
+                    client.testPost("$sakerUrl?include=opplysninger", enDatadelingRequest(), token).bodyAsText(),
+                )[0]
+            perioder["opplysninger"]["visning"].asText() shouldBe "Perioder"
+            perioder["opplysninger"]["antallBarn"].elementer().size shouldBe 2
+
+            val dato = idag.minusDays(1)
+            val paaDato =
+                objectMapper.readTree(
+                    client.testPost("$sakerUrl?include=opplysninger&dato=$dato", enDatadelingRequest(), token).bodyAsText(),
+                )[0]
+            paaDato["opplysninger"]["visning"].asText() shouldBe "PaaDato"
+            paaDato["opplysninger"]["dato"].asText() shouldBe dato.toString()
+            paaDato["opplysninger"]["antallBarn"].asInt() shouldBe 2
+
+            val utenInclude = objectMapper.readTree(client.testPost(sakerUrl, enDatadelingRequest(), token).bodyAsText())[0]
+            utenInclude.has("opplysninger") shouldBe false
+        }
+
+    @Test
+    fun `ugyldig dato gir 400`() =
+        testEndepunkter(sakService = sakService) {
+            client.testPost("$sakerUrl?include=opplysninger&dato=i-går", enDatadelingRequest(), token).status shouldBe
+                HttpStatusCode.BadRequest
         }
 
     @Test
@@ -426,6 +460,11 @@ class SakRoutesTest {
         override val rettighetsperioder = perioder
         override val rettighetstyper = emptyList<Rettighetstyper>()
         override val beregninger = beregninger
+        override val antallBarn =
+            listOf(
+                Periodisert<Int>(idag.minusDays(30), idag.minusDays(2), 1),
+                Periodisert<Int>(idag.minusDays(1), null, 2),
+            )
     }
 
     private fun periode(
