@@ -6,14 +6,14 @@ import no.nav.dagpenger.behandling.SakStatus
 import no.nav.dagpenger.behandling.overlapper
 import no.nav.dagpenger.behandling.tilDTO
 import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
+import no.nav.dagpenger.datadeling.models.GjenstaaendeDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
-import no.nav.dagpenger.datadeling.models.NksGjenstaaendeDTO
-import no.nav.dagpenger.datadeling.models.NksRettighetsperiodeDTO
-import no.nav.dagpenger.datadeling.models.NksSakAvsluttetDTO
-import no.nav.dagpenger.datadeling.models.NksSakDTO
-import no.nav.dagpenger.datadeling.models.NksSakInkluderDTO
-import no.nav.dagpenger.datadeling.models.NksSakLoependeDTO
-import no.nav.dagpenger.datadeling.models.NksSakTilBehandlingDTO
+import no.nav.dagpenger.datadeling.models.RettighetsperiodeDTO
+import no.nav.dagpenger.datadeling.models.SakAvsluttetDTO
+import no.nav.dagpenger.datadeling.models.SakDTO
+import no.nav.dagpenger.datadeling.models.SakInkluderDTO
+import no.nav.dagpenger.datadeling.models.SakLoependeDTO
+import no.nav.dagpenger.datadeling.models.SakTilBehandlingDTO
 import no.nav.dagpenger.datadeling.models.SoknadDTO
 import no.nav.dagpenger.datadeling.models.SoknadTilstandDTO
 import no.nav.dagpenger.meldekort.MeldekortService
@@ -35,15 +35,15 @@ import java.util.UUID
  * det Avsluttet (se Sak). Alt annet er TilBehandling: ingen behandlingsresultat ennå, avslag, bare fremtidige perioder,
  * eller avbrutte/trukne søknadsbehandlinger.
  */
-class NksSakService(
+class SakService(
     private val behandlinger: BehandlingResultatRepositoryMedTolker,
     private val meldekortService: MeldekortService,
     private val søknadBehandlingGraf: SøknadBehandlingGraf,
 ) {
     suspend fun hentSaker(
         request: DatadelingRequestDTO,
-        inkluder: Set<NksSakInkluderDTO>,
-    ): List<NksSakDTO> {
+        inkluder: Set<SakInkluderDTO>,
+    ): List<SakDTO> {
         val saker = behandlinger.hentSaker(request.personIdent)
         val søknadsbehandlingerPerSak =
             søknadBehandlingGraf
@@ -63,8 +63,8 @@ class NksSakService(
 
     suspend fun hentSak(
         sakId: UUID,
-        inkluder: Set<NksSakInkluderDTO>,
-    ): NksSakDTO? {
+        inkluder: Set<SakInkluderDTO>,
+    ): SakDTO? {
         val søknadsbehandlinger = søknadBehandlingGraf.søknaderForSak(sakId).flatMap { it.søknadsbehandlinger }
         return behandlinger.hentSak(sakId)?.tilDTO(inkluder, søknadsbehandlinger)
             ?: søknadsbehandlinger.takeIf { it.isNotEmpty() }?.let { sakUtenResultat(sakId, it, inkluder) }
@@ -91,28 +91,28 @@ class NksSakService(
     private fun sakUtenResultat(
         sakId: UUID,
         søknadsbehandlinger: List<Søknadsbehandling>,
-        inkluder: Set<NksSakInkluderDTO>,
-    ) = NksSakTilBehandlingDTO(
+        inkluder: Set<SakInkluderDTO>,
+    ) = SakTilBehandlingDTO(
         sakId = sakId,
         soknader = søknadsbehandlinger.tilDTO(),
-        meldekort = if (NksSakInkluderDTO.MELDEKORT in inkluder) emptyList() else null,
+        meldekort = if (SakInkluderDTO.MELDEKORT in inkluder) emptyList() else null,
     )
 
     private suspend fun Sak.tilDTO(
-        inkluder: Set<NksSakInkluderDTO>,
+        inkluder: Set<SakInkluderDTO>,
         søknadsbehandlinger: List<Søknadsbehandling>,
-    ): NksSakDTO {
+    ): SakDTO {
         val soknader = søknadsbehandlinger.takeIf { it.isNotEmpty() }?.tilDTO()
-        val meldekort = if (NksSakInkluderDTO.MELDEKORT in inkluder) hentMeldekort() else null
-        val beregninger = if (NksSakInkluderDTO.BEREGNINGER in inkluder) beregninger.map { it.tilDTO() } else null
+        val meldekort = if (SakInkluderDTO.MELDEKORT in inkluder) hentMeldekort() else null
+        val beregninger = if (SakInkluderDTO.BEREGNINGER in inkluder) beregninger.map { it.tilDTO() } else null
 
         return when (status()) {
             SakStatus.TIL_BEHANDLING -> {
-                NksSakTilBehandlingDTO(sakId = sakId, soknader = soknader, meldekort = meldekort)
+                SakTilBehandlingDTO(sakId = sakId, soknader = soknader, meldekort = meldekort)
             }
 
             SakStatus.LOEPENDE -> {
-                NksSakLoependeDTO(
+                SakLoependeDTO(
                     sakId = sakId,
                     soknader = soknader,
                     meldekort = meldekort,
@@ -124,7 +124,7 @@ class NksSakService(
             }
 
             SakStatus.AVSLUTTET -> {
-                NksSakAvsluttetDTO(
+                SakAvsluttetDTO(
                     sakId = sakId,
                     soknader = soknader,
                     meldekort = meldekort,
@@ -136,11 +136,11 @@ class NksSakService(
         }
     }
 
-    private fun Sak.gjenstående(): NksGjenstaaendeDTO? =
+    private fun Sak.gjenstående(): GjenstaaendeDTO? =
         listOf(gjenståendeDager, gjenståendeSanksjon, gjenståendeTidsbegrensetBortfall)
             .takeIf { alle -> alle.any { it != null } }
             ?.let {
-                NksGjenstaaendeDTO(
+                GjenstaaendeDTO(
                     dager = gjenståendeDager,
                     sanksjon = gjenståendeSanksjon,
                     tidsbegrensetBortfall = gjenståendeTidsbegrensetBortfall,
@@ -148,7 +148,7 @@ class NksSakService(
             }
 
     private fun Sak.rettighetsperioderDTO() =
-        rettighetsperioder.map { NksRettighetsperiodeDTO(fraOgMed = it.fraOgMed, tilOgMed = it.tilOgMed, harRett = it.harRett) }
+        rettighetsperioder.map { RettighetsperiodeDTO(fraOgMed = it.fraOgMed, tilOgMed = it.tilOgMed, harRett = it.harRett) }
 
     // Meldekort har ingen sakstilknytning, så de avgrenses til overlapp med sakens periode
     private suspend fun Sak.hentMeldekort(): List<MeldekortDTO> {

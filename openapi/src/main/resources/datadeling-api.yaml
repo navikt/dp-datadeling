@@ -55,6 +55,8 @@ tags:
     description: API for å hente beregningsdetaljer for dagpenger
   - name: Meldekort
     description: API for å hente meldekort for dagpenger
+  - name: Sak
+    description: API for å hente saker med status, søknader og rettighetsperioder for dagpenger
   - name: Dagpengestatus
     description: API for overlappskontroll — om en person er i ny dagpengeløsning (DP-sak)
 
@@ -209,14 +211,14 @@ paths:
       security:
         - azure: [ ]
 
-  /dagpenger/datadeling/v1/nks/saker:
+  /dagpenger/datadeling/v1/saker:
     post:
       description: |-
         Lister alle saker for en person. Responsen er tynn som standard;
         bruk `include` for å ta med meldekort og/eller beregninger.
       tags:
         - Internt
-        - NKS
+        - Sak
       parameters:
         - name: include
           in: query
@@ -227,7 +229,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/NksSakInkluder'
+              $ref: '#/components/schemas/SakInkluder'
       requestBody:
         required: true
         content:
@@ -242,18 +244,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NksSak'
+                  $ref: '#/components/schemas/Sak'
       security:
         - azure: [ ]
 
-  /dagpenger/datadeling/v1/nks/saker/{sakId}:
+  /dagpenger/datadeling/v1/saker/{sakId}:
     get:
       description: |-
         Henter én sak. Svaret er tynt som standard;
         bruk `include` for å ta med meldekort og/eller beregninger.
       tags:
         - Internt
-        - NKS
+        - Sak
       parameters:
         - name: sakId
           in: path
@@ -269,14 +271,14 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/NksSakInkluder'
+              $ref: '#/components/schemas/SakInkluder'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NksSak'
+                $ref: '#/components/schemas/Sak'
         404:
           description: Saken finnes ikke
       security:
@@ -594,24 +596,24 @@ components:
       type: string
       format: uuid
 
-    NksSakInkluder:
+    SakInkluder:
       type: string
       enum:
         - meldekort
         - beregninger
 
-    NksSak:
+    Sak:
       description: En sak, det vil si en sammenhengende behandlingskjede. Diskriminert på `status`.
       oneOf:
-        - $ref: '#/components/schemas/NksSakTilBehandling'
-        - $ref: '#/components/schemas/NksSakLoepende'
-        - $ref: '#/components/schemas/NksSakAvsluttet'
+        - $ref: '#/components/schemas/SakTilBehandling'
+        - $ref: '#/components/schemas/SakLoepende'
+        - $ref: '#/components/schemas/SakAvsluttet'
       discriminator:
         propertyName: status
         mapping:
-          TilBehandling: '#/components/schemas/NksSakTilBehandling'
-          Løpende: '#/components/schemas/NksSakLoepende'
-          Avsluttet: '#/components/schemas/NksSakAvsluttet'
+          TilBehandling: '#/components/schemas/SakTilBehandling'
+          Løpende: '#/components/schemas/SakLoepende'
+          Avsluttet: '#/components/schemas/SakAvsluttet'
 
     Soknad:
       description: En søknad om dagpenger i saken. Tilstand går fra Innsendt via UnderBehandling til Ferdig eller Avbrutt.
@@ -642,7 +644,7 @@ components:
         - Ferdig
         - Avbrutt
 
-    NksSakBase:
+    SakBase:
       type: object
       required:
         - sakId
@@ -660,10 +662,10 @@ components:
           items:
             $ref: '#/components/schemas/Meldekort'
 
-    NksSakTilBehandling:
+    SakTilBehandling:
       description: Saken har ingen rettighetsperiode (ennå). Gjelder også saker uten behandlingsresultat og saker som ikke ga rett til dagpenger. Se soknader for søknadenes tilstand.
       allOf:
-        - $ref: '#/components/schemas/NksSakBase'
+        - $ref: '#/components/schemas/SakBase'
         - type: object
           required:
             - status
@@ -672,10 +674,10 @@ components:
               type: string
               enum: [TilBehandling]
 
-    NksSakLoepende:
+    SakLoepende:
       description: Bruker har løpende rett på dagpenger
       allOf:
-        - $ref: '#/components/schemas/NksSakBase'
+        - $ref: '#/components/schemas/SakBase'
         - type: object
           required:
             - status
@@ -689,7 +691,7 @@ components:
               description: Alle rettighetsperioder i saken, sortert på fraOgMed, inkludert perioder uten rett (pause)
               type: array
               items:
-                $ref: '#/components/schemas/NksRettighetsperiode'
+                $ref: '#/components/schemas/Rettighetsperiode'
             beregninger:
               description: Beregninger per dag. Kun med include=beregninger
               type: array
@@ -698,16 +700,16 @@ components:
             sisteMeldeperiode:
               $ref: '#/components/schemas/LukketPeriode'
             gjenstående:
-              $ref: '#/components/schemas/NksGjenstaaende'
+              $ref: '#/components/schemas/Gjenstaaende'
             sistEndret:
               description: Tidspunktet siste ferdigstilte behandling i saken ble ferdig
               type: string
               format: date-time
 
-    NksSakAvsluttet:
+    SakAvsluttet:
       description: Rettigheten er avsluttet
       allOf:
-        - $ref: '#/components/schemas/NksSakBase'
+        - $ref: '#/components/schemas/SakBase'
         - type: object
           required:
             - status
@@ -721,7 +723,7 @@ components:
               description: Alle rettighetsperioder i saken, sortert på fraOgMed, inkludert perioder uten rett (pause)
               type: array
               items:
-                $ref: '#/components/schemas/NksRettighetsperiode'
+                $ref: '#/components/schemas/Rettighetsperiode'
             beregninger:
               description: Beregninger per dag. Kun med include=beregninger
               type: array
@@ -731,7 +733,7 @@ components:
               type: string
               format: date-time
 
-    NksGjenstaaende:
+    Gjenstaaende:
       description: Gjenstående dager i rettigheten
       type: object
       properties:
@@ -745,7 +747,7 @@ components:
           description: Antall gjenstående dager med tidsbegrenset bortfall
           type: integer
 
-    NksRettighetsperiode:
+    Rettighetsperiode:
       type: object
       required:
         - fraOgMed

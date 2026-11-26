@@ -16,7 +16,7 @@ import no.nav.dagpenger.behandling.OboDagpengerStatusKonsument
 import no.nav.dagpenger.behandling.PerioderService
 import no.nav.dagpenger.behandling.SammensattKonsument
 import no.nav.dagpenger.behandling.arena.ProxyClientArena
-import no.nav.dagpenger.datadeling.api.NksSakService
+import no.nav.dagpenger.datadeling.api.SakService
 import no.nav.dagpenger.datadeling.api.datadelingApi
 import no.nav.dagpenger.datadeling.api.ressurs.LeaderElector
 import no.nav.dagpenger.datadeling.api.ressurs.RessursDao
@@ -55,7 +55,7 @@ internal class ApplicationBuilder(
     private val meldekortService = MeldekortService(meldekortregisterClient, meldepliktAdapterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val søknadsbehandlingRepository = SøknadsbehandlingRepositoryPostgresql()
-    private val nksSakService = NksSakService(tolker, meldekortService, SøknadBehandlingGrafPostgresql(tolker))
+    private val sakService = SakService(tolker, meldekortService, SøknadBehandlingGrafPostgresql(tolker))
     private val leaderElector = LeaderElector(config)
     private val ressursDao = RessursDao()
     private val ressursService = RessursService(ressursDao, leaderElector, config.ressurs)
@@ -75,7 +75,7 @@ internal class ApplicationBuilder(
                             beregningerService = beregningerService,
                             dagpengestatusService = dagpengestatusService,
                             ressursService = ressursService,
-                            nksSakService = nksSakService,
+                            sakService = sakService,
                         )
                     }
                 },

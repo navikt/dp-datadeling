@@ -39,7 +39,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.test.Test
 
-class NksRoutesTest {
+class SakRoutesTest {
     private val idag = LocalDate.now()
     private val sakId = UUID.fromString("11111111-1111-1111-1111-111111111111")
     private val annenSakId = UUID.fromString("22222222-2222-2222-2222-222222222222")
@@ -48,7 +48,7 @@ class NksRoutesTest {
     private val repository = mockk<BehandlingResultatRepositoryMedTolker>()
     private val meldekortService = mockk<MeldekortService>()
     private val graf = FakeSøknadBehandlingGraf()
-    private val nksSakService = NksSakService(repository, meldekortService, graf)
+    private val sakService = SakService(repository, meldekortService, graf)
     private val søknadId = UUID.fromString("33333333-3333-3333-3333-333333333333")
     private val innsendt = LocalDateTime.of(2024, 2, 1, 9, 30, 0)
 
@@ -62,25 +62,25 @@ class NksRoutesTest {
 
     private val token get() = issueAzureToken(azpRoles = listOf(Tilgangsrolle.nks.name))
 
-    private val sakerUrl = "/dagpenger/datadeling/v1/nks/saker"
+    private val sakerUrl = "/dagpenger/datadeling/v1/saker"
 
     @Test
     fun `returnerer 401 uten token`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             client.testPost(sakerUrl, enDatadelingRequest(), token = null).status shouldBe HttpStatusCode.Unauthorized
             client.testGet("$sakerUrl/$sakId", token = null).status shouldBe HttpStatusCode.Unauthorized
         }
 
     @Test
     fun `returnerer 403 uten riktig rolle`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             client.testPost(sakerUrl, enDatadelingRequest(), issueAzureToken(azpRoles = listOf("ROLE"))).status shouldBe
                 HttpStatusCode.Forbidden
         }
 
     @Test
     fun `returnerer tom liste når personen ikke har saker`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns emptyList()
 
             val response = client.testPost(sakerUrl, enDatadelingRequest(), token)
@@ -91,7 +91,7 @@ class NksRoutesTest {
 
     @Test
     fun `returnerer tynne saker uten meldekort og beregninger som standard`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
 
             val response = client.testPost(sakerUrl, enDatadelingRequest(), token)
@@ -116,7 +116,7 @@ class NksRoutesTest {
 
     @Test
     fun `include=meldekort tar med meldekort men ikke beregninger`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
             coEvery { meldekortService.hentMeldekort(any()) } returns listOf(etMeldekort("mk-1"))
 
@@ -129,7 +129,7 @@ class NksRoutesTest {
 
     @Test
     fun `include=beregninger tar med beregninger men ikke meldekort`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
 
             val body = client.testPost("$sakerUrl?include=beregninger", enDatadelingRequest(), token).bodyAsText()
@@ -144,7 +144,7 @@ class NksRoutesTest {
 
     @Test
     fun `include=meldekort,beregninger tar med begge`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
             coEvery { meldekortService.hentMeldekort(any()) } returns listOf(etMeldekort("mk-1"))
 
@@ -157,7 +157,7 @@ class NksRoutesTest {
 
     @Test
     fun `sak med resultat uten periode og uten søknader er TilBehandling uten soknader`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns
                 listOf(Sak(sakId, listOf(SakBehandling(opprettet, behandling(perioder = emptyList())))))
 
@@ -167,7 +167,7 @@ class NksRoutesTest {
 
     @Test
     fun `sak med resultat uten periode og med avbrutt søknad er TilBehandling med søknaden`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns
                 listOf(Sak(sakId, listOf(SakBehandling(opprettet, behandling(perioder = emptyList())))))
             graf.søknadsbehandlinger =
@@ -180,7 +180,7 @@ class NksRoutesTest {
 
     @Test
     fun `sak med resultat uten periode men med søknad under behandling er TilBehandling med tomme meldekort`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns
                 listOf(Sak(sakId, listOf(SakBehandling(opprettet, behandling(perioder = emptyList())))))
             graf.søknadsbehandlinger = listOf(enSøknadsbehandling(sakId))
@@ -202,7 +202,7 @@ class NksRoutesTest {
 
     @Test
     fun `løpende sak får alle søknader, nyeste først, med utfall bare når ferdig`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             val eldre = UUID.fromString("44444444-4444-4444-4444-444444444444")
             every { repository.hentSaker(any()) } returns listOf(enLøpendeSak())
             graf.søknadsbehandlinger =
@@ -221,7 +221,7 @@ class NksRoutesTest {
 
     @Test
     fun `pause i løpende sak er Løpende med siste rettighetsperiode uten rett`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             val pause =
                 Sak(
                     sakId,
@@ -249,7 +249,7 @@ class NksRoutesTest {
 
     @Test
     fun `avsluttet sak serialiseres med tilOgMed og uten gjenstående dager`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             val fra = idag.minusDays(100)
             val til = idag.minusDays(10)
             every { repository.hentSaker(any()) } returns
@@ -277,7 +277,7 @@ class NksRoutesTest {
 
     @Test
     fun `returnerer flere saker med ulik status`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns
                 listOf(
                     enLøpendeSak(),
@@ -295,7 +295,7 @@ class NksRoutesTest {
 
     @Test
     fun `henter enkelt sak med meldekort og beregninger`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSak(sakId) } returns enLøpendeSak()
             coEvery { meldekortService.hentMeldekort(any()) } returns listOf(etMeldekort("mk-1"))
 
@@ -311,7 +311,7 @@ class NksRoutesTest {
 
     @Test
     fun `henter enkelt sak uten include som tynn sak`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSak(sakId) } returns enLøpendeSak()
 
             val sak = objectMapper.readTree(client.testGet("$sakerUrl/$sakId", token).bodyAsText())
@@ -322,7 +322,7 @@ class NksRoutesTest {
 
     @Test
     fun `returnerer 404 for ukjent sakId`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSak(any()) } returns null
 
             client.testGet("$sakerUrl/${UUID.randomUUID()}", token).status shouldBe HttpStatusCode.NotFound
@@ -330,7 +330,7 @@ class NksRoutesTest {
 
     @Test
     fun `søknad med sak men uten resultat er TilBehandling i liste og ved oppslag`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns emptyList()
             every { repository.hentSak(annenSakId) } returns null
             graf.søknadsbehandlinger = listOf(enSøknadsbehandling(annenSakId))
@@ -343,7 +343,7 @@ class NksRoutesTest {
 
     @Test
     fun `kun avbrutt søknad uten resultat er likevel en sak med status TilBehandling`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns emptyList()
             every { repository.hentSak(annenSakId) } returns null
             val avbrutt = listOf(enSøknadsbehandling(annenSakId, SøknadsbehandlingTilstand.Avbrutt))
@@ -358,7 +358,7 @@ class NksRoutesTest {
 
     @Test
     fun `innsendt søknad uten sak vises ikke i listen, mens Innsendt med sak mappes`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns emptyList()
             val utenSak = enSøknadsbehandling(sakId, SøknadsbehandlingTilstand.Innsendt, UUID.randomUUID()).copy(sakId = null)
             graf.søknadsbehandlinger =
@@ -373,7 +373,7 @@ class NksRoutesTest {
 
     @Test
     fun `søknad med flere behandlinger i samme sak vises én gang med siste behandlings tilstand`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns emptyList()
             graf.søknadsbehandlinger =
                 listOf(
@@ -389,7 +389,7 @@ class NksRoutesTest {
 
     @Test
     fun `returnerer 400 for ugyldig include-verdi`() =
-        testEndepunkter(nksSakService = nksSakService) {
+        testEndepunkter(sakService = sakService) {
             every { repository.hentSaker(any()) } returns emptyList()
 
             client.testPost("$sakerUrl?include=meldekort,ugyldig", enDatadelingRequest(), token).status shouldBe
