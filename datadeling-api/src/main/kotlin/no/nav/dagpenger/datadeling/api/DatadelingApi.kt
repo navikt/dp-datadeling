@@ -15,6 +15,7 @@ import no.nav.dagpenger.datadeling.Config
 import no.nav.dagpenger.datadeling.api.config.authentication
 import no.nav.dagpenger.datadeling.api.plugins.configureConsumerContext
 import no.nav.dagpenger.datadeling.api.plugins.configureMetrics
+import no.nav.dagpenger.datadeling.api.plugins.configureStatusPages
 import no.nav.dagpenger.datadeling.api.ressurs.RessursService
 import no.nav.dagpenger.datadeling.objectMapper
 import no.nav.dagpenger.meldekort.MeldekortService
@@ -33,6 +34,7 @@ fun Application.datadelingApi(
     install(ContentNegotiation) {
         register(ContentType.Application.Json, JacksonConverter(objectMapper))
     }
+    configureStatusPages()
     authentication(config)
     configureConsumerContext()
     configureMetrics()

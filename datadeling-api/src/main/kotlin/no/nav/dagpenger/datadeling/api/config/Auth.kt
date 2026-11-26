@@ -59,13 +59,6 @@ val ApplicationCall.applicationId
             .takeUnless { it.isNullOrBlank() }
             ?: "n/a"
 
-fun ApplicationCall.clientId(): String =
-    principal<JWTPrincipal>()
-        ?.payload
-        ?.getClaim("azp")
-        ?.asString()
-        ?: throw IllegalArgumentException("Fant ikke clientId i jwt")
-
 fun AuthenticationConfig.jwtAuth(
     name: String,
     config: IssuerConfig,

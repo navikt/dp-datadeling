@@ -132,4 +132,35 @@ class BeregningerRouteTest {
                 """.trimIndent()
         }
     }
+
+    @Test
+    fun `returnerer 400 ved ugyldig body`() {
+        testEndepunkter {
+            val response =
+                client.testPost(
+                    "/dagpenger/datadeling/v1/beregninger",
+                    "ikke et gyldig request-objekt",
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.beregninger.name)),
+                )
+
+            response.status shouldBe HttpStatusCode.BadRequest
+        }
+    }
+
+    @Test
+    fun `returnerer 500 når tjenesten kaster uventet feil`() {
+        val beregningerService = mockk<BeregningerService>()
+        coEvery { beregningerService.hentBeregninger(any()) } throws IllegalStateException("databasen er nede")
+
+        testEndepunkter(beregningerService = beregningerService) {
+            val response =
+                client.testPost(
+                    "/dagpenger/datadeling/v1/beregninger",
+                    enDatadelingRequest(),
+                    issueAzureToken(azpRoles = listOf(Tilgangsrolle.beregninger.name)),
+                )
+
+            response.status shouldBe HttpStatusCode.InternalServerError
+        }
+    }
 }
