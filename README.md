@@ -23,7 +23,7 @@ Eksterne kall via Maskinporten krever at organisasjonen er registrert som konsum
 ## Arkitektur
 
 - **Inn:** Appen er koblet til Rapids & Rivers på Kafka og lagrer behandlingsresultater og søknader i Postgres (Cloud SQL).
-- **Ut:** Appen svarer på kall ved å lese fra Postgres og slå opp i dp-proxy (Arena), dp-meldekortregister og dp-arena-meldeplikt-adapter. Når den mottar et behandlingsresultat, publiserer den en OBO-melding til Kafka-topicet `obo.ytelser-v1`.
+- **Ut:** Appen svarer på kall ved å lese fra Postgres og slå opp i dp-proxy (Arena), dp-meldekort og dp-arena-meldeplikt-adapter. Når den mottar et behandlingsresultat, publiserer den en OBO-melding til Kafka-topicet `obo.ytelser-v1`.
 - **Leader election:** Én pod rydder bort gamle ressurser.
 - **Migreringer:** Flyway kjører ved oppstart.
 

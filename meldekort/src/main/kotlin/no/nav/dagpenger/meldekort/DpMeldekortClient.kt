@@ -11,13 +11,13 @@ import no.nav.dagpenger.datadeling.models.DatadelingRequestDTO
 import no.nav.dagpenger.datadeling.models.MeldekortDTO
 import no.nav.dagpenger.ktor.client.defaultHttpClient
 
-class MeldekortregisterClient(
-    private val dpMeldekortregisterUrl: String,
+class DpMeldekortClient(
+    private val dpMeldekortUrl: String,
     private val tokenProvider: () -> String,
 ) {
     suspend fun hentMeldekort(request: DatadelingRequestDTO) =
         defaultHttpClient
-            .post("$dpMeldekortregisterUrl/datadeling/meldekort") {
+            .post("$dpMeldekortUrl/datadeling/meldekort") {
                 bearerAuth(tokenProvider.invoke())
                 header(HttpHeaders.Accept, ContentType.Application.Json)
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
