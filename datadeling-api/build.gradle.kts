@@ -54,7 +54,7 @@ dependencies {
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.json)
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+    testImplementation("org.awaitility:awaitility-kotlin:4.4.0")
     testImplementation(testFixtures(project(":behandling")))
     testImplementation(project(":dato"))
 }
