@@ -11,8 +11,8 @@ import no.nav.dagpenger.datadeling.models.MeldekortKildeDTO
 import no.nav.dagpenger.datadeling.models.MeldekortKildeDTORolleDTO
 import no.nav.dagpenger.datadeling.models.MeldekortPeriodeDTO
 import no.nav.dagpenger.datadeling.models.OpprettetAvDTO
+import no.nav.dagpenger.meldekort.DpMeldekortClient
 import no.nav.dagpenger.meldekort.MeldekortService
-import no.nav.dagpenger.meldekort.MeldekortregisterClient
 import no.nav.dagpenger.meldekort.MeldepliktAdapterClient
 import no.nav.dagpenger.meldekort.Periode
 import no.nav.dagpenger.meldekort.Rapporteringsperiode
@@ -29,9 +29,9 @@ import kotlin.test.assertEquals
 
 class MeldekortServiceTest {
     private val ident = "01020312345"
-    private val meldekortregisterClient =
-        MeldekortregisterClient(
-            dpMeldekortregisterUrl = "http://localhost:8093",
+    private val dpMeldekortClient =
+        DpMeldekortClient(
+            dpMeldekortUrl = "http://localhost:8093",
             tokenProvider = { "token" },
         )
     private val meldepliktAdapterClient =
@@ -39,7 +39,7 @@ class MeldekortServiceTest {
             dpMeldepliktAdapterUrl = "http://localhost:8093",
             tokenProvider = { "token" },
         )
-    private val meldekortService = MeldekortService(meldekortregisterClient, meldepliktAdapterClient)
+    private val meldekortService = MeldekortService(dpMeldekortClient, meldepliktAdapterClient)
 
     companion object {
         private lateinit var proxyMockServer: WireMockServer
@@ -66,7 +66,7 @@ class MeldekortServiceTest {
     }
 
     @Test
-    fun `ingen meldekort`() {
+    fun `ingen meldekort fra dp-meldekort`() {
         val fom = LocalDate.now().minusDays(14)
         val tom = LocalDate.now()
         val request = enDatadelingRequest(fom, tom)
@@ -79,7 +79,7 @@ class MeldekortServiceTest {
     }
 
     @Test
-    fun `ett meldekort fra meldekortregister`() {
+    fun `ett meldekort fra dp-meldekort`() {
         val fom = LocalDate.now().minusDays(14)
         val tom = LocalDate.now()
         val request = enDatadelingRequest(fom, tom)
@@ -96,7 +96,7 @@ class MeldekortServiceTest {
     }
 
     @Test
-    fun `flere meldekort fra meldekortregister`() {
+    fun `flere meldekort fra dp-meldekort`() {
         val fom = LocalDate.now().minusDays(14)
         val tom = LocalDate.now()
         val request = enDatadelingRequest(fom, tom)
@@ -333,7 +333,7 @@ class MeldekortServiceTest {
     }
 
     private fun mockResponse(
-        meldekortregisterResponse: List<MeldekortDTO>,
+        dpMeldekortResponse: List<MeldekortDTO>,
         meldepliktAdapterInnsendteResponse: List<Rapporteringsperiode> = emptyList(),
         meldepliktAdapterTilUtfyllingResponse: List<Rapporteringsperiode> = emptyList(),
         delayMs: Int = 0,
@@ -344,7 +344,7 @@ class MeldekortServiceTest {
                 .willReturn(
                     WireMock
                         .jsonResponse(
-                            ObjectMapper().writeValueAsString(meldekortregisterResponse),
+                            ObjectMapper().writeValueAsString(dpMeldekortResponse),
                             200,
                         ).withFixedDelay(delayMs),
                 ),

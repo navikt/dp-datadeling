@@ -26,8 +26,8 @@ import no.nav.dagpenger.datadeling.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.datadeling.db.SøknadBehandlingGrafPostgresql
 import no.nav.dagpenger.datadeling.db.SøknadRepositoryPostgresql
 import no.nav.dagpenger.datadeling.db.SøknadsbehandlingRepositoryPostgresql
+import no.nav.dagpenger.meldekort.DpMeldekortClient
 import no.nav.dagpenger.meldekort.MeldekortService
-import no.nav.dagpenger.meldekort.MeldekortregisterClient
 import no.nav.dagpenger.meldekort.MeldepliktAdapterClient
 import no.nav.dagpenger.søknad.SøknadMottak
 import no.nav.dagpenger.søknad.SøknadRepository
@@ -43,7 +43,7 @@ internal class ApplicationBuilder(
 ) : RapidsConnection.StatusListener {
     private val behandlingResultatRepositoryPostgresql = BehandlingResultatRepositoryPostgresql()
     private val config = Config.appConfig
-    private val meldekortregisterClient = MeldekortregisterClient(Config.dpMeldekortregisterUrl, Config.dpMeldekortregisterTokenProvider)
+    private val dpMeldekortClient = DpMeldekortClient(Config.dpMeldekortUrl, Config.dpMeldekortTokenProvider)
     private val meldepliktAdapterClient = MeldepliktAdapterClient(Config.dpMeldepliktAdapterUrl, Config.dpMeldepliktAdapterTokenProvider)
     private val proxyClient = ProxyClientArena(Config.dpProxyUrl, Config.dpProxyTokenProvider)
 
@@ -52,7 +52,7 @@ internal class ApplicationBuilder(
     private val perioderService = PerioderService(proxyClient, tolker)
     private val beregningerService = BeregningerService(proxyClient, tolker)
     private val dagpengestatusService = DagpengestatusService(DagpengestatusRepository(behandlingResultatRepositoryPostgresql))
-    private val meldekortService = MeldekortService(meldekortregisterClient, meldepliktAdapterClient)
+    private val meldekortService = MeldekortService(dpMeldekortClient, meldepliktAdapterClient)
     private val søknadRepository: SøknadRepository = SøknadRepositoryPostgresql()
     private val søknadsbehandlingRepository = SøknadsbehandlingRepositoryPostgresql()
     private val sakService = SakService(tolker, meldekortService, SøknadBehandlingGrafPostgresql(tolker))

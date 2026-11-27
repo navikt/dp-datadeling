@@ -81,11 +81,11 @@ internal object Config {
         properties[Key("DP_DATADELING_URL", stringType)]
     }
 
-    val dpMeldekortregisterUrl by lazy {
-        properties[Key("DP_MELDEKORTREGISTER_URL", stringType)]
+    val dpMeldekortUrl by lazy {
+        properties[Key("DP_MELDEKORT_URL", stringType)]
     }
-    val dpMeldekortregisterTokenProvider by lazy {
-        azureAdTokenSupplier(properties[Key("DP_MELDEKORTREGISTER_SCOPE", stringType)])
+    val dpMeldekortTokenProvider by lazy {
+        azureAdTokenSupplier(properties[Key("DP_MELDEKORT_SCOPE", stringType)])
     }
 
     val dpMeldepliktAdapterUrl by lazy {

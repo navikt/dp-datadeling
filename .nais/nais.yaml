@@ -57,7 +57,6 @@ spec:
         {{/each}}
     outbound:
       rules:
-        - application: dp-meldekortregister
         - application: dp-meldekort
         - application: dp-arena-meldeplikt-adapter
         - application: logging
@@ -66,10 +65,10 @@ spec:
         - host: "{{ dpProxyHost }}"
   leaderElection: true
   env:
-    - name: DP_MELDEKORTREGISTER_URL
-      value: http://{{ dpMeldekortregisterHost }}
-    - name: DP_MELDEKORTREGISTER_SCOPE
-      value: "{{ dpMeldekortregisterScope }}"
+    - name: DP_MELDEKORT_URL
+      value: http://{{ dpMeldekortHost }}
+    - name: DP_MELDEKORT_SCOPE
+      value: "{{ dpMeldekortScope }}"
     - name: DP_MELDEPLIKT_ADAPTER_URL
       value: http://{{ dpMeldepliktAdapterHost }}
     - name: DP_MELDEPLIKT_ADAPTER_SCOPE
